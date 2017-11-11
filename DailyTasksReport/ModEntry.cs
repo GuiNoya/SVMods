@@ -175,7 +175,7 @@ namespace DailyTasksReport
         {
             foreach (KeyValuePair<Vector2, StardewValley.Object> pair in farmCave.objects)
             {
-                if (pair.Value.parentSheetIndex == 128 && pair.Value.heldObject != null)
+                if (pair.Value.parentSheetIndex == 128 && pair.Value.heldObject != null && pair.Value.readyForHarvest)
                 {
                     report.AddFarmCaveObject(pair.Value.heldObject);
                 }
