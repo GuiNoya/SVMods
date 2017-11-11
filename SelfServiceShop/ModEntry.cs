@@ -24,7 +24,8 @@ namespace SelfServiceShop
 
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
         {
-            if (e.IsActionButton && Game1.activeClickableMenu == null)
+            e.Button.TryGetController(out Buttons button);
+            if (Context.IsWorldReady && Context.IsPlayerFree && Game1.activeClickableMenu == null && (e.IsActionButton || button == Buttons.A))
             {
                 string property = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
                 switch (property)
