@@ -18,10 +18,11 @@ namespace DailyTasksReport
         IList<Tuple<Vector2, string>> unharvestedCropsInGreenhouse = new List<Tuple<Vector2, string>>();
         IList<Tuple<Vector2, string>> deadCropsInFarm = new List<Tuple<Vector2, string>>();
         IList<Tuple<Vector2, string>> deadCropsInGreenhouse = new List<Tuple<Vector2, string>>();
-        bool petExists = false;
+        internal bool petExists = false;
         bool petWasPetted = true;
         bool petBowlFilled = true;
         IList<FarmAnimal> unpettedAnimals = new List<FarmAnimal>();
+        IList<FarmAnimal> uncollectedAnimalProductFromAnimal = new List<FarmAnimal>();
         IList<Tuple<Building, int>> missingHay = new List<Tuple<Building, int>>();
         int totalHay = 0;
         string farmCaveChoice;
@@ -30,6 +31,7 @@ namespace DailyTasksReport
         IList<Tuple<CrabPot, string>> uncollectedCrabpots = new List<Tuple<CrabPot, string>>();
         IList<Tuple<CrabPot, string>> notBaitedCrabpots = new List<Tuple<CrabPot, string>>();
         IList<Tuple<StardewValley.Object, string>> uncollectedTappers = new List<Tuple<StardewValley.Object, string>>();
+
 
         public ReportBuilder(ModEntry parent)
         {
@@ -63,6 +65,8 @@ namespace DailyTasksReport
                 stringBuilder.Append($"You did not pet your pet today.^");
             if (unpettedAnimals.Count > 0 && (++count > 0))
                 stringBuilder.Append($"Not petted animals: {unpettedAnimals.Count}^");
+            if (uncollectedAnimalProductFromAnimal.Count > 0 && (++count > 0))
+                stringBuilder.Append($"Uncollected animal products: {uncollectedAnimalProductFromAnimal.Count}^");
             if (totalHay > 0 && (++count > 0))
                 stringBuilder.Append($"Empty hay spots on feeding benches: {totalHay}^");
             if (objectsInFarmCave.Count > 0 && (++count > 0))
@@ -126,6 +130,21 @@ namespace DailyTasksReport
                     {
                         stringBuilder.Append($"{animal.type} {animal.displayName}^");
                         count++;
+                    }
+
+                    NextPage(ref stringBuilder, ref count);
+                }
+
+                if (uncollectedAnimalProductFromAnimal.Count > 0)
+                {
+                    stringBuilder.Append("Animal products:^");
+                    ++count;
+
+                    foreach (FarmAnimal animal in uncollectedAnimalProductFromAnimal)
+                    {
+                        string produceName = Game1.objectInformation[animal.currentProduce].Split("/".ToCharArray(), 2)[0];
+                        stringBuilder.Append($"{animal.type} {animal.displayName} has {produceName}^");
+                        ++count;
                     }
 
                     NextPage(ref stringBuilder, ref count);
@@ -206,7 +225,12 @@ namespace DailyTasksReport
 
             return stringBuilder.ToString();
         }
-        
+
+        internal void AddUncollectedAnimalProduct(FarmAnimal farmAnimal)
+        {
+            uncollectedAnimalProductFromAnimal.Add(farmAnimal);
+        }
+
         private string Pluralize(string name, int number)
         {
             if (number < 2)
@@ -265,11 +289,6 @@ namespace DailyTasksReport
                 parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
         }
 
-        internal void FoundPet()
-        {
-            petExists = true;
-        }
-
         internal void PetWasNotPetted()
         {
             petWasPetted = false;
@@ -324,6 +343,7 @@ namespace DailyTasksReport
             deadCropsInFarm.Clear();
             deadCropsInGreenhouse.Clear();
             unpettedAnimals.Clear();
+            uncollectedAnimalProductFromAnimal.Clear();
             petExists = false;
             petBowlFilled = true;
             petWasPetted = true;

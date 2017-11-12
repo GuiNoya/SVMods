@@ -1,10 +1,10 @@
 ﻿{
 	"Name": "DailyTasksReport",
 	"Author": "GuiNoya",
-	"Version": "1.0.1",
+	"Version": "1.1",
 	"Description": "Shows information about some daily tasks in your farm",
 	"UniqueID": "GuiNoya.DailyTasksReport",
 	"EntryDll": "DailyTasksReport.dll",
-	"MinimumApiLevel": "2.0",
+	"MinimumApiLevel": "2.1",
 	"UpdateKeys": [ "Nexus:1624", "GitHub:GuiNoya/SVMods" ]
 }

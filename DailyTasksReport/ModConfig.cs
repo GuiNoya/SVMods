@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
+﻿using Newtonsoft.Json;
 using StardewModdingAPI;
+using System.Collections.Generic;
 
 namespace DailyTasksReport
 {
@@ -21,6 +22,20 @@ namespace DailyTasksReport
         public bool UnfilledPetBowl { get; set; } = true;
         /// <summary> Check or not for unpetted animals in your farm. </summary>
         public bool UnpettedAnimals { get; set; } = true;
+        /// <summary> Check or not if that are animal products ready to collect. </summary>
+        [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Auto)]
+        public Dictionary<string, bool> AnimalProducts { get; set; } = new Dictionary<string, bool>() {
+                                                                                   //{ "Chicken egg", true },
+                                                                                   //{ "Dinosaur egg", true }
+                                                                                   //{ "Duck egg", true},
+                                                                                   //{ "Duck feather", true },
+                                                                                   { "Cow milk", true },
+                                                                                   { "Goat milk", true },
+                                                                                   { "Sheep wool", true }
+                                                                                   //{ "Truffle", true},
+                                                                                   //{ "Rabit's foot", true },
+                                                                                   //{ "Slime", true }
+                                                                                   };
         /// <summary> Check or not if the feeding benches are not full. </summary>
         public bool MissingHay { get; set; } = true;
         /// <summary> Check or not if there is something in the farm cave. </summary>

@@ -19,6 +19,8 @@ namespace DailyTasksReport
         internal ModConfig config;
         private ReportBuilder report;
 
+        internal bool checkAnimalProducts;
+
         private static readonly int[] fruits = new int[] { 296, 396, 406, 410, 613, 634, 635, 636, 637, 638 };
 
         /*********
@@ -29,6 +31,8 @@ namespace DailyTasksReport
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<ModConfig>();
+            checkAnimalProducts = config.AnimalProducts.ContainsValue(true);
+
             report = new ReportBuilder(this);
             
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
@@ -62,8 +66,8 @@ namespace DailyTasksReport
                     }
                     if (location is Farm farm)
                     {
-                        if (config.UnpettedAnimals)
-                            CheckForUnpettedAnimals(farm);
+                        if (config.UnpettedAnimals || config.AnimalProducts.ContainsValue(true))
+                            CheckAnimals(farm);
                         if (config.UnfilledPetBowl)
                             CheckForUnfilledPetBowl(farm);
                     }
@@ -94,7 +98,6 @@ namespace DailyTasksReport
             {
                 if (pair.Value.name == "Tapper" && pair.Value.readyForHarvest)
                 {
-                    Monitor.Log($"{pair.Value.name} {pair.Value.tileLocation == pair.Key} {pair.Key} {pair.Value.tileLocation}");
                     report.AddTapper(pair.Value, location.name);
                 }
             }
@@ -141,7 +144,7 @@ namespace DailyTasksReport
                     bool wasPettedToday = Helper.Reflection.GetPrivateValue<bool>(pet, "wasPetToday");
                     if (!wasPettedToday)
                         report.PetWasNotPetted();
-                    report.FoundPet();
+                    report.petExists = true;
                     return;
                 }
             }
@@ -155,13 +158,20 @@ namespace DailyTasksReport
             }
         }
 
-        private void CheckForUnpettedAnimals(Farm farm)
+        private void CheckAnimals(Farm farm)
         {
             foreach (FarmAnimal farmAnimal in farm.getAllFarmAnimals())
             {
-                if (!farmAnimal.wasPet)
+                if (config.UnpettedAnimals && !farmAnimal.wasPet)
                 {
                     report.AddUnpettedAnimal(farmAnimal);
+                }
+                if (checkAnimalProducts  && farmAnimal.currentProduce > 0)
+                {
+                    if ((farmAnimal.type.Contains("Cow") && config.AnimalProducts["Cow milk"]) || 
+                        (farmAnimal.type.Contains("Goat") && config.AnimalProducts["Goat milk"]) ||
+                        (farmAnimal.type.Contains("Sheep") && config.AnimalProducts["Sheep wool"]))
+                            report.AddUncollectedAnimalProduct(farmAnimal);
                 }
             }
         }
