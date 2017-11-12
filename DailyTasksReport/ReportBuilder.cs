@@ -29,6 +29,7 @@ namespace DailyTasksReport
         int caveObjectsCount = 0;
         IList<Tuple<CrabPot, string>> uncollectedCrabpots = new List<Tuple<CrabPot, string>>();
         IList<Tuple<CrabPot, string>> notBaitedCrabpots = new List<Tuple<CrabPot, string>>();
+        IList<Tuple<StardewValley.Object, string>> uncollectedTappers = new List<Tuple<StardewValley.Object, string>>();
 
         public ReportBuilder(ModEntry parent)
         {
@@ -70,6 +71,8 @@ namespace DailyTasksReport
                 stringBuilder.Append($"Crabpots ready to collect: {uncollectedCrabpots.Count}^");
             if (notBaitedCrabpots.Count > 0 && (++count > 0))
                 stringBuilder.Append($"Crabpots not baited: {notBaitedCrabpots.Count}^");
+            if (uncollectedTappers.Count > 0 && (++count > 0))
+                stringBuilder.Append($"Uncollected tappers: {uncollectedTappers.Count}^");
 
             if (count == 0)
             {
@@ -81,7 +84,7 @@ namespace DailyTasksReport
             {
                 NextPage(ref stringBuilder, ref count);
 
-                if (parent.config.UnwateredCrops && (unwateredCropsInFarm.Count > 0 || unwateredCropsInGreenhouse.Count > 0))
+                if (unwateredCropsInFarm.Count > 0 || unwateredCropsInGreenhouse.Count > 0)
                 {
                     stringBuilder.Append("Unwatered crops:^");
                     count++;
@@ -92,7 +95,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.UnharvestedCrops && (unharvestedCropsInFarm.Count > 0 || unharvestedCropsInGreenhouse.Count > 0))
+                if (unharvestedCropsInFarm.Count > 0 || unharvestedCropsInGreenhouse.Count > 0)
                 {
                     stringBuilder.Append("Ready to harvest crops:^");
                     count++;
@@ -103,7 +106,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.DeadCrops && deadCropsInFarm.Count > 0 || deadCropsInGreenhouse.Count > 0)
+                if (deadCropsInFarm.Count > 0 || deadCropsInGreenhouse.Count > 0)
                 {
                     stringBuilder.Append("Dead Crops:^");
                     count++;
@@ -114,7 +117,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.UnpettedAnimals && unpettedAnimals.Count > 0)
+                if (unpettedAnimals.Count > 0)
                 {
                     stringBuilder.Append("Unpetted animals:^");
                     count++;
@@ -128,7 +131,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.MissingHay && totalHay > 0)
+                if (totalHay > 0)
                 {
                     stringBuilder.Append("Feedbenches not full of hay:^");
                     count++;
@@ -145,7 +148,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.FarmCave && objectsInFarmCave.Count > 0)
+                if (objectsInFarmCave.Count > 0)
                 {
                     stringBuilder.Append($"{farmCaveChoice} in the farm cave:^");
                     count++;
@@ -160,7 +163,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.UncollectedCrabpots && uncollectedCrabpots.Count > 0)
+                if (uncollectedCrabpots.Count > 0)
                 {
                     stringBuilder.Append("Uncollected crabpots:^");
                     count++;
@@ -174,7 +177,7 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (parent.config.NotBaitedCrabpots && notBaitedCrabpots.Count > 0)
+                if (notBaitedCrabpots.Count > 0)
                 {
                     stringBuilder.Append("Crabpots still not baited:^");
                     ++count;
@@ -184,12 +187,26 @@ namespace DailyTasksReport
                         stringBuilder.Append($"{t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
                         count++;
                     }
+
+                    NextPage(ref stringBuilder, ref count);
+                }
+
+                if (uncollectedTappers.Count > 0)
+                {
+                    stringBuilder.Append("Tappers ready to collect:^");
+                    ++count;
+
+                    foreach (Tuple<StardewValley.Object, string> t in uncollectedTappers)
+                    {
+                        stringBuilder.Append($"{t.Item1.heldObject.name} at {t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
+                        ++count;
+                    }
                 }
             }
 
             return stringBuilder.ToString();
         }
-
+        
         private string Pluralize(string name, int number)
         {
             if (number < 2)
@@ -291,6 +308,11 @@ namespace DailyTasksReport
         internal void AddNotBaitedCrabpot(CrabPot cb, string locationName)
         {
             notBaitedCrabpots.Add(Tuple.Create(cb, locationName));
+        }
+
+        internal void AddTapper(StardewValley.Object tapper, string locationName)
+        {
+            uncollectedTappers.Add(Tuple.Create(tapper, locationName));
         }
 
         internal void Clear()

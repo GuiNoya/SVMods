@@ -29,5 +29,7 @@ namespace DailyTasksReport
         public bool UncollectedCrabpots { get; set; } = true;
         /// <summary> Check or not if you have not baited crabpots. </summary>
         public bool NotBaitedCrabpots { get; set; } = true;
+        /// <summary> Check or not if there are tappers ready to collect. </summary>
+        public bool UncollectedTappers { get; set; } = true;
     }
 }

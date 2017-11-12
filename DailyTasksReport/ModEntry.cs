@@ -38,7 +38,7 @@ namespace DailyTasksReport
         {
             if (!Context.IsWorldReady || !Context.IsPlayerFree)
                 return;
-
+            
             if (e.Button == config.OpenReportKey)
             {
                 report.Clear();
@@ -72,17 +72,34 @@ namespace DailyTasksReport
                         if (config.FarmCave)
                             CheckFarmCave(location as FarmCave);
                     }
+                    if (location.IsOutdoors || location.name == "Greenhouse")
+                    {
+                        CheckTappers(location);
+                    }
                     if (location.waterTiles != null)
                     {
                         if (config.UncollectedCrabpots || config.NotBaitedCrabpots)
                             CheckForCrabpots(location);
                     }
+                    
                 }
                 OpenReport();
                 report.Clear();
             }
         }
-        
+
+        private void CheckTappers(GameLocation location)
+        {
+            foreach (KeyValuePair<Vector2, StardewValley.Object> pair in location.objects)
+            {
+                if (pair.Value.name == "Tapper" && pair.Value.readyForHarvest)
+                {
+                    Monitor.Log($"{pair.Value.name} {pair.Value.tileLocation == pair.Key} {pair.Key} {pair.Value.tileLocation}");
+                    report.AddTapper(pair.Value, location.name);
+                }
+            }
+        }
+
         private void OpenReport()
         {
             if (Game1.activeClickableMenu != null)
