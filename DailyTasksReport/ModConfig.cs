@@ -44,7 +44,29 @@ namespace DailyTasksReport
         public bool UncollectedCrabpots { get; set; } = true;
         /// <summary> Check or not if you have not baited crabpots. </summary>
         public bool NotBaitedCrabpots { get; set; } = true;
-        /// <summary> Check or not if there are tappers ready to collect. </summary>
-        public bool UncollectedTappers { get; set; } = true;
+        /// <summary> Check or not if there are BigCraftables (tapper, machines, ...) ready to collect. </summary>
+        [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Auto)]
+        public Dictionary<string, bool> Machines { get; set; } = new Dictionary<string, bool>() {
+                                                                { "Bee House", true },
+                                                                //{ "Cask", true },
+                                                                { "Charcoal Kiln", true },
+                                                                { "Cheese Press", true },
+                                                                { "Crystalarium", true },
+                                                                { "Furnace", true },
+                                                                { "Keg", true },
+                                                                { "Lightning Rod", true },
+                                                                { "Loom", true },
+                                                                { "Mayonnaise Machine", true },
+                                                                { "Oil Maker", true },
+                                                                { "Preserves Jar", true },
+                                                                { "Recycling Machine", true },
+                                                                { "Seed Maker", true },
+                                                                { "Slime Egg-Press", true },
+                                                                { "Soda Machine", true },
+                                                                { "Statue Of Endless Fortune", true },
+                                                                { "Statue Of Perfection", true },
+                                                                { "Tapper", true },
+                                                                { "Worm Bin", true }
+        };
     }
 }

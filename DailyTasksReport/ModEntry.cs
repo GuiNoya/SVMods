@@ -20,6 +20,7 @@ namespace DailyTasksReport
         private ReportBuilder report;
 
         internal bool checkAnimalProducts;
+        internal bool checkMachines;
 
         private static readonly int[] fruits = new int[] { 296, 396, 406, 410, 613, 634, 635, 636, 637, 638 };
 
@@ -32,9 +33,10 @@ namespace DailyTasksReport
         {
             config = helper.ReadConfig<ModConfig>();
             checkAnimalProducts = config.AnimalProducts.ContainsValue(true);
+            checkMachines = config.Machines.ContainsValue(true);
 
             report = new ReportBuilder(this);
-            
+
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
         }
 
@@ -42,7 +44,7 @@ namespace DailyTasksReport
         {
             if (!Context.IsWorldReady || !Context.IsPlayerFree)
                 return;
-            
+
             if (e.Button == config.OpenReportKey)
             {
                 report.Clear();
@@ -76,29 +78,29 @@ namespace DailyTasksReport
                         if (config.FarmCave)
                             CheckFarmCave(location as FarmCave);
                     }
-                    if (location.IsOutdoors || location.name == "Greenhouse")
-                    {
-                        CheckTappers(location);
-                    }
                     if (location.waterTiles != null)
                     {
                         if (config.UncollectedCrabpots || config.NotBaitedCrabpots)
                             CheckForCrabpots(location);
                     }
-                    
+                    CheckBigCraftables(location);
+
                 }
                 OpenReport();
                 report.Clear();
             }
         }
 
-        private void CheckTappers(GameLocation location)
+        private void CheckBigCraftables(GameLocation location)
         {
             foreach (KeyValuePair<Vector2, StardewValley.Object> pair in location.objects)
             {
-                if (pair.Value.name == "Tapper" && pair.Value.readyForHarvest)
+                if (pair.Value.bigCraftable && checkMachines)
                 {
-                    report.AddTapper(pair.Value, location.name);
+                    if (config.Machines.ContainsKey(pair.Value.name) && config.Machines[pair.Value.name] && pair.Value.readyForHarvest)
+                    {
+                        report.AddMachine(pair.Value, location.name);
+                    }
                 }
             }
         }
@@ -166,12 +168,14 @@ namespace DailyTasksReport
                 {
                     report.AddUnpettedAnimal(farmAnimal);
                 }
-                if (checkAnimalProducts  && farmAnimal.currentProduce > 0)
+                if (checkAnimalProducts && farmAnimal.currentProduce > 0)
                 {
-                    if ((farmAnimal.type.Contains("Cow") && config.AnimalProducts["Cow milk"]) || 
+                    if ((farmAnimal.type.Contains("Cow") && config.AnimalProducts["Cow milk"]) ||
                         (farmAnimal.type.Contains("Goat") && config.AnimalProducts["Goat milk"]) ||
                         (farmAnimal.type.Contains("Sheep") && config.AnimalProducts["Sheep wool"]))
-                            report.AddUncollectedAnimalProduct(farmAnimal);
+                    {
+                        report.AddUncollectedAnimalProduct(farmAnimal);
+                    }
                 }
             }
         }

@@ -30,7 +30,7 @@ namespace DailyTasksReport
         int caveObjectsCount = 0;
         IList<Tuple<CrabPot, string>> uncollectedCrabpots = new List<Tuple<CrabPot, string>>();
         IList<Tuple<CrabPot, string>> notBaitedCrabpots = new List<Tuple<CrabPot, string>>();
-        IList<Tuple<StardewValley.Object, string>> uncollectedTappers = new List<Tuple<StardewValley.Object, string>>();
+        IList<Tuple<StardewValley.Object, string>> uncollectedMachines = new List<Tuple<StardewValley.Object, string>>();
 
 
         public ReportBuilder(ModEntry parent)
@@ -75,8 +75,8 @@ namespace DailyTasksReport
                 stringBuilder.Append($"Crabpots ready to collect: {uncollectedCrabpots.Count}^");
             if (notBaitedCrabpots.Count > 0 && (++count > 0))
                 stringBuilder.Append($"Crabpots not baited: {notBaitedCrabpots.Count}^");
-            if (uncollectedTappers.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Uncollected tappers: {uncollectedTappers.Count}^");
+            if (uncollectedMachines.Count > 0 && (++count > 0))
+                stringBuilder.Append($"Uncollected machines: {uncollectedMachines.Count}^");
 
             if (count == 0)
             {
@@ -210,14 +210,14 @@ namespace DailyTasksReport
                     NextPage(ref stringBuilder, ref count);
                 }
 
-                if (uncollectedTappers.Count > 0)
+                if (uncollectedMachines.Count > 0)
                 {
-                    stringBuilder.Append("Tappers ready to collect:^");
+                    stringBuilder.Append("Machines ready to collect:^");
                     ++count;
 
-                    foreach (Tuple<StardewValley.Object, string> t in uncollectedTappers)
+                    foreach (Tuple<StardewValley.Object, string> t in uncollectedMachines)
                     {
-                        stringBuilder.Append($"{t.Item1.heldObject.name} at {t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
+                        stringBuilder.Append($"{t.Item1.name} with {t.Item1.heldObject.name} at {t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
                         ++count;
                     }
                 }
@@ -329,9 +329,9 @@ namespace DailyTasksReport
             notBaitedCrabpots.Add(Tuple.Create(cb, locationName));
         }
 
-        internal void AddTapper(StardewValley.Object tapper, string locationName)
+        internal void AddMachine(StardewValley.Object machine, string locationName)
         {
-            uncollectedTappers.Add(Tuple.Create(tapper, locationName));
+            uncollectedMachines.Add(Tuple.Create(machine, locationName));
         }
 
         internal void Clear()
@@ -353,6 +353,7 @@ namespace DailyTasksReport
             notBaitedCrabpots.Clear();
             objectsInFarmCave.Clear();
             caveObjectsCount = 0;
+            uncollectedMachines.Clear();
         }
     }
 }
