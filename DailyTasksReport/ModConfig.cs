@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 
 namespace DailyTasksReport
 {
     internal class ModConfig
     {
         /// <summary> The keyboard key to open the report. </summary>
-        public string OpenReportKey { get; set; } = Keys.Y.ToString();
+        public SButton OpenReportKey { get; set; } = SButton.Y;
         /// <summary> Show detailed info on the next pages. </summary>
         public bool ShowDetailedInfo { get; set; } = true;
         /// <summary> Check or not for unwatered crops in farm and greenhouse. </summary>

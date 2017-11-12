@@ -9,6 +9,7 @@ namespace ZoomLevelKeybind
     public class ModEntry : Mod
     {
         private ModConfig config;
+
         public override void Entry(IModHelper helper)
         {
             config = helper.ReadConfig<ModConfig>();
@@ -23,9 +24,9 @@ namespace ZoomLevelKeybind
 
             if (e.Button.TryGetKeyboard(out Keys key))
             {
-                if (key.ToString() == config.IncreaseZoomKey)
+                if (e.Button == config.IncreaseZoomKey)
                     IncreaseZoom();
-                else if (key.ToString() == config.DecreaseZoomKey)
+                else if (e.Button == config.DecreaseZoomKey)
                     DecreaseZoom();
                 return;
             }
@@ -34,12 +35,12 @@ namespace ZoomLevelKeybind
             {
                 bool wasZoom = false;
 
-                if (button.ToString() == config.IncreaseZoomButton)
+                if (e.Button == config.IncreaseZoomButton)
                 {
                     IncreaseZoom();
                     wasZoom = true;
                 }
-                else if (button.ToString() == config.DecreaseZoomButton)
+                else if (e.Button == config.DecreaseZoomButton)
                 {
                     DecreaseZoom();
                     wasZoom = true;

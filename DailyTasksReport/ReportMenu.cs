@@ -10,7 +10,7 @@ using StardewValley;
 
 namespace DailyTasksReport
 {
-    class ReportMenu : LetterViewerMenu
+    public class ReportMenu : LetterViewerMenu
     {
         private ModEntry parent;
         private IPrivateField<int> pageNumber;
@@ -29,7 +29,7 @@ namespace DailyTasksReport
         {
             base.receiveKeyPress(key);
 
-            if (key.ToString() == parent.config.OpenReportKey && this.readyToClose())
+            if ((SButton)key == parent.config.OpenReportKey && this.readyToClose())
             {
                 if (firstKeyEvent)
                 {
@@ -38,12 +38,12 @@ namespace DailyTasksReport
                 }
                 this.exitThisMenu();
             }
-            else if (key.Equals(Keys.Right) && pageNumber.GetValue() < numberOfPages - 1)
+            else if (key == Keys.Right && pageNumber.GetValue() < numberOfPages - 1)
             {
                 pageNumber.SetValue(pageNumber.GetValue() + 1);
                 Game1.playSound("shwip");
             }
-            else if (key.Equals(Keys.Left) && pageNumber.GetValue() > 0)
+            else if (key == Keys.Left && pageNumber.GetValue() > 0)
             {
                 pageNumber.SetValue(pageNumber.GetValue() - 1);
                 Game1.playSound("shwip");

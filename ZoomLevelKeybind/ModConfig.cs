@@ -1,13 +1,14 @@
 ﻿using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
 
 namespace ZoomLevelKeybind
 {
     internal class ModConfig
     {
-        public string IncreaseZoomKey { get; set; } = Keys.OemPeriod.ToString();
-        public string DecreaseZoomKey { get; set; } = Keys.OemComma.ToString();
-        public string IncreaseZoomButton { get; set; } = Buttons.RightStick.ToString();
-        public string DecreaseZoomButton { get; set; } = Buttons.LeftStick.ToString();
+        public SButton IncreaseZoomKey { get; set; } = SButton.OemPeriod;
+        public SButton DecreaseZoomKey { get; set; } = SButton.OemComma;
+        public SButton IncreaseZoomButton { get; set; } = SButton.RightStick;
+        public SButton DecreaseZoomButton { get; set; } = SButton.LeftStick;
         public bool SuppressControllerButton { get; set; } = true;
         public bool MoreZoom { get; set; } = true;
         public bool UnlimitedZoom { get; set; } = false;
