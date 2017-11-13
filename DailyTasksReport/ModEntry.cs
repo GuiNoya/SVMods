@@ -36,16 +36,15 @@ namespace DailyTasksReport
             checkMachines = config.Machines.ContainsValue(true);
 
             report = new ReportBuilder(this);
-
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
             if (!Context.IsWorldReady || !Context.IsPlayerFree)
                 return;
 
-            if (e.Button == config.OpenReportKey)
+            if (e.KeyPressed.ToString() == config.OpenReportKey)
             {
                 report.Clear();
 

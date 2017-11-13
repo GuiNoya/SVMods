@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using StardewModdingAPI;
+﻿using Microsoft.Xna.Framework.Input;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace DailyTasksReport
@@ -7,7 +7,7 @@ namespace DailyTasksReport
     internal class ModConfig
     {
         /// <summary> The keyboard key to open the report. </summary>
-        public SButton OpenReportKey { get; set; } = SButton.Y;
+        public string OpenReportKey { get; set; } = Keys.Y.ToString();
         /// <summary> Show detailed info on the next pages. </summary>
         public bool ShowDetailedInfo { get; set; } = true;
         /// <summary> Check or not for unwatered crops in farm and greenhouse. </summary>

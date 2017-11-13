@@ -25,7 +25,7 @@ namespace DailyTasksReport
         {
             base.receiveKeyPress(key);
 
-            if ((SButton)key == parent.config.OpenReportKey && this.readyToClose())
+            if (key.ToString() == parent.config.OpenReportKey && this.readyToClose())
             {
                 if (firstKeyEvent)
                 {
