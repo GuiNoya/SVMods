@@ -68,7 +68,7 @@ namespace DailyTasksReport
                     }
                     if (location is Farm farm)
                     {
-                        if (config.UnpettedAnimals || config.AnimalProducts.ContainsValue(true))
+                        if (config.UnpettedAnimals || checkAnimalProducts)
                             CheckAnimals(farm);
                         if (config.UnfilledPetBowl)
                             CheckForUnfilledPetBowl(farm);
@@ -90,21 +90,7 @@ namespace DailyTasksReport
                 report.Clear();
             }
         }
-
-        private void CheckBigCraftables(GameLocation location)
-        {
-            foreach (KeyValuePair<Vector2, StardewValley.Object> pair in location.objects)
-            {
-                if (pair.Value.bigCraftable && checkMachines)
-                {
-                    if (config.Machines.ContainsKey(pair.Value.name) && config.Machines[pair.Value.name] && pair.Value.readyForHarvest)
-                    {
-                        report.AddMachine(pair.Value, location.name);
-                    }
-                }
-            }
-        }
-
+        
         private void OpenReport()
         {
             if (Game1.activeClickableMenu != null)
@@ -223,6 +209,20 @@ namespace DailyTasksReport
                     if (config.NotBaitedCrabpots && cb.bait == null)
                     {
                         report.AddNotBaitedCrabpot(cb, location.name);
+                    }
+                }
+            }
+        }
+
+        private void CheckBigCraftables(GameLocation location)
+        {
+            foreach (KeyValuePair<Vector2, StardewValley.Object> pair in location.objects)
+            {
+                if (pair.Value.bigCraftable && checkMachines)
+                {
+                    if (config.Machines.ContainsKey(pair.Value.name) && config.Machines[pair.Value.name] && pair.Value.readyForHarvest)
+                    {
+                        report.AddMachine(pair.Value, location.name);
                     }
                 }
             }
