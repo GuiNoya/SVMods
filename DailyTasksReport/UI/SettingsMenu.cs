@@ -28,6 +28,9 @@ namespace DailyTasksReport
         private int currentIndex = 0;
         private int yScrollBarOffsetHeld = -1;
 
+        internal static bool configChanged = false;
+        internal static OptionsEnum groupClicked;
+
         public SettingsMenu(ModEntry parent, int currentIndex = 0) :
                         base(Game1.viewport.Width / 2 - Game1.tileSize * 10 / 2,
                              Game1.viewport.Height / 2 - Game1.tileSize * 8 / 2,
@@ -52,42 +55,46 @@ namespace DailyTasksReport
                 slots.Add(new Rectangle(xPositionOnScreen, yPositionOnScreen + yMargin + (height - Game1.tileSize / 2) / ItemsPerPage * i, width, (height - yMargin * 2) / ItemsPerPage));
 
             // Add options
-            options.Add(new Checkbox("Show detailed info", 1, parent.config));
+
+            options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.config));
             options.Add(new OptionsElement("Report:"));
-            options.Add(new Checkbox("Unwatered crops", 2, parent.config));
-            options.Add(new Checkbox("Unharvested crops", 3, parent.config));
-            options.Add(new Checkbox("Dead crops", 4, parent.config));
-            options.Add(new Checkbox("Unpetted pet", 5, parent.config));
-            options.Add(new Checkbox("Unfilled pet bowl", 6, parent.config));
-            options.Add(new Checkbox("Unpetted animals", 7, parent.config));
-            options.Add(new Checkbox("Animal products:", -1, parent.config));
-            options.Add(new Checkbox("Cow milk", 8, parent.config, 1));
-            options.Add(new Checkbox("Goat milk", 9, parent.config, 1));
-            options.Add(new Checkbox("Sheep wool", 10, parent.config, 1));
-            options.Add(new Checkbox("Missing hay", 11, parent.config));
-            options.Add(new Checkbox("Items in farm cave", 12, parent.config));
-            options.Add(new Checkbox("Uncollected crabpots", 13, parent.config));
-            options.Add(new Checkbox("Not baited crabpots", 14, parent.config));
-            options.Add(new Checkbox("Machines:", -1, parent.config));
-            options.Add(new Checkbox("Bee house", 15, parent.config, 1));
-            options.Add(new Checkbox("Charcoal Kiln", 16, parent.config, 1));
-            options.Add(new Checkbox("Cheese Press", 17, parent.config, 1));
-            options.Add(new Checkbox("Crystalarium", 18, parent.config, 1));
-            options.Add(new Checkbox("Furnace", 19, parent.config, 1));
-            options.Add(new Checkbox("Keg", 20, parent.config, 1));
-            options.Add(new Checkbox("Lightning Rod", 21, parent.config, 1));
-            options.Add(new Checkbox("Loom", 22, parent.config, 1));
-            options.Add(new Checkbox("Mayonnaise Machine", 23, parent.config, 1));
-            options.Add(new Checkbox("Oil Maker", 24, parent.config, 1));
-            options.Add(new Checkbox("Preserves Jar", 25, parent.config, 1));
-            options.Add(new Checkbox("Recycling Machine", 26, parent.config, 1));
-            options.Add(new Checkbox("Seed Maker", 27, parent.config, 1));
-            options.Add(new Checkbox("Slime Egg-Press", 28, parent.config, 1));
-            options.Add(new Checkbox("Soda Machine", 29, parent.config, 1));
-            options.Add(new Checkbox("Statue Of Endless Fortune", 30, parent.config, 1));
-            options.Add(new Checkbox("Statue Of Perfection", 31, parent.config, 1));
-            options.Add(new Checkbox("Tapper", 32, parent.config, 1));
-            options.Add(new Checkbox("Worm bin", 33, parent.config, 1));
+            options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.config));
+            options.Add(new Checkbox("Unharvested crops", OptionsEnum.unharvestedCrops, parent.config));
+            options.Add(new Checkbox("Dead crops", OptionsEnum.DeadCrops, parent.config));
+            options.Add(new Checkbox("Unpetted pet", OptionsEnum.unpettedPet, parent.config));
+            options.Add(new Checkbox("Unfilled pet bowl", OptionsEnum.UnfilledPetBowl, parent.config));
+            options.Add(new Checkbox("Unpetted animals", OptionsEnum.UnpettedAnimals, parent.config));
+            // Animal products
+            options.Add(new Checkbox("Animal products:", OptionsEnum.AllAnimalProducts, parent.config));
+            options.Add(new Checkbox("Cow milk", OptionsEnum.CowMilk, parent.config, 1));
+            options.Add(new Checkbox("Goat milk", OptionsEnum.GoatMilk, parent.config, 1));
+            options.Add(new Checkbox("Sheep wool", OptionsEnum.SheepWool, parent.config, 1));
+
+            options.Add(new Checkbox("Missing hay", OptionsEnum.MissingHay, parent.config));
+            options.Add(new Checkbox("Items in farm cave", OptionsEnum.FarmCave, parent.config));
+            options.Add(new Checkbox("Uncollected crabpots", OptionsEnum.UncollectedCrabpots, parent.config));
+            options.Add(new Checkbox("Not baited crabpots", OptionsEnum.NotBaitedCrabpots, parent.config));
+            // Machines
+            options.Add(new Checkbox("Machines:", OptionsEnum.AllMachines, parent.config));
+            options.Add(new Checkbox("Bee house", OptionsEnum.BeeHouse, parent.config, 1));
+            options.Add(new Checkbox("Charcoal Kiln", OptionsEnum.CharcoalKiln, parent.config, 1));
+            options.Add(new Checkbox("Cheese Press", OptionsEnum.CheesePress, parent.config, 1));
+            options.Add(new Checkbox("Crystalarium", OptionsEnum.Crystalarium, parent.config, 1));
+            options.Add(new Checkbox("Furnace", OptionsEnum.Furnace, parent.config, 1));
+            options.Add(new Checkbox("Keg", OptionsEnum.Keg, parent.config, 1));
+            options.Add(new Checkbox("Lightning Rod", OptionsEnum.LightningRod, parent.config, 1));
+            options.Add(new Checkbox("Loom", OptionsEnum.Loom, parent.config, 1));
+            options.Add(new Checkbox("Mayonnaise Machine", OptionsEnum.MayonnaiseMachine, parent.config, 1));
+            options.Add(new Checkbox("Oil Maker", OptionsEnum.OilMaker, parent.config, 1));
+            options.Add(new Checkbox("Preserves Jar", OptionsEnum.PreservesJar, parent.config, 1));
+            options.Add(new Checkbox("Recycling Machine", OptionsEnum.RecyclingMachine, parent.config, 1));
+            options.Add(new Checkbox("Seed Maker", OptionsEnum.SeedMaker, parent.config, 1));
+            options.Add(new Checkbox("Slime Egg-Press", OptionsEnum.SlimeEggPress, parent.config, 1));
+            options.Add(new Checkbox("Soda Machine", OptionsEnum.SodaMachine, parent.config, 1));
+            options.Add(new Checkbox("Statue Of Endless Fortune", OptionsEnum.StatueOfEndlessFortune, parent.config, 1));
+            options.Add(new Checkbox("Statue Of Perfection", OptionsEnum.StatueOfPerfection, parent.config, 1));
+            options.Add(new Checkbox("Tapper", OptionsEnum.Tapper, parent.config, 1));
+            options.Add(new Checkbox("Worm bin", OptionsEnum.WormBin, parent.config, 1));
         }
 
         public override void draw(SpriteBatch b)
@@ -145,8 +152,16 @@ namespace DailyTasksReport
                 if (slots[i].Contains(x, y) && options[currentIndex + i].bounds.Contains(x - slots[i].X, y - slots[i].Y))
                 {
                     options[currentIndex + i].receiveLeftClick(x, y);
-                    return;
+                    break;
                 }
+            }
+            
+            if (configChanged)
+            {
+                CheckForGroupChanges(groupClicked);
+
+                parent.Helper.WriteConfig(parent.config);
+                configChanged = false;
             }
 
             // Check the close button
@@ -188,6 +203,18 @@ namespace DailyTasksReport
         private void SetCurrentIndexFromScrollBar()
         {
             currentIndex = (options.Count - ItemsPerPage) * (scrollBar.bounds.Y - scrollBarRunner.Y) / (scrollBarRunner.Height - scrollBar.bounds.Height);
+        }
+
+        private void CheckForGroupChanges(OptionsEnum group)
+        {
+            int i = 0;
+            bool isChecked;
+            while (!(options[i] is Checkbox cb && cb.option == group))
+                ++i;
+            isChecked = (options[i] as Checkbox).isChecked;
+            ++i;
+            for (; i < options.Count && options[i] is Checkbox cb && cb.itemLevel > 0; ++i)
+                cb.isChecked = isChecked;
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
