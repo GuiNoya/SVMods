@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using StardewValley;
 
-namespace DailyTasksReport
+namespace DailyTasksReport.UI
 {
     internal class Checkbox : OptionsElement
     {

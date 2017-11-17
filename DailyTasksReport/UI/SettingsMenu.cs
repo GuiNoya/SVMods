@@ -8,8 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
+using Microsoft.Xna.Framework.Input;
 
-namespace DailyTasksReport
+namespace DailyTasksReport.UI
 {
     class SettingsMenu : IClickableMenu
     {
@@ -30,6 +31,7 @@ namespace DailyTasksReport
 
         internal static bool configChanged = false;
         internal static OptionsEnum groupClicked;
+        internal static InputListener keyReceiver = null;
 
         public SettingsMenu(ModEntry parent, int currentIndex = 0) :
                         base(Game1.viewport.Width / 2 - Game1.tileSize * 10 / 2,
@@ -55,7 +57,7 @@ namespace DailyTasksReport
                 slots.Add(new Rectangle(xPositionOnScreen, yPositionOnScreen + yMargin + (height - Game1.tileSize / 2) / ItemsPerPage * i, width, (height - yMargin * 2) / ItemsPerPage));
 
             // Add options
-
+            options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, slots[0].Width, parent.config));
             options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.config));
             options.Add(new OptionsElement("Report:"));
             options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.config));
@@ -104,6 +106,13 @@ namespace DailyTasksReport
             int yTitleOffset = (int)(SpriteText.getHeightOfString("Daily Tasks Report Settings") * 1.6);
             SpriteText.drawStringWithScrollCenteredAt(b, "Daily Tasks Settings", xPositionOnScreen + width / 2, yPositionOnScreen - yTitleOffset);
 
+            upArrow.draw(b);
+            downArrow.draw(b);
+            drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), scrollBarRunner.X, scrollBarRunner.Y, scrollBarRunner.Width, scrollBarRunner.Height, Color.White, Game1.pixelZoom);
+            scrollBar.draw(b);
+
+            base.draw(b);
+
             b.End();
             b.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
 
@@ -114,14 +123,9 @@ namespace DailyTasksReport
 
             b.End();
             b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-
-            upArrow.draw(b);
-            downArrow.draw(b);
-            drawTextureBox(b, Game1.mouseCursors, new Rectangle(403, 383, 6, 6), scrollBarRunner.X, scrollBarRunner.Y, scrollBarRunner.Width, scrollBarRunner.Height, Color.White, Game1.pixelZoom);
-            scrollBar.draw(b);
-
-            base.draw(b);
-            drawMouse(b);
+            
+            if (!Game1.options.hardwareCursor)
+                drawMouse(b);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -151,7 +155,7 @@ namespace DailyTasksReport
             {
                 if (slots[i].Contains(x, y) && options[currentIndex + i].bounds.Contains(x - slots[i].X, y - slots[i].Y))
                 {
-                    options[currentIndex + i].receiveLeftClick(x, y);
+                    options[currentIndex + i].receiveLeftClick(x - slots[i].X, y - slots[i].Y);
                     break;
                 }
             }
@@ -207,6 +211,9 @@ namespace DailyTasksReport
 
         private void CheckForGroupChanges(OptionsEnum group)
         {
+            if (groupClicked != OptionsEnum.AllAnimalProducts && groupClicked != OptionsEnum.AllMachines)
+                return;
+
             int i = 0;
             bool isChecked;
             while (!(options[i] is Checkbox cb && cb.option == group))
@@ -243,6 +250,21 @@ namespace DailyTasksReport
             upArrow.tryHover(x, y);
             downArrow.tryHover(x, y);
             scrollBar.tryHover(x, y);
+        }
+
+        public override void receiveKeyPress(Keys key)
+        {
+            if (keyReceiver != null)
+            {
+                keyReceiver.receiveKeyPress(key);
+                if (configChanged)
+                {
+                    parent.Helper.WriteConfig(parent.config);
+                    configChanged = false;
+                }
+            }
+            else
+                base.receiveKeyPress(key);
         }
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)

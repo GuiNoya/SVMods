@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace DailyTasksReport
+namespace DailyTasksReport.UI
 {
     public class ReportMenu : LetterViewerMenu
     {

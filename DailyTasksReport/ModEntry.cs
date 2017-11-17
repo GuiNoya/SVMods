@@ -90,14 +90,14 @@ namespace DailyTasksReport
                 report.Clear();
             }
         }
-        
+
         private void OpenReport()
         {
             if (Game1.activeClickableMenu != null)
             {
                 Game1.exitActiveMenu();
             }
-            Game1.activeClickableMenu = new ReportMenu(this, report.ToString());
+            Game1.activeClickableMenu = new UI.ReportMenu(this, report.ToString());
         }
 
         private void CheckForCrops(GameLocation location)

@@ -1,4 +1,4 @@
-﻿namespace DailyTasksReport
+﻿namespace DailyTasksReport.UI
 {
     internal enum OptionsEnum
     {
