@@ -155,7 +155,6 @@ namespace DailyTasksReport.UI
                 base.draw(b, slotX, slotY);
             }
         }
-        
 
         public override void receiveLeftClick(int x, int y)
         {

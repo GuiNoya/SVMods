@@ -21,8 +21,8 @@ namespace DailyTasksReport.UI
         private OptionsEnum option;
         private Rectangle buttonBounds;
         private bool listening = false;
-        
-        public InputListener(string label, OptionsEnum whichOption, int slotWidth , ModConfig config, int itemLevel = 0) : base(label, -1, -1, slotWidth, Game1.pixelZoom * 11, (int)whichOption)
+
+        public InputListener(string label, OptionsEnum whichOption, int slotWidth, ModConfig config, int itemLevel = 0) : base(label, -1, -1, slotWidth, Game1.pixelZoom * 11, (int)whichOption)
         {
             buttonBounds = new Rectangle(slotWidth - 28 * Game1.pixelZoom, Game1.pixelZoom * 3 - 1, 21 * Game1.pixelZoom, 11 * Game1.pixelZoom);
 
@@ -57,10 +57,10 @@ namespace DailyTasksReport.UI
             }
             else
             {
-                switch(option)
+                switch (option)
                 {
                     case OptionsEnum.OpenReportKey:
-                        config.OpenReportKey = (SButton) key;
+                        config.OpenReportKey = (SButton)key;
                         break;
                 }
                 buttonName = ((SButton)key).ToString();

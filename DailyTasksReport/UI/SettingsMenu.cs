@@ -123,7 +123,7 @@ namespace DailyTasksReport.UI
 
             b.End();
             b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
-            
+
             if (!Game1.options.hardwareCursor)
                 drawMouse(b);
         }
@@ -151,6 +151,12 @@ namespace DailyTasksReport.UI
                 return;
             }
 
+            if (scrollBarRunner.Contains(x, y))
+            {
+                yScrollBarOffsetHeld = scrollBar.bounds.Height / 2;
+                return;
+            }
+
             for (int i = 0; i < slots.Count; ++i)
             {
                 if (slots[i].Contains(x, y) && options[currentIndex + i].bounds.Contains(x - slots[i].X, y - slots[i].Y))
@@ -159,7 +165,7 @@ namespace DailyTasksReport.UI
                     break;
                 }
             }
-            
+
             if (configChanged)
             {
                 CheckForGroupChanges(groupClicked);
