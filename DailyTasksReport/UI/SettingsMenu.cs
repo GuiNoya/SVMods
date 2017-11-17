@@ -223,15 +223,15 @@ namespace DailyTasksReport
 
         public override void receiveScrollWheelAction(int direction)
         {
-            if (direction < 0 && currentIndex > 0)
+            if (direction > 0 && currentIndex > 0)
             {
-                ++currentIndex;
+                --currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shiny4");
             }
-            else if (direction > 0 && currentIndex < options.Count - ItemsPerPage)
+            else if (direction < 0 && currentIndex < options.Count - ItemsPerPage)
             {
-                --currentIndex;
+                ++currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shiny4");
             }
