@@ -32,7 +32,7 @@ namespace SelfServiceShop
                 switch (property)
                 {
                     case "Buy General":
-                        if (config.Pierre && IsNpcInLocation("Pierre"))
+                        if (config.Pierre && (config.ShopsAlwaysOpen || IsNpcInLocation("Pierre")))
                         {
                             e.SuppressButton();
                             SuppressRightMouseButton(e.Button.ToString());
@@ -40,8 +40,15 @@ namespace SelfServiceShop
                         }
                         break;
                     case "Carpenter":
-                        if (config.Carpenter && Game1.currentLocation.characters.Find(c => c.name == "Robin") is NPC robin && robin != null)
+                        if (config.Carpenter)
                         {
+                            NPC robin;
+                            if (config.ShopsAlwaysOpen)
+                                robin = GetNpc("Robin");
+                            else if (Game1.currentLocation.characters.Find(c => c.name == "Robin") is NPC npc && npc != null)
+                                robin = npc;
+                            else
+                                break;
                             IPrivateMethod carpenters = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "carpenters");
                             Vector2 tileLocation = robin.getTileLocation();
                             carpenters.Invoke(new Location((int)tileLocation.X, (int)tileLocation.Y));
@@ -50,8 +57,15 @@ namespace SelfServiceShop
                         }
                         break;
                     case "AnimalShop":
-                        if (config.Ranch && Game1.currentLocation.characters.Find(c => c.name == "Marnie") is NPC marnie && marnie != null)
+                        if (config.Ranch)
                         {
+                            NPC marnie;
+                            if (config.ShopsAlwaysOpen)
+                                marnie = GetNpc("Marnie");
+                            else if (Game1.currentLocation.characters.Find(c => c.name == "Marnie") is NPC npc && npc != null)
+                                marnie = npc;
+                            else
+                                break;
                             IPrivateMethod animalShop = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "animalShop");
                             Vector2 tileLocation = marnie.getTileLocation();
                             animalShop.Invoke(new Location((int)tileLocation.X, (int)tileLocation.Y + 1));
@@ -60,7 +74,7 @@ namespace SelfServiceShop
                         }
                         break;
                     case "Buy Fish":
-                        if (config.FishShop && (IsNpcInLocation("Willy") || IsNpcInLocation("Willy", "Beach")))
+                        if (config.FishShop && (config.ShopsAlwaysOpen || IsNpcInLocation("Willy") || IsNpcInLocation("Willy", "Beach")))
                         {
                             e.SuppressButton();
                             SuppressRightMouseButton(e.Button.ToString());
@@ -68,15 +82,16 @@ namespace SelfServiceShop
                         }
                         break;
                     case "IceCreamStand":
-                        if (!config.IceCreamStand || (!config.IceCreamInAllSeasons && SDate.Now().Season != "summer"))
-                            break;
-                        Dictionary<Item, int[]> d = new Dictionary<Item, int[]>
+                        if (config.IceCreamStand && ((config.ShopsAlwaysOpen || config.IceCreamInAllSeasons) || SDate.Now().Season == "summer"))
                         {
-                            { new Object(233, 1), new int[2] { 250, int.MaxValue } }
-                        };
-                        Game1.activeClickableMenu = new ShopMenu(d);
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
+                            Dictionary<Item, int[]> d = new Dictionary<Item, int[]>
+                            {
+                                { new Object(233, 1), new int[2] { 250, int.MaxValue } }
+                            };
+                            Game1.activeClickableMenu = new ShopMenu(d);
+                            e.SuppressButton();
+                            SuppressRightMouseButton(e.Button.ToString());
+                        }
                         break;
                 }
             }
@@ -85,6 +100,21 @@ namespace SelfServiceShop
         private bool IsNpcInLocation(string name, string locationName = "")
         {
             return (locationName == "" ? Game1.currentLocation : Game1.locations.Find(l => l.name == locationName)).characters.Exists(c => c.name == name);
+        }
+
+        private NPC GetNpc(string name)
+        {
+            NPC npc = Game1.currentLocation.characters.Find(c => c.name == name);
+            if (npc != null)
+                return npc;
+
+            foreach (var location in Game1.locations)
+            {
+                npc = location.characters.Find(c => c.name == name);
+                if (npc != null)
+                    return npc;
+            }
+            return null;
         }
 
         /// <summary>

@@ -8,5 +8,6 @@
         public bool FishShop { get; set; } = true;
         public bool IceCreamStand { get; set; } = true;
         public bool IceCreamInAllSeasons { get; set; } = false;
+        public bool ShopsAlwaysOpen { get; set; } = false;
     }
 }
