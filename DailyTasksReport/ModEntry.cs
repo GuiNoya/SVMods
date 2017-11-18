@@ -42,7 +42,7 @@ namespace DailyTasksReport
 
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
         {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree)
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || e.Button == SButton.None)
                 return;
 
             if (e.Button == config.OpenReportKey)
@@ -88,6 +88,10 @@ namespace DailyTasksReport
                 }
                 OpenReport();
                 report.Clear();
+            }
+            else if (e.Button == config.OpenSettings)
+            {
+                UI.SettingsMenu.OpenMenu(this);
             }
         }
 

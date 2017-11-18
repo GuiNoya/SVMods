@@ -29,6 +29,7 @@ namespace DailyTasksReport.UI
         private int currentIndex = 0;
         private int yScrollBarOffsetHeld = -1;
 
+        private static IClickableMenu previousMenu;
         internal static bool configChanged = false;
         internal static OptionsEnum groupClicked;
         internal static InputListener keyReceiver = null;
@@ -58,6 +59,7 @@ namespace DailyTasksReport.UI
 
             // Add options
             options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, slots[0].Width, parent.config));
+            options.Add(new InputListener("Open Settings Key", OptionsEnum.OpenSettings, slots[0].Width, parent.config));
             options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.config));
             options.Add(new OptionsElement("Report:"));
             options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.config));
@@ -125,7 +127,7 @@ namespace DailyTasksReport.UI
             b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
 
             if (!Game1.options.hardwareCursor)
-                drawMouse(b);
+                b.Draw(Game1.mouseCursors, new Vector2(Game1.getMouseX(), Game1.getMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16)), Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
@@ -277,6 +279,26 @@ namespace DailyTasksReport.UI
         {
             if (Game1.activeClickableMenu is SettingsMenu)
                 Game1.activeClickableMenu = new SettingsMenu(parent, currentIndex);
+        }
+
+        public static void OpenMenu(ModEntry parent)
+        {
+            previousMenu = Game1.activeClickableMenu;
+            if (Game1.activeClickableMenu != null)
+                Game1.exitActiveMenu();
+            Game1.activeClickableMenu = new SettingsMenu(parent)
+            {
+                exitFunction = new onExit(OnExitFunc)
+            };
+        }
+
+        private static void OnExitFunc()
+        {
+            if (previousMenu != null)
+            {
+                Game1.activeClickableMenu = previousMenu;
+                previousMenu = null;
+            }
         }
     }
 }

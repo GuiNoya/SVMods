@@ -4,6 +4,7 @@
     {
         // Special options
         OpenReportKey = 1,
+        OpenSettings = 2,
 
         // Basic options
         ShowDetailedInfo = 50,

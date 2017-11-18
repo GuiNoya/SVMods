@@ -34,6 +34,9 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.OpenReportKey:
                     buttonName = config.OpenReportKey.ToString();
                     break;
+                case OptionsEnum.OpenSettings:
+                    buttonName = config.OpenSettings.ToString();
+                    break;
             }
         }
 
@@ -61,6 +64,9 @@ namespace DailyTasksReport.UI
                 {
                     case OptionsEnum.OpenReportKey:
                         config.OpenReportKey = (SButton)key;
+                        break;
+                    case OptionsEnum.OpenSettings:
+                        config.OpenSettings = (SButton)key;
                         break;
                 }
                 buttonName = ((SButton)key).ToString();

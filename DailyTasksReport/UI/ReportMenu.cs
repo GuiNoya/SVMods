@@ -22,6 +22,7 @@ namespace DailyTasksReport.UI
         public Texture2D letterTexture;
         public ClickableTextureComponent backButton;
         public ClickableTextureComponent forwardButton;
+        public ClickableTextureComponent settingsButton;
 
         public ReportMenu(ModEntry parent, string text) : base((int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0).X, (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0).Y, 320 * Game1.pixelZoom, 180 * Game1.pixelZoom, true)
         {
@@ -38,6 +39,7 @@ namespace DailyTasksReport.UI
             };
             this.letterTexture = Game1.temporaryContent.Load<Texture2D>("LooseSprites\\letterBG");
             this.mailMessage = SpriteText.getStringBrokenIntoSectionsOfHeight(text, width - Game1.tileSize / 2, height - Game1.tileSize * 2);
+            this.settingsButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14, 12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17), (float)(Game1.pixelZoom * 0.85));
 
             this.parent = parent;
             this.firstKeyEvent = true;
@@ -93,6 +95,10 @@ namespace DailyTasksReport.UI
                 ++page;
                 Game1.playSound("shwip");
             }
+            else if (settingsButton.containsPoint(x, y))
+            {
+                UI.SettingsMenu.OpenMenu(parent);
+            }
             else if (isWithinBounds(x, y))
             {
                 if (page < mailMessage.Count - 1)
@@ -121,6 +127,7 @@ namespace DailyTasksReport.UI
         public override void performHoverAction(int x, int y)
         {
             base.performHoverAction(x, y);
+            settingsButton.tryHover(x, y, 0.5f);
             backButton.tryHover(x, y, 0.6f);
             forwardButton.tryHover(x, y, 0.6f);
         }
@@ -162,6 +169,11 @@ namespace DailyTasksReport.UI
                 --page;
                 Game1.playSound("shwip");
             }
+            else if ((SButton)key == parent.config.OpenSettings)
+            {
+                UI.SettingsMenu.OpenMenu(parent);
+            }
+
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
@@ -177,6 +189,8 @@ namespace DailyTasksReport.UI
             {
                 SpriteText.drawString(b, mailMessage[page], xPositionOnScreen + Game1.tileSize / 2, yPositionOnScreen + Game1.tileSize / 2, 999999, width - Game1.tileSize, 999999, 0.75f, 0.865f);
                 base.draw(b);
+                settingsButton.draw(b);
+
                 if (page < mailMessage.Count - 1)
                     forwardButton.draw(b);
                 if (page > 0)
