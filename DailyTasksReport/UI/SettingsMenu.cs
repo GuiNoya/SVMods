@@ -103,6 +103,8 @@ namespace DailyTasksReport.UI
 
         public override void draw(SpriteBatch b)
         {
+            previousMenu?.draw(b);
+
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             drawTextureBox(Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
             int yTitleOffset = (int)(SpriteText.getHeightOfString("Daily Tasks Report Settings") * 1.6);
