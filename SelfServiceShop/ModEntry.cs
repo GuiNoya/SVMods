@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -27,10 +28,11 @@ namespace SelfServiceShop
             if (Context.IsWorldReady && Context.IsPlayerFree && Game1.activeClickableMenu == null && (e.IsActionButton || e.Button == SButton.ControllerA))
             {
                 string property = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
+                
                 switch (property)
                 {
                     case "Buy General":
-                        if (config.Pierre && GetNpcInCurrentLocation("Pierre") is NPC pierre && pierre != null)
+                        if (config.Pierre && IsNpcInLocation("Pierre"))
                         {
                             e.SuppressButton();
                             SuppressRightMouseButton(e.Button.ToString());
@@ -38,7 +40,7 @@ namespace SelfServiceShop
                         }
                         break;
                     case "Carpenter":
-                        if (config.Carpenter && GetNpcInCurrentLocation("Robin") is NPC robin && robin != null)
+                        if (config.Carpenter && Game1.currentLocation.characters.Find(c => c.name == "Robin") is NPC robin && robin != null)
                         {
                             IPrivateMethod carpenters = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "carpenters");
                             Vector2 tileLocation = robin.getTileLocation();
@@ -48,13 +50,21 @@ namespace SelfServiceShop
                         }
                         break;
                     case "AnimalShop":
-                        if (config.Ranch && GetNpcInCurrentLocation("Marnie") is NPC marnie && marnie != null)
+                        if (config.Ranch && Game1.currentLocation.characters.Find(c => c.name == "Marnie") is NPC marnie && marnie != null)
                         {
                             IPrivateMethod animalShop = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "animalShop");
                             Vector2 tileLocation = marnie.getTileLocation();
                             animalShop.Invoke(new Location((int)tileLocation.X, (int)tileLocation.Y + 1));
                             e.SuppressButton();
                             SuppressRightMouseButton(e.Button.ToString());
+                        }
+                        break;
+                    case "Buy Fish":
+                        if (config.FishShop && (IsNpcInLocation("Willy") || IsNpcInLocation("Willy", "Beach")))
+                        {
+                            e.SuppressButton();
+                            SuppressRightMouseButton(e.Button.ToString());
+                            Game1.activeClickableMenu = new ShopMenu(Utility.getFishShopStock(Game1.player), 0, "Willy");
                         }
                         break;
                     case "IceCreamStand":
@@ -68,24 +78,13 @@ namespace SelfServiceShop
                         e.SuppressButton();
                         SuppressRightMouseButton(e.Button.ToString());
                         break;
-                    default:
-                        return;
                 }
             }
         }
-
-        private NPC GetNpcInCurrentLocation(string name)
+        
+        private bool IsNpcInLocation(string name, string locationName = "")
         {
-            NPC npc = null;
-            foreach (NPC character in Game1.currentLocation.characters)
-            {
-                if (character.name == name)
-                {
-                    npc = character;
-                    break;
-                }
-            }
-            return npc;
+            return (locationName == "" ? Game1.currentLocation : Game1.locations.Find(l => l.name == locationName)).characters.Exists(c => c.name == name);
         }
 
         /// <summary>
