@@ -31,7 +31,6 @@ namespace DailyTasksReport.UI
 
         private static IClickableMenu previousMenu;
         internal static bool configChanged = false;
-        internal static OptionsEnum groupClicked;
         internal static InputListener keyReceiver = null;
 
         public SettingsMenu(ModEntry parent, int currentIndex = 0) :
@@ -172,7 +171,7 @@ namespace DailyTasksReport.UI
 
             if (configChanged)
             {
-                CheckForGroupChanges(groupClicked);
+                RefreshOptionStatus();
 
                 parent.Helper.WriteConfig(parent.config);
                 configChanged = false;
@@ -219,19 +218,13 @@ namespace DailyTasksReport.UI
             currentIndex = (options.Count - ItemsPerPage) * (scrollBar.bounds.Y - scrollBarRunner.Y) / (scrollBarRunner.Height - scrollBar.bounds.Height);
         }
 
-        private void CheckForGroupChanges(OptionsEnum group)
+        private void RefreshOptionStatus()
         {
-            if (groupClicked != OptionsEnum.AllAnimalProducts && groupClicked != OptionsEnum.AllMachines)
-                return;
-
-            int i = 0;
-            bool isChecked;
-            while (!(options[i] is Checkbox cb && cb.option == group))
-                ++i;
-            isChecked = (options[i] as Checkbox).isChecked;
-            ++i;
-            for (; i < options.Count && options[i] is Checkbox cb && cb.itemLevel > 0; ++i)
-                cb.isChecked = isChecked;
+            foreach (OptionsElement option in options)
+            {
+                if (option is Checkbox cb)
+                    cb.RefreshStatus();
+            }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)

@@ -27,6 +27,11 @@ namespace DailyTasksReport.UI
                 this.whichOption = (int)whichOption;
 
             // Load options
+            RefreshStatus();
+        }
+
+        internal void RefreshStatus()
+        {
             switch (option)
             {
                 case OptionsEnum.ShowDetailedInfo:
@@ -207,7 +212,6 @@ namespace DailyTasksReport.UI
                     config.AnimalProducts["Cow milk"] = isChecked;
                     config.AnimalProducts["Goat milk"] = isChecked;
                     config.AnimalProducts["Sheep wool"] = isChecked;
-                    SettingsMenu.groupClicked = OptionsEnum.AllAnimalProducts;
                     break;
                 case OptionsEnum.CowMilk:
                     config.AnimalProducts["Cow milk"] = isChecked;
@@ -223,7 +227,6 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.AllMachines:
                     foreach (var key in config.Machines.Keys.ToList())
                         config.Machines[key] = isChecked;
-                    SettingsMenu.groupClicked = OptionsEnum.AllMachines;
                     break;
                 case OptionsEnum.BeeHouse:
                     config.Machines["Bee House"] = isChecked;
