@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -7,6 +10,7 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using xTile.Dimensions;
+using Object = StardewValley.Object;
 
 namespace SelfServiceShop
 {
@@ -14,21 +18,71 @@ namespace SelfServiceShop
     public class ModEntry : Mod
     {
         private ModConfig _config;
+        private Keys _keyPressed = Keys.None;
+        private ButtonState _rmbPreviousState = ButtonState.Released;
+        private int _whatToSuppress;
 
         public override void Entry(IModHelper helper)
         {
             _config = helper.ReadConfig<ModConfig>();
 
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            ControlEvents.MouseChanged += ControlEvents_MouseChanged;
+            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
+            ControlEvents.ControllerButtonPressed += ControlEvents_ControllerButtonPressed;
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void ControlEvents_MouseChanged(object sender, EventArgsMouseStateChanged e)
         {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree || Game1.activeClickableMenu != null ||
-                !e.IsActionButton && e.Button != SButton.ControllerA)
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (e.NewState.RightButton)
+            {
+                case ButtonState.Pressed when _rmbPreviousState == ButtonState.Released:
+                    _rmbPreviousState = ButtonState.Pressed;
+                    _whatToSuppress = 2;
+                    HandleAction();
+                    break;
+                case ButtonState.Released:
+                    _rmbPreviousState = ButtonState.Released;
+                    break;
+            }
+        }
+
+        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
+        {
+            if (Game1.options.actionButton.Any(b => b.Equals(new InputButton(e.KeyPressed))))
+            {
+                _keyPressed = e.KeyPressed;
+                _whatToSuppress = 1;
+                HandleAction();
+            }
+        }
+
+        private void ControlEvents_ControllerButtonPressed(object sender, EventArgsControllerButtonPressed e)
+        {
+            if (e.ButtonPressed == Buttons.A)
+            {
+                _whatToSuppress = 3;
+                HandleAction();
+            }
+        }
+
+        private void HandleAction()
+        {
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || Game1.activeClickableMenu != null)
                 return;
 
-            var property = Game1.currentLocation.doesTileHaveProperty((int) e.Cursor.GrabTile.X, (int) e.Cursor.GrabTile.Y, "Action", "Buildings");
+            // from SMAPI 2.0 (SMAPI/Framework/SGame.cs)
+            var screenPixels = new Vector2(Game1.getMouseX(), Game1.getMouseY());
+            var tile = new Vector2((int) ((Game1.viewport.X + screenPixels.X) / Game1.tileSize),
+                (int) ((Game1.viewport.Y + screenPixels.Y) / Game1.tileSize));
+            var grabTile =
+                Game1.mouseCursorTransparency > 0 &&
+                Utility.tileWithinRadiusOfPlayer((int) tile.X, (int) tile.Y, 1, Game1.player)
+                    ? tile
+                    : Game1.player.GetGrabTile();
+
+            var property =
+                Game1.currentLocation.doesTileHaveProperty((int) grabTile.X, (int) grabTile.Y, "Action", "Buildings");
 
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (property)
@@ -36,8 +90,7 @@ namespace SelfServiceShop
                 case "Buy General":
                     if (_config.Pierre && (_config.ShopsAlwaysOpen || IsNpcInLocation("Pierre")))
                     {
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
+                        SuppressButton();
                         Game1.activeClickableMenu =
                             new ShopMenu(((SeedShop) Game1.currentLocation).shopStock(), 0, "Pierre");
                     }
@@ -55,8 +108,7 @@ namespace SelfServiceShop
                         var carpenters = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "carpenters");
                         var tileLocation = robin.getTileLocation();
                         carpenters.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y));
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
+                        SuppressButton();
                     }
                     break;
                 case "AnimalShop":
@@ -72,16 +124,14 @@ namespace SelfServiceShop
                         var animalShop = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "animalShop");
                         var tileLocation = marnie.getTileLocation();
                         animalShop.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y + 1));
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
+                        SuppressButton();
                     }
                     break;
                 case "Buy Fish":
                     if (_config.FishShop &&
                         (_config.ShopsAlwaysOpen || IsNpcInLocation("Willy") || IsNpcInLocation("Willy", "Beach")))
                     {
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
+                        SuppressButton();
                         Game1.activeClickableMenu = new ShopMenu(Utility.getFishShopStock(Game1.player), 0, "Willy");
                     }
                     break;
@@ -94,8 +144,7 @@ namespace SelfServiceShop
                             {new Object(233, 1), new[] {250, int.MaxValue}}
                         };
                         Game1.activeClickableMenu = new ShopMenu(d);
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
+                        SuppressButton();
                     }
                     break;
             }
@@ -122,25 +171,54 @@ namespace SelfServiceShop
             return null;
         }
 
-        /// <summary>
-        ///     EventArgsInput.SuppressButton has a bug that does not suppress mouse buttons as of SMAPI 2.1.
-        ///     So this method is a workaround to this bug.
-        ///     Issue: https://github.com/Pathoschild/SMAPI/issues/384
-        /// </summary>
-        private static void SuppressRightMouseButton(string button)
+        // From SMAPI 2.0 (SMAPI/Events/EventsArgsInput.cs) and https://github.com/Pathoschild/SMAPI/issues/384
+        private void SuppressButton()
         {
-            if (button != "MouseRight")
-                return;
-            Game1.oldMouseState = new MouseState(
-                Game1.oldMouseState.X,
-                Game1.oldMouseState.Y,
-                Game1.oldMouseState.ScrollWheelValue,
-                Game1.oldMouseState.LeftButton,
-                Game1.oldMouseState.MiddleButton,
-                ButtonState.Pressed,
-                Game1.oldMouseState.XButton1,
-                Game1.oldMouseState.XButton2
-            );
+            // keyboard
+            switch (_whatToSuppress)
+            {
+                case 1 when _keyPressed != Keys.None:
+                    Game1.oldKBState =
+                        new KeyboardState(Game1.oldKBState.GetPressedKeys().Union(new[] {_keyPressed}).ToArray());
+                    break;
+                case 2:
+                    Game1.oldMouseState = new MouseState(
+                        Game1.oldMouseState.X,
+                        Game1.oldMouseState.Y,
+                        Game1.oldMouseState.ScrollWheelValue,
+                        Game1.oldMouseState.LeftButton,
+                        Game1.oldMouseState.MiddleButton,
+                        ButtonState.Pressed,
+                        Game1.oldMouseState.XButton1,
+                        Game1.oldMouseState.XButton2
+                    );
+                    break;
+                case 3:
+                    var thumbsticks = Game1.oldPadState.ThumbSticks;
+                    var triggers = Game1.oldPadState.Triggers;
+                    var buttons = Game1.oldPadState.Buttons;
+                    var dpad = Game1.oldPadState.DPad;
+
+                    var mask =
+                        (buttons.A == ButtonState.Pressed ? Buttons.A : 0)
+                        | (buttons.B == ButtonState.Pressed ? Buttons.B : 0)
+                        | (buttons.Back == ButtonState.Pressed ? Buttons.Back : 0)
+                        | (buttons.BigButton == ButtonState.Pressed ? Buttons.BigButton : 0)
+                        | (buttons.LeftShoulder == ButtonState.Pressed ? Buttons.LeftShoulder : 0)
+                        | (buttons.LeftStick == ButtonState.Pressed ? Buttons.LeftStick : 0)
+                        | (buttons.RightShoulder == ButtonState.Pressed ? Buttons.RightShoulder : 0)
+                        | (buttons.RightStick == ButtonState.Pressed ? Buttons.RightStick : 0)
+                        | (buttons.Start == ButtonState.Pressed ? Buttons.Start : 0)
+                        | (buttons.X == ButtonState.Pressed ? Buttons.X : 0)
+                        | (buttons.Y == ButtonState.Pressed ? Buttons.Y : 0);
+                    mask = mask ^ Buttons.A;
+                    buttons = new GamePadButtons(mask);
+
+                    Game1.oldPadState = new GamePadState(thumbsticks, triggers, buttons, dpad);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"Unknown suppress option {_whatToSuppress}");
+            }
         }
     }
 }
