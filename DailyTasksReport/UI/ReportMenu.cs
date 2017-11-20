@@ -1,48 +1,64 @@
-﻿using StardewValley.Menus;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley.BellsAndWhistles;
-using System;
+using StardewValley.Menus;
 
 namespace DailyTasksReport.UI
 {
     public class ReportMenu : IClickableMenu
     {
-        private ModEntry parent;
+        private readonly Texture2D _letterTexture = Game1.temporaryContent.Load<Texture2D>("LooseSprites\\letterBG");
+        private ClickableTextureComponent _backButton;
+        private ClickableTextureComponent _forwardButton;
+        private ClickableTextureComponent _settingsButton;
 
-        private List<string> mailMessage = new List<string>();
-        private int page;
-        private float scale;
-        private bool firstKeyEvent;
+        private readonly ModEntry _parent;
+        private readonly List<string> _mailMessage;
+        private bool _firstKeyEvent;
+        private int _page;
+        private float _scale;
 
-        public Texture2D letterTexture;
-        public ClickableTextureComponent backButton;
-        public ClickableTextureComponent forwardButton;
-        public ClickableTextureComponent settingsButton;
-
-        public ReportMenu(ModEntry parent, string text) : base((int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0).X, (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0).Y, 320 * Game1.pixelZoom, 180 * Game1.pixelZoom, true)
+        public ReportMenu(ModEntry parent, string text) : base(
+            (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).X,
+            (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).Y,
+            320 * Game1.pixelZoom, 180 * Game1.pixelZoom, true)
         {
+            _parent = parent;
+            _firstKeyEvent = true;
+
             Game1.playSound("shwip");
-            this.backButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + Game1.tileSize / 2, yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom, 11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(352, 495, 12, 11), Game1.pixelZoom)
+
+            _backButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + Game1.tileSize / 2,
+                    yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom,
+                    11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(352, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 101,
                 rightNeighborID = 102
             };
-            this.forwardButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2 - 12 * Game1.pixelZoom, yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom, 11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(365, 495, 12, 11), Game1.pixelZoom)
+
+            _forwardButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2 - 12 * Game1.pixelZoom,
+                    yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom,
+                    11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(365, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 102,
                 leftNeighborID = 101
             };
-            this.letterTexture = Game1.temporaryContent.Load<Texture2D>("LooseSprites\\letterBG");
-            this.mailMessage = SpriteText.getStringBrokenIntoSectionsOfHeight(text, width - Game1.tileSize / 2, height - Game1.tileSize * 2);
-            this.settingsButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14, 12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17), (float)(Game1.pixelZoom * 0.85));
 
-            this.parent = parent;
-            this.firstKeyEvent = true;
+            _mailMessage =
+                SpriteText.getStringBrokenIntoSectionsOfHeight(text, width - Game1.tileSize / 2,
+                    height - Game1.tileSize * 2);
+
+            _settingsButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
+                    12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
+                (float) (Game1.pixelZoom * 0.85));
         }
 
         public override void snapToDefaultClickableComponent()
@@ -53,65 +69,80 @@ namespace DailyTasksReport.UI
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
         {
-            xPositionOnScreen = (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0).X;
-            yPositionOnScreen = (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom, 0, 0).Y;
-            backButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + Game1.tileSize / 2, yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom, 11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(352, 495, 12, 11), Game1.pixelZoom)
+            xPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).X;
+            yPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).Y;
+
+            _backButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + Game1.tileSize / 2,
+                    yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom,
+                    11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(352, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 101,
                 rightNeighborID = 102
             };
-            forwardButton = new ClickableTextureComponent(new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2 - 12 * Game1.pixelZoom, yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom, 11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(365, 495, 12, 11), Game1.pixelZoom)
+
+            _forwardButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + width - Game1.tileSize / 2 - 12 * Game1.pixelZoom,
+                    yPositionOnScreen + height - Game1.tileSize / 2 - 16 * Game1.pixelZoom, 12 * Game1.pixelZoom,
+                    11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(365, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 102,
                 leftNeighborID = 101
             };
+
+            _settingsButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
+                    12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
+                (float) (Game1.pixelZoom * 0.85));
         }
 
         public override void receiveGamePadButton(Buttons b)
         {
             base.receiveGamePadButton(b);
-            if (b == Buttons.LeftTrigger && page > 0)
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (b)
             {
-                --page;
-                Game1.playSound("shwip");
-            }
-            else if (b == Buttons.RightTrigger && page < mailMessage.Count - 1)
-            {
-                ++page;
-                Game1.playSound("shwip");
+                case Buttons.LeftTrigger when _page > 0:
+                    --_page;
+                    Game1.playSound("shwip");
+                    break;
+                case Buttons.RightTrigger when _page < _mailMessage.Count - 1:
+                    ++_page;
+                    Game1.playSound("shwip");
+                    break;
             }
         }
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
             base.receiveLeftClick(x, y, playSound);
-            if (backButton.containsPoint(x, y) && page > 0)
+            if (_backButton.containsPoint(x, y) && _page > 0)
             {
-                --page;
+                --_page;
                 Game1.playSound("shwip");
             }
-            else if (forwardButton.containsPoint(x, y) && page < mailMessage.Count - 1)
+            else if (_forwardButton.containsPoint(x, y) && _page < _mailMessage.Count - 1)
             {
-                ++page;
+                ++_page;
                 Game1.playSound("shwip");
             }
-            else if (settingsButton.containsPoint(x, y))
+            else if (_settingsButton.containsPoint(x, y))
             {
-                UI.SettingsMenu.OpenMenu(parent);
+                SettingsMenu.OpenMenu(_parent);
             }
             else if (isWithinBounds(x, y))
             {
-                if (page < mailMessage.Count - 1)
+                if (_page < _mailMessage.Count - 1)
                 {
-                    ++page;
+                    ++_page;
                     Game1.playSound("shwip");
                 }
-                else if (page == mailMessage.Count - 1 && mailMessage.Count > 1)
+                else if (_page == _mailMessage.Count - 1 && _mailMessage.Count > 1)
                 {
-                    page = 0;
+                    _page = 0;
                     Game1.playSound("shwip");
                 }
-                else if (mailMessage.Count == 1)
+                else if (_mailMessage.Count == 1)
                 {
                     exitThisMenuNoSound();
                     Game1.playSound("shwip");
@@ -127,53 +158,54 @@ namespace DailyTasksReport.UI
         public override void performHoverAction(int x, int y)
         {
             base.performHoverAction(x, y);
-            settingsButton.tryHover(x, y, 0.5f);
-            backButton.tryHover(x, y, 0.6f);
-            forwardButton.tryHover(x, y, 0.6f);
+            _settingsButton.tryHover(x, y, 0.5f);
+            _backButton.tryHover(x, y, 0.6f);
+            _forwardButton.tryHover(x, y, 0.6f);
         }
 
         public override void update(GameTime time)
         {
             base.update(time);
-            if (scale < 1.0)
+            if (_scale < 1.0f)
             {
-                scale = (float)(scale + time.ElapsedGameTime.Milliseconds * (3.0 / 1000.0));
-                if (scale >= 1.0)
-                    scale = 1f;
+                _scale = (float) (_scale + time.ElapsedGameTime.Milliseconds * (3.0 / 1000.0));
+                if (_scale >= 1.0f)
+                    _scale = 1.0f;
             }
-            if (page >= mailMessage.Count - 1 || forwardButton.containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()))
+            if (_page >= _mailMessage.Count - 1 ||
+                _forwardButton.containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()))
                 return;
-            forwardButton.scale = (float)(4.0 + Math.Sin(time.TotalGameTime.Milliseconds / (64.0 * Math.PI)) / 1.5);
+            _forwardButton.scale = (float) (4.0 + Math.Sin(time.TotalGameTime.Milliseconds / (64.0 * Math.PI)) / 1.5);
         }
 
         public override void receiveKeyPress(Keys key)
         {
             base.receiveKeyPress(key);
 
-            if ((SButton)key == parent.config.OpenReportKey && readyToClose())
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if ((SButton) key == _parent.Config.OpenReportKey && readyToClose())
             {
-                if (firstKeyEvent)
+                if (_firstKeyEvent)
                 {
-                    firstKeyEvent = false;
+                    _firstKeyEvent = false;
                     return;
                 }
                 exitThisMenu();
             }
-            else if (key == Keys.Right && page < mailMessage.Count - 1)
+            else if (key == Keys.Right && _page < _mailMessage.Count - 1)
             {
-                ++page;
+                ++_page;
                 Game1.playSound("shwip");
             }
-            else if (key == Keys.Left && page > 0)
+            else if (key == Keys.Left && _page > 0)
             {
-                --page;
+                --_page;
                 Game1.playSound("shwip");
             }
-            else if ((SButton)key == parent.config.OpenSettings)
+            else if ((SButton) key == _parent.Config.OpenSettings)
             {
-                UI.SettingsMenu.OpenMenu(parent);
+                SettingsMenu.OpenMenu(_parent);
             }
-
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
@@ -184,20 +216,27 @@ namespace DailyTasksReport.UI
         public override void draw(SpriteBatch b)
         {
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.4f);
-            b.Draw(letterTexture, new Vector2(xPositionOnScreen + width / 2, yPositionOnScreen + height / 2), new Rectangle?(new Rectangle(0, 0, 320, 180)), Color.White, 0.0f, new Vector2(160f, 90f), Game1.pixelZoom * scale, SpriteEffects.None, 0.86f);
-            if (scale == 1.0)
-            {
-                SpriteText.drawString(b, mailMessage[page], xPositionOnScreen + Game1.tileSize / 2, yPositionOnScreen + Game1.tileSize / 2, 999999, width - Game1.tileSize, 999999, 0.75f, 0.865f);
-                base.draw(b);
-                settingsButton.draw(b);
+            b.Draw(_letterTexture, new Vector2(xPositionOnScreen + width / 2, yPositionOnScreen + height / 2),
+                new Rectangle(0, 0, 320, 180), Color.White, 0.0f, new Vector2(160f, 90f), Game1.pixelZoom * _scale,
+                SpriteEffects.None, 0.86f);
 
-                if (page < mailMessage.Count - 1)
-                    forwardButton.draw(b);
-                if (page > 0)
-                    backButton.draw(b);
+            if (_scale >= 1.0f)
+            {
+                SpriteText.drawString(b, _mailMessage[_page], xPositionOnScreen + Game1.tileSize / 2,
+                    yPositionOnScreen + Game1.tileSize / 2, 999999, width - Game1.tileSize, 999999, 0.75f, 0.865f);
+                base.draw(b);
+                _settingsButton.draw(b);
+
+                if (_page < _mailMessage.Count - 1)
+                    _forwardButton.draw(b);
+                if (_page > 0)
+                    _backButton.draw(b);
             }
+
             if (!Game1.options.hardwareCursor)
-                b.Draw(Game1.mouseCursors, new Vector2(Game1.getMouseX(), Game1.getMouseY()), new Rectangle?(Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16)), Color.White, 0.0f, Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
+                b.Draw(Game1.mouseCursors, new Vector2(Game1.getMouseX(), Game1.getMouseY()),
+                    Game1.getSourceRectForStandardTileSheet(Game1.mouseCursors, 0, 16, 16), Color.White, 0.0f,
+                    Vector2.Zero, Game1.pixelZoom + Game1.dialogueButtonScale / 150f, SpriteEffects.None, 1f);
         }
     }
 }

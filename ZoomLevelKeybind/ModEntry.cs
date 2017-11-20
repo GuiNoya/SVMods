@@ -1,19 +1,20 @@
 ﻿using System;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using Microsoft.Xna.Framework.Input;
 
 namespace ZoomLevelKeybind
 {
+    // ReSharper disable once UnusedMember.Global
     public class ModEntry : Mod
     {
-        private ModConfig config;
+        private ModConfig _config;
 
         public override void Entry(IModHelper helper)
         {
-            config = helper.ReadConfig<ModConfig>();
-            
+            _config = helper.ReadConfig<ModConfig>();
+
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
         }
 
@@ -22,53 +23,51 @@ namespace ZoomLevelKeybind
             //if (!Context.IsWorldReady)
             //    return;
 
-            if (e.Button.TryGetKeyboard(out Keys key))
+            if (e.Button.TryGetKeyboard(out Keys _))
             {
-                if (e.Button == config.IncreaseZoomKey)
+                if (e.Button == _config.IncreaseZoomKey)
                     IncreaseZoom();
-                else if (e.Button == config.DecreaseZoomKey)
+                else if (e.Button == _config.DecreaseZoomKey)
                     DecreaseZoom();
-                return;
             }
-
-            if (e.Button.TryGetController(out Buttons button))
+            else if (e.Button.TryGetController(out Buttons _))
             {
-                bool wasZoom = false;
+                var wasZoom = false;
 
-                if (e.Button == config.IncreaseZoomButton)
+                if (e.Button == _config.IncreaseZoomButton)
                 {
                     IncreaseZoom();
                     wasZoom = true;
                 }
-                else if (e.Button == config.DecreaseZoomButton)
+                else if (e.Button == _config.DecreaseZoomButton)
                 {
                     DecreaseZoom();
                     wasZoom = true;
                 }
 
-                if (config.SuppressControllerButton && wasZoom)
+                if (_config.SuppressControllerButton && wasZoom)
                     e.SuppressButton();
             }
         }
 
         private void IncreaseZoom()
         {
-            if (config.UnlimitedZoom)
-                Game1.options.zoomLevel = Game1.options.zoomLevel >= 0.05f ? 0.05f : (float)Math.Round((double)Game1.options.zoomLevel + 0.05, 2);
+            if (_config.UnlimitedZoom)
+                Game1.options.zoomLevel = Game1.options.zoomLevel >= 0.05f ? 0.05f : (float) Math.Round(Game1.options.zoomLevel + 0.05, 2);
             else
-                Game1.options.zoomLevel = Game1.options.zoomLevel >= 1.25f ? 1.25f : (float)Math.Round((double)Game1.options.zoomLevel + 0.05, 2);
+                Game1.options.zoomLevel = Game1.options.zoomLevel >= 1.25f ? 1.25f : (float) Math.Round(Game1.options.zoomLevel + 0.05, 2);
 
             Program.gamePtr.refreshWindowSettings();
         }
 
         private void DecreaseZoom()
         {
-            if (config.UnlimitedZoom)
-                Game1.options.zoomLevel = Game1.options.zoomLevel <= 0.05f ? 0.05f : (float)Math.Round((double)Game1.options.zoomLevel - 0.05, 2);
-            else if (config.MoreZoom)
-                Game1.options.zoomLevel = Game1.options.zoomLevel <= 0.35f ? 0.35f : (float)Math.Round((double)Game1.options.zoomLevel - 0.05, 2);
+            if (_config.UnlimitedZoom)
+                Game1.options.zoomLevel = Game1.options.zoomLevel <= 0.05f ? 0.05f : (float) Math.Round(Game1.options.zoomLevel - 0.05, 2);
+            else if (_config.MoreZoom)
+                Game1.options.zoomLevel = Game1.options.zoomLevel <= 0.35f ? 0.35f : (float) Math.Round(Game1.options.zoomLevel - 0.05, 2);
             else
-                Game1.options.zoomLevel = Game1.options.zoomLevel <= 0.75f ? 0.75f : (float)Math.Round((double)Game1.options.zoomLevel - 0.05, 2);
+                Game1.options.zoomLevel = Game1.options.zoomLevel <= 0.75f ? 0.75f : (float) Math.Round(Game1.options.zoomLevel - 0.05, 2);
 
             Program.gamePtr.refreshWindowSettings();
         }

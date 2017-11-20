@@ -11,9 +11,9 @@
 
         // What to report
         UnwateredCrops = 100,
-        unharvestedCrops = 101,
+        UnharvestedCrops = 101,
         DeadCrops = 102,
-        unpettedPet = 103,
+        UnpettedPet = 103,
         UnfilledPetBowl = 104,
         UnpettedAnimals = 105,
         MissingHay = 106,
@@ -31,8 +31,9 @@
         GoatMilk = 206,
         SheepWool = 207,
         Truffle = 208,
-        Rabitsfoot = 209,
-        Slime = 210,
+        RabitsWool = 209,
+        Rabitsfoot = 210,
+        Slime = 211,
 
         //Machines
         AllMachines = 300,

@@ -1,4 +1,6 @@
-﻿namespace SelfServiceShop
+﻿// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
+
+namespace SelfServiceShop
 {
     internal class ModConfig
     {

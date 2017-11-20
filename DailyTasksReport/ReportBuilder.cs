@@ -11,72 +11,74 @@ namespace DailyTasksReport
 {
     internal class ReportBuilder
     {
-        ModEntry parent;
-        IList<Tuple<Vector2, string>> unwateredCropsInFarm = new List<Tuple<Vector2, string>>();
-        IList<Tuple<Vector2, string>> unwateredCropsInGreenhouse = new List<Tuple<Vector2, string>>();
-        IList<Tuple<Vector2, string>> unharvestedCropsInFarm = new List<Tuple<Vector2, string>>();
-        IList<Tuple<Vector2, string>> unharvestedCropsInGreenhouse = new List<Tuple<Vector2, string>>();
-        IList<Tuple<Vector2, string>> deadCropsInFarm = new List<Tuple<Vector2, string>>();
-        IList<Tuple<Vector2, string>> deadCropsInGreenhouse = new List<Tuple<Vector2, string>>();
-        internal bool petExists = false;
-        bool petWasPetted = true;
-        bool petBowlFilled = true;
-        IList<FarmAnimal> unpettedAnimals = new List<FarmAnimal>();
-        IList<FarmAnimal> uncollectedAnimalProductFromAnimal = new List<FarmAnimal>();
-        IList<Tuple<Building, int>> missingHay = new List<Tuple<Building, int>>();
-        int totalHay = 0;
-        string farmCaveChoice;
-        Dictionary<string, int> objectsInFarmCave = new Dictionary<string, int>();
-        int caveObjectsCount = 0;
-        IList<Tuple<CrabPot, string>> uncollectedCrabpots = new List<Tuple<CrabPot, string>>();
-        IList<Tuple<CrabPot, string>> notBaitedCrabpots = new List<Tuple<CrabPot, string>>();
-        IList<Tuple<StardewValley.Object, string>> uncollectedMachines = new List<Tuple<StardewValley.Object, string>>();
+        private readonly ModEntry _parent;
+        private readonly IList<Tuple<Vector2, string>> _unwateredCropsInFarm = new List<Tuple<Vector2, string>>();
+        private readonly IList<Tuple<Vector2, string>> _unwateredCropsInGreenhouse = new List<Tuple<Vector2, string>>();
+        private readonly IList<Tuple<Vector2, string>> _unharvestedCropsInFarm = new List<Tuple<Vector2, string>>();
+        private readonly IList<Tuple<Vector2, string>> _unharvestedCropsInGreenhouse = new List<Tuple<Vector2, string>>();
+        private readonly IList<Tuple<Vector2, string>> _deadCropsInFarm = new List<Tuple<Vector2, string>>();
+        private readonly IList<Tuple<Vector2, string>> _deadCropsInGreenhouse = new List<Tuple<Vector2, string>>();
+        internal bool PetExists;
+        private bool _petWasPetted = true;
+        private bool _petBowlFilled = true;
+        private readonly IList<FarmAnimal> _unpettedAnimals = new List<FarmAnimal>();
+        private readonly IList<FarmAnimal> _uncollectedAnimalProductFromAnimal = new List<FarmAnimal>();
+        private readonly IList<Tuple<Building, int>> _missingHay = new List<Tuple<Building, int>>();
+        private int _totalHay;
+        private string _farmCaveChoice;
+        private readonly Dictionary<string, int> _objectsInFarmCave = new Dictionary<string, int>();
+        private int _caveObjectsCount;
+        private readonly IList<Tuple<CrabPot, string>> _uncollectedCrabpots = new List<Tuple<CrabPot, string>>();
+        private readonly IList<Tuple<CrabPot, string>> _notBaitedCrabpots = new List<Tuple<CrabPot, string>>();
+        private readonly IList<Tuple<StardewValley.Object, string>> _uncollectedMachines = new List<Tuple<StardewValley.Object, string>>();
 
 
         public ReportBuilder(ModEntry parent)
         {
-            this.parent = parent;
+            _parent = parent;
         }
 
         public override string ToString()
         {
-            int count = 0;
-            StringBuilder stringBuilder = new StringBuilder();
-            if (Game1.player.caveChoice == 1)
-                farmCaveChoice = "Fruits";
-            else if (Game1.player.caveChoice == 2)
-                farmCaveChoice = "Mushrooms";
+            var count = 0;
+            var stringBuilder = new StringBuilder();
 
-            if (unwateredCropsInFarm.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Farm crops not watered: {unwateredCropsInFarm.Count}^");
-            if (unwateredCropsInGreenhouse.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Greenhouse crops not watered: {unwateredCropsInGreenhouse.Count}^");
-            if (unharvestedCropsInFarm.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Farm crops ready to harvest: {unharvestedCropsInFarm.Count}^");
-            if (unharvestedCropsInGreenhouse.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Greenhouse crops ready to harvested {unharvestedCropsInGreenhouse.Count}^");
-            if (deadCropsInFarm.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Dead crops in the farm: {deadCropsInFarm.Count}^");
-            if (deadCropsInGreenhouse.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Dead crops in the greenhouse {deadCropsInGreenhouse.Count}^");
-            if (petExists && !petBowlFilled && (++count > 0))
-                stringBuilder.Append($"You did not fill your pet's bowl.^");
-            if (petExists && !petWasPetted && (++count > 0))
-                stringBuilder.Append($"You did not pet your pet today.^");
-            if (unpettedAnimals.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Not petted animals: {unpettedAnimals.Count}^");
-            if (uncollectedAnimalProductFromAnimal.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Uncollected animal products: {uncollectedAnimalProductFromAnimal.Count}^");
-            if (totalHay > 0 && (++count > 0))
-                stringBuilder.Append($"Empty hay spots on feeding benches: {totalHay}^");
-            if (objectsInFarmCave.Count > 0 && (++count > 0))
-                stringBuilder.Append($"{farmCaveChoice} in the farm cave: {caveObjectsCount}^");
-            if (uncollectedCrabpots.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Crabpots ready to collect: {uncollectedCrabpots.Count}^");
-            if (notBaitedCrabpots.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Crabpots not baited: {notBaitedCrabpots.Count}^");
-            if (uncollectedMachines.Count > 0 && (++count > 0))
-                stringBuilder.Append($"Uncollected machines: {uncollectedMachines.Count}^");
+            // ReSharper disable once ConvertIfStatementToSwitchStatement
+            if (Game1.player.caveChoice == 1)
+                _farmCaveChoice = "Fruits";
+            else if (Game1.player.caveChoice == 2)
+                _farmCaveChoice = "Mushrooms";
+
+            if (_unwateredCropsInFarm.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Farm crops not watered: {_unwateredCropsInFarm.Count}^");
+            if (_unwateredCropsInGreenhouse.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Greenhouse crops not watered: {_unwateredCropsInGreenhouse.Count}^");
+            if (_unharvestedCropsInFarm.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Farm crops ready to harvest: {_unharvestedCropsInFarm.Count}^");
+            if (_unharvestedCropsInGreenhouse.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Greenhouse crops ready to harvested {_unharvestedCropsInGreenhouse.Count}^");
+            if (_deadCropsInFarm.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Dead crops in the farm: {_deadCropsInFarm.Count}^");
+            if (_deadCropsInGreenhouse.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Dead crops in the greenhouse {_deadCropsInGreenhouse.Count}^");
+            if (PetExists && !_petBowlFilled && ++count > 0)
+                stringBuilder.Append("You did not fill your pet's bowl.^");
+            if (PetExists && !_petWasPetted && ++count > 0)
+                stringBuilder.Append("You did not pet your pet today.^");
+            if (_unpettedAnimals.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Not petted animals: {_unpettedAnimals.Count}^");
+            if (_uncollectedAnimalProductFromAnimal.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Uncollected animal products: {_uncollectedAnimalProductFromAnimal.Count}^");
+            if (_totalHay > 0 && ++count > 0)
+                stringBuilder.Append($"Empty hay spots on feeding benches: {_totalHay}^");
+            if (_objectsInFarmCave.Count > 0 && ++count > 0)
+                stringBuilder.Append($"{_farmCaveChoice} in the farm cave: {_caveObjectsCount}^");
+            if (_uncollectedCrabpots.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Crabpots ready to collect: {_uncollectedCrabpots.Count}^");
+            if (_notBaitedCrabpots.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Crabpots not baited: {_notBaitedCrabpots.Count}^");
+            if (_uncollectedMachines.Count > 0 && ++count > 0)
+                stringBuilder.Append($"Uncollected machines: {_uncollectedMachines.Count}^");
 
             if (count == 0)
             {
@@ -84,142 +86,143 @@ namespace DailyTasksReport
                 return stringBuilder.ToString();
             }
 
-            if (parent.config.ShowDetailedInfo)
+            if (!_parent.Config.ShowDetailedInfo)
+                return stringBuilder.ToString();
+
+            NextPage(ref stringBuilder, ref count);
+
+            if (_unwateredCropsInFarm.Count > 0 || _unwateredCropsInGreenhouse.Count > 0)
             {
+                stringBuilder.Append("Unwatered crops:^");
+                count++;
+
+                EchoForCrops(ref stringBuilder, _unwateredCropsInFarm, ref count, "Farm");
+                EchoForCrops(ref stringBuilder, _unwateredCropsInGreenhouse, ref count, "Greenhouse");
+
                 NextPage(ref stringBuilder, ref count);
+            }
 
-                if (unwateredCropsInFarm.Count > 0 || unwateredCropsInGreenhouse.Count > 0)
+            if (_unharvestedCropsInFarm.Count > 0 || _unharvestedCropsInGreenhouse.Count > 0)
+            {
+                stringBuilder.Append("Ready to harvest crops:^");
+                count++;
+
+                EchoForCrops(ref stringBuilder, _unharvestedCropsInFarm, ref count, "Farm");
+                EchoForCrops(ref stringBuilder, _unharvestedCropsInGreenhouse, ref count, "Greenhouse");
+
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_deadCropsInFarm.Count > 0 || _deadCropsInGreenhouse.Count > 0)
+            {
+                stringBuilder.Append("Dead Crops:^");
+                count++;
+
+                EchoForCrops(ref stringBuilder, _deadCropsInFarm, ref count, "Farm");
+                EchoForCrops(ref stringBuilder, _deadCropsInGreenhouse, ref count, "Greenhouse");
+
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_unpettedAnimals.Count > 0)
+            {
+                stringBuilder.Append("Unpetted animals:^");
+                count++;
+
+                foreach (var animal in _unpettedAnimals)
                 {
-                    stringBuilder.Append("Unwatered crops:^");
+                    stringBuilder.Append($"{animal.type} {animal.displayName}^");
                     count++;
-
-                    EchoForCrops(ref stringBuilder, unwateredCropsInFarm, ref count, "Farm");
-                    EchoForCrops(ref stringBuilder, unwateredCropsInGreenhouse, ref count, "Greenhouse");
-
-                    NextPage(ref stringBuilder, ref count);
                 }
 
-                if (unharvestedCropsInFarm.Count > 0 || unharvestedCropsInGreenhouse.Count > 0)
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_uncollectedAnimalProductFromAnimal.Count > 0)
+            {
+                stringBuilder.Append("Animal products:^");
+                ++count;
+
+                foreach (var animal in _uncollectedAnimalProductFromAnimal)
                 {
-                    stringBuilder.Append("Ready to harvest crops:^");
-                    count++;
-
-                    EchoForCrops(ref stringBuilder, unharvestedCropsInFarm, ref count, "Farm");
-                    EchoForCrops(ref stringBuilder, unharvestedCropsInGreenhouse, ref count, "Greenhouse");
-
-                    NextPage(ref stringBuilder, ref count);
-                }
-
-                if (deadCropsInFarm.Count > 0 || deadCropsInGreenhouse.Count > 0)
-                {
-                    stringBuilder.Append("Dead Crops:^");
-                    count++;
-
-                    EchoForCrops(ref stringBuilder, deadCropsInFarm, ref count, "Farm");
-                    EchoForCrops(ref stringBuilder, deadCropsInGreenhouse, ref count, "Greenhouse");
-
-                    NextPage(ref stringBuilder, ref count);
-                }
-
-                if (unpettedAnimals.Count > 0)
-                {
-                    stringBuilder.Append("Unpetted animals:^");
-                    count++;
-
-                    foreach (FarmAnimal animal in unpettedAnimals)
-                    {
-                        stringBuilder.Append($"{animal.type} {animal.displayName}^");
-                        count++;
-                    }
-
-                    NextPage(ref stringBuilder, ref count);
-                }
-
-                if (uncollectedAnimalProductFromAnimal.Count > 0)
-                {
-                    stringBuilder.Append("Animal products:^");
+                    var produceName = Game1.objectInformation[animal.currentProduce].Split("/".ToCharArray(), 2)[0];
+                    stringBuilder.Append($"{animal.type} {animal.displayName} has {produceName}^");
                     ++count;
-
-                    foreach (FarmAnimal animal in uncollectedAnimalProductFromAnimal)
-                    {
-                        string produceName = Game1.objectInformation[animal.currentProduce].Split("/".ToCharArray(), 2)[0];
-                        stringBuilder.Append($"{animal.type} {animal.displayName} has {produceName}^");
-                        ++count;
-                    }
-
-                    NextPage(ref stringBuilder, ref count);
                 }
 
-                if (totalHay > 0)
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_totalHay > 0)
+            {
+                stringBuilder.Append("Feedbenches not full of hay:^");
+                count++;
+
+                foreach (var tuple in _missingHay)
                 {
-                    stringBuilder.Append("Feedbenches not full of hay:^");
+                    var s = "s";
+                    if (tuple.Item2 == 1)
+                        s = string.Empty;
+                    stringBuilder.Append($"{tuple.Item2} hay{s} missing at {tuple.Item1.indoors.Name} ({tuple.Item1.tileX}, {tuple.Item1.tileY})^");
                     count++;
-
-                    foreach (Tuple<Building, int> tuple in missingHay)
-                    {
-                        string s = "s";
-                        if (tuple.Item2 == 1)
-                            s = String.Empty;
-                        stringBuilder.Append($"{tuple.Item2} hay{s} missing at {tuple.Item1.indoors.Name} ({tuple.Item1.tileX}, {tuple.Item1.tileY})^");
-                        count++;
-                    }
-
-                    NextPage(ref stringBuilder, ref count);
                 }
 
-                if (objectsInFarmCave.Count > 0)
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_objectsInFarmCave.Count > 0)
+            {
+                stringBuilder.Append($"{_farmCaveChoice} in the farm cave:^");
+                count++;
+
+                foreach (var pair in _objectsInFarmCave)
                 {
-                    stringBuilder.Append($"{farmCaveChoice} in the farm cave:^");
+                    var name = Pluralize(pair.Key, pair.Value);
+                    stringBuilder.Append($"{pair.Value} {name}^");
                     count++;
-
-                    foreach (KeyValuePair<string, int> pair in objectsInFarmCave)
-                    {
-                        string name = Pluralize(pair.Key, pair.Value);
-                        stringBuilder.Append($"{pair.Value} {name}^");
-                        count++;
-                    }
-
-                    NextPage(ref stringBuilder, ref count);
                 }
 
-                if (uncollectedCrabpots.Count > 0)
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_uncollectedCrabpots.Count > 0)
+            {
+                stringBuilder.Append("Uncollected crabpots:^");
+                count++;
+
+                foreach (var t in _uncollectedCrabpots)
                 {
-                    stringBuilder.Append("Uncollected crabpots:^");
+                    stringBuilder.Append($"{t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
                     count++;
-
-                    foreach (Tuple<CrabPot, string> t in uncollectedCrabpots)
-                    {
-                        stringBuilder.Append($"{t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
-                        count++;
-                    }
-
-                    NextPage(ref stringBuilder, ref count);
                 }
 
-                if (notBaitedCrabpots.Count > 0)
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            if (_notBaitedCrabpots.Count > 0)
+            {
+                stringBuilder.Append("Crabpots still not baited:^");
+                ++count;
+
+                foreach (var t in _notBaitedCrabpots)
                 {
-                    stringBuilder.Append("Crabpots still not baited:^");
+                    stringBuilder.Append($"{t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
+                    count++;
+                }
+
+                NextPage(ref stringBuilder, ref count);
+            }
+
+            // ReSharper disable once InvertIf
+            if (_uncollectedMachines.Count > 0)
+            {
+                stringBuilder.Append("Machines ready to collect:^");
+                ++count;
+
+                foreach (var t in _uncollectedMachines)
+                {
+                    stringBuilder.Append($"{t.Item1.name} with {t.Item1.heldObject.name} at {t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
                     ++count;
-
-                    foreach (Tuple<CrabPot, string> t in notBaitedCrabpots)
-                    {
-                        stringBuilder.Append($"{t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
-                        count++;
-                    }
-
-                    NextPage(ref stringBuilder, ref count);
-                }
-
-                if (uncollectedMachines.Count > 0)
-                {
-                    stringBuilder.Append("Machines ready to collect:^");
-                    ++count;
-
-                    foreach (Tuple<StardewValley.Object, string> t in uncollectedMachines)
-                    {
-                        stringBuilder.Append($"{t.Item1.name} with {t.Item1.heldObject.name} at {t.Item2} ({t.Item1.tileLocation.X}, {t.Item1.tileLocation.Y})^");
-                        ++count;
-                    }
                 }
             }
 
@@ -228,10 +231,10 @@ namespace DailyTasksReport
 
         internal void AddUncollectedAnimalProduct(FarmAnimal farmAnimal)
         {
-            uncollectedAnimalProductFromAnimal.Add(farmAnimal);
+            _uncollectedAnimalProductFromAnimal.Add(farmAnimal);
         }
 
-        private string Pluralize(string name, int number)
+        private static string Pluralize(string name, int number)
         {
             if (number < 2)
                 return name;
@@ -250,9 +253,9 @@ namespace DailyTasksReport
             }
         }
 
-        private static void EchoForCrops(ref StringBuilder stringBuilder, IList<Tuple<Vector2, string>> list, ref int count, string name)
+        private static void EchoForCrops(ref StringBuilder stringBuilder, IEnumerable<Tuple<Vector2, string>> list, ref int count, string name)
         {
-            foreach (Tuple<Vector2, string> tuple in list)
+            foreach (var tuple in list)
             {
                 stringBuilder.Append($"{tuple.Item2} at {name} ({tuple.Item1.X}, {tuple.Item1.Y})^");
                 count++;
@@ -261,99 +264,117 @@ namespace DailyTasksReport
 
         internal void AddUnwateredCrop(string locationName, Vector2 pos, string cropName)
         {
-            if (locationName == "Farm")
-                unwateredCropsInFarm.Add(Tuple.Create(pos, cropName));
-            else if (locationName == "Greenhouse")
-                unwateredCropsInGreenhouse.Add(Tuple.Create(pos, cropName));
-            else
-                parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
+            switch (locationName)
+            {
+                case "Farm":
+                    _unwateredCropsInFarm.Add(Tuple.Create(pos, cropName));
+                    break;
+                case "Greenhouse":
+                    _unwateredCropsInGreenhouse.Add(Tuple.Create(pos, cropName));
+                    break;
+                default:
+                    _parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
+                    break;
+            }
         }
 
         internal void AddUnharvestedCrop(string locationName, Vector2 pos, string cropName)
         {
-            if (locationName == "Farm")
-                unharvestedCropsInFarm.Add(Tuple.Create(pos, cropName));
-            else if (locationName == "Greenhouse")
-                unharvestedCropsInGreenhouse.Add(Tuple.Create(pos, cropName));
-            else
-                parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
+            switch (locationName)
+            {
+                case "Farm":
+                    _unharvestedCropsInFarm.Add(Tuple.Create(pos, cropName));
+                    break;
+                case "Greenhouse":
+                    _unharvestedCropsInGreenhouse.Add(Tuple.Create(pos, cropName));
+                    break;
+                default:
+                    _parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
+                    break;
+            }
         }
 
         internal void AddDeadCrop(string locationName, Vector2 pos, string cropName)
         {
-            if (locationName == "Farm")
-                deadCropsInFarm.Add(Tuple.Create(pos, cropName));
-            else if (locationName == "Greenhouse")
-                deadCropsInGreenhouse.Add(Tuple.Create(pos, cropName));
-            else
-                parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
+            switch (locationName)
+            {
+                case "Farm":
+                    _deadCropsInFarm.Add(Tuple.Create(pos, cropName));
+                    break;
+                case "Greenhouse":
+                    _deadCropsInGreenhouse.Add(Tuple.Create(pos, cropName));
+                    break;
+                default:
+                    _parent.Monitor.Log("Crop location is not Farm nor Greenhouse.", LogLevel.Error);
+                    break;
+            }
         }
 
         internal void PetWasNotPetted()
         {
-            petWasPetted = false;
+            _petWasPetted = false;
         }
 
         internal void PetBowlNotFilled()
         {
-            petBowlFilled = false;
+            _petBowlFilled = false;
         }
 
         internal void AddUnpettedAnimal(FarmAnimal animal)
         {
-            unpettedAnimals.Add(animal);
+            _unpettedAnimals.Add(animal);
         }
 
         internal void AddMissingHay(Building building, int missing)
         {
-            missingHay.Add(Tuple.Create(building, missing));
-            totalHay += missing;
+            _missingHay.Add(Tuple.Create(building, missing));
+            _totalHay += missing;
         }
 
         internal void AddFarmCaveObject(StardewValley.Object o)
         {
-            if (objectsInFarmCave.ContainsKey(o.name))
-                objectsInFarmCave[o.name] += 1;
+            if (_objectsInFarmCave.ContainsKey(o.name))
+                _objectsInFarmCave[o.name] += 1;
             else
-                objectsInFarmCave.Add(o.name, 1);
-            caveObjectsCount++;
+                _objectsInFarmCave.Add(o.name, 1);
+            _caveObjectsCount++;
         }
 
         internal void AddUncollectedCrabpot(CrabPot cb, string locationName)
         {
-            uncollectedCrabpots.Add(Tuple.Create(cb, locationName));
+            _uncollectedCrabpots.Add(Tuple.Create(cb, locationName));
         }
 
         internal void AddNotBaitedCrabpot(CrabPot cb, string locationName)
         {
-            notBaitedCrabpots.Add(Tuple.Create(cb, locationName));
+            _notBaitedCrabpots.Add(Tuple.Create(cb, locationName));
         }
 
         internal void AddMachine(StardewValley.Object machine, string locationName)
         {
-            uncollectedMachines.Add(Tuple.Create(machine, locationName));
+            _uncollectedMachines.Add(Tuple.Create(machine, locationName));
         }
 
         internal void Clear()
         {
-            unwateredCropsInFarm.Clear();
-            unwateredCropsInGreenhouse.Clear();
-            unharvestedCropsInFarm.Clear();
-            unharvestedCropsInGreenhouse.Clear();
-            deadCropsInFarm.Clear();
-            deadCropsInGreenhouse.Clear();
-            unpettedAnimals.Clear();
-            uncollectedAnimalProductFromAnimal.Clear();
-            petExists = false;
-            petBowlFilled = true;
-            petWasPetted = true;
-            missingHay.Clear();
-            totalHay = 0;
-            uncollectedCrabpots.Clear();
-            notBaitedCrabpots.Clear();
-            objectsInFarmCave.Clear();
-            caveObjectsCount = 0;
-            uncollectedMachines.Clear();
+            _unwateredCropsInFarm.Clear();
+            _unwateredCropsInGreenhouse.Clear();
+            _unharvestedCropsInFarm.Clear();
+            _unharvestedCropsInGreenhouse.Clear();
+            _deadCropsInFarm.Clear();
+            _deadCropsInGreenhouse.Clear();
+            _unpettedAnimals.Clear();
+            _uncollectedAnimalProductFromAnimal.Clear();
+            PetExists = false;
+            _petBowlFilled = true;
+            _petWasPetted = true;
+            _missingHay.Clear();
+            _totalHay = 0;
+            _uncollectedCrabpots.Clear();
+            _notBaitedCrabpots.Clear();
+            _objectsInFarmCave.Clear();
+            _caveObjectsCount = 0;
+            _uncollectedMachines.Clear();
         }
     }
 }
