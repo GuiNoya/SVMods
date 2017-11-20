@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework.Input;
 using Newtonsoft.Json;
 using StardewModdingAPI;
 
@@ -10,7 +11,7 @@ namespace DailyTasksReport
         public string OpenReportKey { get; set; } = Keys.Y.ToString();
 
         /// <summary> The input to open the settings menu. </summary>
-        public SButton OpenSettings { get; set; } = SButton.None;
+        public string OpenSettings { get; set; } = Keys.None.ToString();
 
         /// <summary> Show detailed info on the next pages. </summary>
         public bool ShowDetailedInfo { get; set; } = true;

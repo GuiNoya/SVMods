@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
@@ -183,7 +182,7 @@ namespace DailyTasksReport.UI
             base.receiveKeyPress(key);
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
-            if ((SButton) key == _parent.Config.OpenReportKey && readyToClose())
+            if (key.ToString() == _parent.Config.OpenReportKey && readyToClose())
             {
                 if (_firstKeyEvent)
                 {
@@ -202,7 +201,7 @@ namespace DailyTasksReport.UI
                 --_page;
                 Game1.playSound("shwip");
             }
-            else if ((SButton) key == _parent.Config.OpenSettings)
+            else if (key.ToString() == _parent.Config.OpenSettings)
             {
                 SettingsMenu.OpenMenu(_parent);
             }

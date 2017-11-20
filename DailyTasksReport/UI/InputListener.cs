@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -31,10 +30,10 @@ namespace DailyTasksReport.UI
             switch (whichOption)
             {
                 case OptionsEnum.OpenReportKey:
-                    _buttonName = config.OpenReportKey.ToString();
+                    _buttonName = config.OpenReportKey;
                     break;
                 case OptionsEnum.OpenSettings:
-                    _buttonName = config.OpenSettings.ToString();
+                    _buttonName = config.OpenSettings;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
@@ -65,15 +64,15 @@ namespace DailyTasksReport.UI
                 switch (_option)
                 {
                     case OptionsEnum.OpenReportKey:
-                        _config.OpenReportKey = (SButton) key;
+                        _config.OpenReportKey = key.ToString();
                         break;
                     case OptionsEnum.OpenSettings:
-                        _config.OpenSettings = (SButton) key;
+                        _config.OpenSettings = key.ToString();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
                 }
-                _buttonName = ((SButton) key).ToString();
+                _buttonName = key.ToString();
                 SettingsMenu.ConfigChanged = true;
                 Game1.playSound("coin");
             }

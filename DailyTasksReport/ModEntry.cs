@@ -1,5 +1,6 @@
 ﻿using System;
 using DailyTasksReport.UI;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -40,10 +41,10 @@ namespace DailyTasksReport
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree || e.Button == SButton.None)
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || e.KeyPressed == Keys.None)
                 return;
 
-            if (e.KeyPressed.ToString() == config.OpenReportKey)
+            if (e.KeyPressed.ToString() == Config.OpenReportKey)
             {
                 _report.Clear();
 
@@ -78,7 +79,7 @@ namespace DailyTasksReport
                 OpenReport();
                 _report.Clear();
             }
-            else if (e.Button == Config.OpenSettings)
+            else if (e.KeyPressed.ToString() == Config.OpenSettings)
             {
                 SettingsMenu.OpenMenu(this);
             }
