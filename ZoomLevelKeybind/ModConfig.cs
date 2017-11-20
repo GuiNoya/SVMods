@@ -1,5 +1,6 @@
-﻿using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
+﻿using StardewModdingAPI;
+
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 
 namespace ZoomLevelKeybind
 {

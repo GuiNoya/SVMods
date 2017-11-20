@@ -46,11 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\Checkbox.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReportBuilder.cs" />
-    <Compile Include="ReportMenu.cs" />
+    <Compile Include="UI\InputListener.cs" />
+    <Compile Include="UI\OptionsEnum.cs" />
+    <Compile Include="UI\ReportMenu.cs" />
+    <Compile Include="UI\SettingsMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="manifest.json" />
