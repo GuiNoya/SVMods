@@ -74,7 +74,6 @@ namespace DailyTasksReport.UI
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
                 }
                 _buttonName = ((SButton) key).ToString();
-                SettingsMenu.ConfigChanged = true;
                 Game1.playSound("coin");
             }
             _listening = false;

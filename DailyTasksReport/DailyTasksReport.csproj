@@ -46,6 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tasks\ObjectsTask.cs" />
+    <Compile Include="Tasks\AnimalsTask.cs" />
+    <Compile Include="Tasks\CropsTask.cs" />
+    <Compile Include="Tasks\FarmCaveTask.cs" />
+    <Compile Include="Tasks\PetTask.cs" />
+    <Compile Include="Tasks\Task.cs" />
+    <Compile Include="Tasks\TaskItem.cs" />
     <Compile Include="UI\Checkbox.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModEntry.cs" />
