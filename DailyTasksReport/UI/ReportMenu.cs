@@ -22,15 +22,17 @@ namespace DailyTasksReport.UI
         private int _page;
         private float _scale;
 
-        public ReportMenu(ModEntry parent, string text) : base(
+        public ReportMenu(ModEntry parent, string text, bool skipAnimation = false) : base(
             (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).X,
             (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).Y,
             320 * Game1.pixelZoom, 180 * Game1.pixelZoom, true)
         {
             _parent = parent;
             _firstKeyEvent = true;
+            _scale = skipAnimation ? 1.0f : 0.0f;
 
-            Game1.playSound("shwip");
+            if (!skipAnimation)
+                Game1.playSound("shwip");
 
             _backButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + Game1.tileSize / 2,
@@ -93,6 +95,8 @@ namespace DailyTasksReport.UI
                 new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
                     12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
                 (float) (Game1.pixelZoom * 0.85));
+
+            initializeUpperRightCloseButton();
         }
 
         public override void receiveGamePadButton(Buttons b)

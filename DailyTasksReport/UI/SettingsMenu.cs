@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,22 +12,21 @@ namespace DailyTasksReport.UI
     internal class SettingsMenu : IClickableMenu
     {
         private const int ItemsPerPage = 8;
-        private readonly int _yMargin = Game1.tileSize / 4;
 
         private static IClickableMenu _previousMenu;
-        internal static bool ConfigChanged;
         internal static InputListener KeyReceiver = null;
-
-        private readonly ClickableTextureComponent _upArrow;
         private readonly ClickableTextureComponent _downArrow;
-        private readonly ClickableTextureComponent _scrollBar;
-        private Rectangle _scrollBarRunner;
+        private readonly List<OptionsElement> _options = new List<OptionsElement>();
 
         private readonly ModEntry _parent;
+        private readonly ClickableTextureComponent _scrollBar;
         private readonly List<Rectangle> _slots = new List<Rectangle>();
-        private readonly List<OptionsElement> _options = new List<OptionsElement>();
-        
+
+        private readonly ClickableTextureComponent _upArrow;
+        private readonly int _yMargin = Game1.tileSize / 4;
+
         private int _currentIndex;
+        private Rectangle _scrollBarRunner;
         private int _yScrollBarOffsetHeld = -1;
 
         private SettingsMenu(ModEntry parent, int currentIndex = 0) :
@@ -107,7 +107,7 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Tapper", OptionsEnum.Tapper, parent.Config, 1));
             _options.Add(new Checkbox("Worm bin", OptionsEnum.WormBin, parent.Config, 1));
         }
-
+        
         public override void draw(SpriteBatch b)
         {
             _previousMenu?.draw(b);
@@ -115,7 +115,8 @@ namespace DailyTasksReport.UI
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             drawTextureBox(Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
             var yTitleOffset = (int) (SpriteText.getHeightOfString("Daily Tasks Report Settings") * 1.6);
-            SpriteText.drawStringWithScrollCenteredAt(b, "Daily Tasks Settings", xPositionOnScreen + width / 2, yPositionOnScreen - yTitleOffset);
+            SpriteText.drawStringWithScrollCenteredAt(b, "Daily Tasks Settings", xPositionOnScreen + width / 2,
+                yPositionOnScreen - yTitleOffset);
 
             _upArrow.draw(b);
             _downArrow.draw(b);
@@ -169,20 +170,22 @@ namespace DailyTasksReport.UI
                 return;
             }
 
+            var optionClicked = false;
             for (var i = 0; i < _slots.Count; ++i)
                 // ReSharper disable once InvertIf
-                if (_slots[i].Contains(x, y) && _options[_currentIndex + i].bounds.Contains(x - _slots[i].X, y - _slots[i].Y))
+                if (_slots[i].Contains(x, y) &&
+                    _options[_currentIndex + i].bounds.Contains(x - _slots[i].X, y - _slots[i].Y))
                 {
                     _options[_currentIndex + i].receiveLeftClick(x - _slots[i].X, y - _slots[i].Y);
+                    optionClicked = true;
+                    _parent.RefreshReport = true;
                     break;
                 }
 
-            if (ConfigChanged)
+            if (optionClicked)
             {
                 RefreshOptionStatus();
-
                 _parent.Helper.WriteConfig(_parent.Config);
-                ConfigChanged = false;
             }
 
             // Check the close button
@@ -268,9 +271,7 @@ namespace DailyTasksReport.UI
             if (KeyReceiver != null)
             {
                 KeyReceiver.receiveKeyPress(key);
-                if (!ConfigChanged) return;
                 _parent.Helper.WriteConfig(_parent.Config);
-                ConfigChanged = false;
             }
             else
             {
@@ -280,8 +281,10 @@ namespace DailyTasksReport.UI
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
         {
-            if (Game1.activeClickableMenu is SettingsMenu)
-                Game1.activeClickableMenu = new SettingsMenu(_parent, _currentIndex);
+            if (!(Game1.activeClickableMenu is SettingsMenu)) return;
+
+            Game1.activeClickableMenu = new SettingsMenu(_parent, _currentIndex);
+            _previousMenu?.gameWindowSizeChanged(oldBounds, newBounds);
         }
 
         public static void OpenMenu(ModEntry parent)
@@ -300,6 +303,14 @@ namespace DailyTasksReport.UI
             if (_previousMenu == null) return;
             Game1.activeClickableMenu = _previousMenu;
             _previousMenu = null;
+        }
+
+        public static event EventHandler ReportConfigChanged;
+
+        internal static void RaiseReportConfigChanged()
+        {
+            var handler = ReportConfigChanged;
+            handler?.Invoke(null, null);
         }
     }
 }

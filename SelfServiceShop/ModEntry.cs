@@ -98,32 +98,42 @@ namespace SelfServiceShop
                 case "Carpenter":
                     if (_config.Carpenter)
                     {
-                        NPC robin;
                         if (_config.ShopsAlwaysOpen)
-                            robin = GetNpc("Robin");
-                        else if (Game1.currentLocation.characters.Find(c => c.name == "Robin") is NPC npc)
-                            robin = npc;
+                        {
+                            Carpenters();
+                        }
                         else
-                            break;
-                        var carpenters = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "carpenters");
-                        var tileLocation = robin.getTileLocation();
-                        carpenters.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y));
+                        {
+                            NPC robin;
+                            if (Game1.currentLocation.characters.Find(c => c.name == "Robin") is NPC npc)
+                                robin = npc;
+                            else
+                                break;
+                            var carpenters = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "carpenters");
+                            var tileLocation = robin.getTileLocation();
+                            carpenters.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y));
+                        }
                         SuppressButton();
                     }
                     break;
                 case "AnimalShop":
                     if (_config.Ranch)
                     {
-                        NPC marnie;
                         if (_config.ShopsAlwaysOpen)
-                            marnie = GetNpc("Marnie");
-                        else if (Game1.currentLocation.characters.Find(c => c.name == "Marnie") is NPC npc)
-                            marnie = npc;
+                        {
+                            AnimalShop();
+                        }
                         else
-                            break;
-                        var animalShop = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "animalShop");
-                        var tileLocation = marnie.getTileLocation();
-                        animalShop.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y + 1));
+                        {
+                            NPC marnie;
+                            if (Game1.currentLocation.characters.Find(c => c.name == "Marnie") is NPC npc)
+                                marnie = npc;
+                            else
+                                break;
+                            var animalShop = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "animalShop");
+                            var tileLocation = marnie.getTileLocation();
+                            animalShop.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y + 1));
+                        }
                         SuppressButton();
                     }
                     break;
@@ -156,19 +166,51 @@ namespace SelfServiceShop
                 .characters.Exists(c => c.name == name);
         }
 
-        private static NPC GetNpc(string name)
+        private void Carpenters()
         {
-            var npc = Game1.currentLocation.characters.Find(c => c.name == name);
-            if (npc != null)
-                return npc;
-
-            foreach (var location in Game1.locations)
+            if (Game1.player.currentUpgrade != null)
+                return;
+            if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction())
             {
-                npc = location.characters.Find(c => c.name == name);
-                if (npc != null)
-                    return npc;
+                Response[] answerChoices;
+                if (Game1.player.houseUpgradeLevel < 3)
+                    answerChoices = new[]
+                    {
+                        new Response("Shop",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop")),
+                        new Response("Upgrade",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_UpgradeHouse")),
+                        new Response("Construct",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Construct")),
+                        new Response("Leave",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Leave"))
+                    };
+                else
+                    answerChoices = new[]
+                    {
+                        new Response("Shop",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop")),
+                        new Response("Construct",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Construct")),
+                        new Response("Leave",
+                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Leave"))
+                    };
+                Game1.currentLocation.createQuestionDialogue(
+                    Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu"), answerChoices,
+                    "carpenter");
+                return;
             }
-            return null;
+            Game1.activeClickableMenu = new ShopMenu(Utility.getCarpenterStock(), 0, "Robin");
+        }
+
+        private void AnimalShop()
+        {
+            Game1.currentLocation.createQuestionDialogue("", new[]
+            {
+                new Response("Supplies", Game1.content.LoadString("Strings\\Locations:AnimalShop_Marnie_Supplies")),
+                new Response("Purchase", Game1.content.LoadString("Strings\\Locations:AnimalShop_Marnie_Animals")),
+                new Response("Leave", Game1.content.LoadString("Strings\\Locations:AnimalShop_Marnie_Leave"))
+            }, "Marnie");
         }
 
         // From SMAPI 2.0 (SMAPI/Events/EventsArgsInput.cs) and https://github.com/Pathoschild/SMAPI/issues/384
