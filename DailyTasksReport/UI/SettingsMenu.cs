@@ -38,9 +38,7 @@ namespace DailyTasksReport.UI
             _currentIndex = currentIndex;
 
             Game1.playSound("bigSelect");
-
-            allClickableComponents = new List<ClickableComponent>();
-
+            
             upperRightCloseButton.bounds = new Rectangle(xPositionOnScreen + width + Game1.pixelZoom * 4,
                 yPositionOnScreen - Game1.pixelZoom * 20, Game1.pixelZoom * 12, Game1.pixelZoom * 12);
 
@@ -73,11 +71,9 @@ namespace DailyTasksReport.UI
                     upNeighborID = i > 0 ? i - 1 : -7777,
                     downNeighborID = i < ItemsPerPage - 1 ? i + 1 : -7777
                 };
-                allClickableComponents.Add(clickableComponent);
                 _slots.Add(clickableComponent);
             }
-
-            allClickableComponents.Add(upperRightCloseButton);
+            
 
             // Add options
             _options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, _slots[0].bounds.Width, parent.Config));
@@ -130,8 +126,10 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Tapper", OptionsEnum.Tapper, parent.Config, 1));
             _options.Add(new Checkbox("Worm bin", OptionsEnum.WormBin, parent.Config, 1));
 
-            currentlySnappedComponent = _slots[0];
-            snapToDefaultClickableComponent();
+            if (!Game1.options.snappyMenus || !Game1.options.gamepadControls) return;
+            allClickableComponents = new List<ClickableComponent>(_slots) {upperRightCloseButton};
+            currentlySnappedComponent = allClickableComponents[0];
+            snapCursorToCurrentSnappedComponent();
         }
 
         public sealed override void snapToDefaultClickableComponent()
@@ -141,7 +139,7 @@ namespace DailyTasksReport.UI
             snapCursorToCurrentSnappedComponent();
         }
 
-        public override void snapCursorToCurrentSnappedComponent()
+        public sealed override void snapCursorToCurrentSnappedComponent()
         {
             if (currentlySnappedComponent?.myID < _options.Count)
                 switch (_options[currentlySnappedComponent.myID + _currentIndex])
@@ -300,8 +298,9 @@ namespace DailyTasksReport.UI
 
         private void AdjustScrollBarPosition()
         {
-            _scrollBar.bounds.Y = _scrollBarRunner.Y + (_scrollBarRunner.Height - _scrollBar.bounds.Height) /
-                                  (_options.Count - ItemsPerPage) * _currentIndex;
+            _scrollBar.bounds.Y = (int) (_scrollBarRunner.Y +
+                                         (double) (_scrollBarRunner.Height - _scrollBar.bounds.Height) /
+                                         (_options.Count - ItemsPerPage) * _currentIndex);
         }
 
         private void SetCurrentIndexFromScrollBar()

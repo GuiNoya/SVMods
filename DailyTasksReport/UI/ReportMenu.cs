@@ -72,11 +72,9 @@ namespace DailyTasksReport.UI
             upperRightCloseButton.myID = 100;
             upperRightCloseButton.downNeighborID = 103;
 
-            if (Game1.options.SnappyMenus)
-            {
-                allClickableComponents = new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
-                snapToDefaultClickableComponent();
-            }
+            if (!Game1.options.SnappyMenus || !Game1.options.gamepadControls) return;
+            allClickableComponents = new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
+            snapToDefaultClickableComponent();
         }
 
         public sealed override void snapToDefaultClickableComponent()
