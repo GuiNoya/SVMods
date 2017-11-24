@@ -11,6 +11,8 @@ namespace DailyTasksReport.UI
     {
         private readonly ModConfig _config;
         private readonly OptionsEnum _option;
+
+        internal readonly int ItemLevel;
         private bool _isChecked;
 
         public Checkbox(string label, OptionsEnum whichOption, ModConfig config, int itemLevel = 0) :
@@ -18,6 +20,7 @@ namespace DailyTasksReport.UI
         {
             _option = whichOption;
             _config = config;
+            ItemLevel = itemLevel;
             bounds.X += itemLevel * Game1.pixelZoom * 7;
 
             if (whichOption == OptionsEnum.AllAnimalProducts || whichOption == OptionsEnum.AllMachines)

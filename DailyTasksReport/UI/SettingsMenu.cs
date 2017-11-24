@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
@@ -14,13 +13,12 @@ namespace DailyTasksReport.UI
         private const int ItemsPerPage = 8;
 
         private static IClickableMenu _previousMenu;
-        internal static InputListener KeyReceiver = null;
         private readonly ClickableTextureComponent _downArrow;
         private readonly List<OptionsElement> _options = new List<OptionsElement>();
 
         private readonly ModEntry _parent;
         private readonly ClickableTextureComponent _scrollBar;
-        private readonly List<Rectangle> _slots = new List<Rectangle>();
+        private readonly List<ClickableComponent> _slots = new List<ClickableComponent>();
 
         private readonly ClickableTextureComponent _upArrow;
         private readonly int _yMargin = Game1.tileSize / 4;
@@ -41,8 +39,13 @@ namespace DailyTasksReport.UI
 
             Game1.playSound("bigSelect");
 
+            allClickableComponents = new List<ClickableComponent>();
+
             upperRightCloseButton.bounds = new Rectangle(xPositionOnScreen + width + Game1.pixelZoom * 4,
                 yPositionOnScreen - Game1.pixelZoom * 20, Game1.pixelZoom * 12, Game1.pixelZoom * 12);
+
+            upperRightCloseButton.myID = 100;
+            upperRightCloseButton.downNeighborID = 0;
 
             // Initialize UI components
             _upArrow = new ClickableTextureComponent(
@@ -60,13 +63,25 @@ namespace DailyTasksReport.UI
                 height - _upArrow.bounds.Height * 2 - Game1.pixelZoom * 3);
 
             for (var i = 0; i < ItemsPerPage; ++i)
-                _slots.Add(new Rectangle(xPositionOnScreen,
+            {
+                var clickableComponent = new ClickableComponent(new Rectangle(xPositionOnScreen,
                     yPositionOnScreen + _yMargin + (height - Game1.tileSize / 2) / ItemsPerPage * i, width,
-                    (height - _yMargin * 2) / ItemsPerPage));
+                    (height - _yMargin * 2) / ItemsPerPage), i.ToString())
+                {
+                    myID = i,
+                    fullyImmutable = true,
+                    upNeighborID = i > 0 ? i - 1 : -7777,
+                    downNeighborID = i < ItemsPerPage - 1 ? i + 1 : -7777
+                };
+                allClickableComponents.Add(clickableComponent);
+                _slots.Add(clickableComponent);
+            }
+
+            allClickableComponents.Add(upperRightCloseButton);
 
             // Add options
-            _options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, _slots[0].Width, parent.Config));
-            _options.Add(new InputListener("Open Settings Key", OptionsEnum.OpenSettings, _slots[0].Width, parent.Config));
+            _options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, _slots[0].bounds.Width, parent.Config));
+            _options.Add(new InputListener("Open Settings Key", OptionsEnum.OpenSettings, _slots[0].bounds.Width, parent.Config));
             _options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.Config));
             _options.Add(new OptionsElement("Report:"));
             _options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.Config));
@@ -106,8 +121,64 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Statue Of Perfection", OptionsEnum.StatueOfPerfection, parent.Config, 1));
             _options.Add(new Checkbox("Tapper", OptionsEnum.Tapper, parent.Config, 1));
             _options.Add(new Checkbox("Worm bin", OptionsEnum.WormBin, parent.Config, 1));
+
+            currentlySnappedComponent = _slots[0];
+            snapToDefaultClickableComponent();
         }
-        
+
+        public sealed override void snapToDefaultClickableComponent()
+        {
+            _currentIndex = 0;
+            currentlySnappedComponent = allClickableComponents[0];
+            snapCursorToCurrentSnappedComponent();
+        }
+
+        public override void snapCursorToCurrentSnappedComponent()
+        {
+            if (currentlySnappedComponent?.myID < _options.Count)
+                switch (_options[currentlySnappedComponent.myID + _currentIndex])
+                {
+                    case InputListener _:
+                        Game1.setMousePosition(currentlySnappedComponent.bounds.Right - Game1.tileSize * 3 / 4,
+                            currentlySnappedComponent.bounds.Center.Y);
+                        break;
+                    case Checkbox cb:
+                        Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4 +
+                            cb.ItemLevel * Game1.pixelZoom * 7, currentlySnappedComponent.bounds.Center.Y);
+                        break;
+                    default:
+                        Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4,
+                            currentlySnappedComponent.bounds.Center.Y);
+                        break;
+                }
+            else
+                base.snapCursorToCurrentSnappedComponent();
+        }
+
+        protected override void customSnapBehavior(int direction, int oldRegion, int oldId)
+        {
+            if (oldId == ItemsPerPage - 1 && direction == 2 && _currentIndex < _options.Count - ItemsPerPage)
+            {
+                ++_currentIndex;
+                AdjustScrollBarPosition();
+                Game1.playSound("shiny4");
+            }
+            else if (oldId == 0 && direction == 0)
+            {
+                if (_currentIndex > 0)
+                {
+                    --_currentIndex;
+                    AdjustScrollBarPosition();
+                    Game1.playSound("shiny4");
+                }
+                else
+                {
+                    currentlySnappedComponent = allClickableComponents[ItemsPerPage];
+                    snapCursorToCurrentSnappedComponent();
+                }
+            }
+        }
+
         public override void draw(SpriteBatch b)
         {
             _previousMenu?.draw(b);
@@ -130,7 +201,7 @@ namespace DailyTasksReport.UI
             b.Begin(SpriteSortMode.FrontToBack, BlendState.NonPremultiplied, SamplerState.PointClamp, null, null);
 
             for (var i = 0; i < ItemsPerPage; ++i)
-                _options[_currentIndex + i].draw(b, _slots[i].X, _slots[i].Y);
+                _options[_currentIndex + i].draw(b, _slots[i].bounds.X, _slots[i].bounds.Y);
 
             b.End();
             b.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, null, null);
@@ -173,10 +244,10 @@ namespace DailyTasksReport.UI
             var optionClicked = false;
             for (var i = 0; i < _slots.Count; ++i)
                 // ReSharper disable once InvertIf
-                if (_slots[i].Contains(x, y) &&
-                    _options[_currentIndex + i].bounds.Contains(x - _slots[i].X, y - _slots[i].Y))
+                if (_slots[i].bounds.Contains(x, y) &&
+                    _options[_currentIndex + i].bounds.Contains(x - _slots[i].bounds.X, y - _slots[i].bounds.Y))
                 {
-                    _options[_currentIndex + i].receiveLeftClick(x - _slots[i].X, y - _slots[i].Y);
+                    _options[_currentIndex + i].receiveLeftClick(x - _slots[i].bounds.X, y - _slots[i].bounds.Y);
                     optionClicked = true;
                     _parent.RefreshReport = true;
                     break;
@@ -264,19 +335,6 @@ namespace DailyTasksReport.UI
             _upArrow.tryHover(x, y);
             _downArrow.tryHover(x, y);
             _scrollBar.tryHover(x, y);
-        }
-
-        public override void receiveKeyPress(Keys key)
-        {
-            if (KeyReceiver != null)
-            {
-                KeyReceiver.receiveKeyPress(key);
-                _parent.Helper.WriteConfig(_parent.Config);
-            }
-            else
-            {
-                base.receiveKeyPress(key);
-            }
         }
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
