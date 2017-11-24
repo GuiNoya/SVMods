@@ -43,7 +43,7 @@ namespace DailyTasksReport.Tasks
 
         private void Scan(GameLocation location = null)
         {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree)
+            if (!Context.IsWorldReady || !Context.IsPlayerFree || (!_config.UnwateredCrops && !_config.UnharvestedCrops && !_config.DeadCrops))
                 return;
 
             if (location == null)

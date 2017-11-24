@@ -95,6 +95,14 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Cow milk", OptionsEnum.CowMilk, parent.Config, 1));
             _options.Add(new Checkbox("Goat milk", OptionsEnum.GoatMilk, parent.Config, 1));
             _options.Add(new Checkbox("Sheep wool", OptionsEnum.SheepWool, parent.Config, 1));
+            _options.Add(new Checkbox("Chicken egg", OptionsEnum.ChickenEgg, parent.Config, 1));
+            _options.Add(new Checkbox("Dinosaur egg", OptionsEnum.DinosaurEgg, parent.Config, 1));
+            _options.Add(new Checkbox("Duck egg", OptionsEnum.DuckEgg, parent.Config, 1));
+            _options.Add(new Checkbox("Duck feather", OptionsEnum.DuckFeather, parent.Config, 1));
+            _options.Add(new Checkbox("Rabit's wool", OptionsEnum.RabitsWool, parent.Config, 1));
+            _options.Add(new Checkbox("Rabit's foot", OptionsEnum.RabitsFoot, parent.Config, 1));
+            _options.Add(new Checkbox("Truffle", OptionsEnum.Truffle, parent.Config, 1));
+            _options.Add(new Checkbox("Slime ball", OptionsEnum.SlimeBall, parent.Config, 1));
             // Other configs
             _options.Add(new Checkbox("Missing hay", OptionsEnum.MissingHay, parent.Config));
             _options.Add(new Checkbox("Items in farm cave", OptionsEnum.FarmCave, parent.Config));
