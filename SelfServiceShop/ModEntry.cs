@@ -120,9 +120,7 @@ namespace SelfServiceShop
 
         private void Carpenters()
         {
-            if (Game1.player.currentUpgrade != null)
-                return;
-            if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction())
+            if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction() && Game1.player.currentUpgrade == null)
             {
                 Response[] answerChoices;
                 if (Game1.player.houseUpgradeLevel < 3)
