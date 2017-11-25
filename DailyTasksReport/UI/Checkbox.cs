@@ -11,6 +11,8 @@ namespace DailyTasksReport.UI
     {
         private readonly ModConfig _config;
         private readonly OptionsEnum _option;
+
+        internal readonly int ItemLevel;
         private bool _isChecked;
 
         public Checkbox(string label, OptionsEnum whichOption, ModConfig config, int itemLevel = 0) :
@@ -18,6 +20,7 @@ namespace DailyTasksReport.UI
         {
             _option = whichOption;
             _config = config;
+            ItemLevel = itemLevel;
             bounds.X += itemLevel * Game1.pixelZoom * 7;
 
             if (whichOption == OptionsEnum.AllAnimalProducts || whichOption == OptionsEnum.AllMachines)
@@ -71,9 +74,7 @@ namespace DailyTasksReport.UI
 
                 // Animal products
                 case OptionsEnum.AllAnimalProducts:
-                    _isChecked = _config.AnimalProducts["Cow milk"] &&
-                                 _config.AnimalProducts["Goat milk"] &&
-                                 _config.AnimalProducts["Sheep wool"];
+                    _isChecked = !_config.AnimalProducts.ContainsValue(false);
                     break;
                 case OptionsEnum.CowMilk:
                     _isChecked = _config.AnimalProducts["Cow milk"];
@@ -83,6 +84,30 @@ namespace DailyTasksReport.UI
                     break;
                 case OptionsEnum.SheepWool:
                     _isChecked = _config.AnimalProducts["Sheep wool"];
+                    break;
+                case OptionsEnum.ChickenEgg:
+                    _isChecked = _config.AnimalProducts["Chicken egg"];
+                    break;
+                case OptionsEnum.DinosaurEgg:
+                    _isChecked = _config.AnimalProducts["Dinosaur egg"];
+                    break;
+                case OptionsEnum.DuckEgg:
+                    _isChecked = _config.AnimalProducts["Duck egg"];
+                    break;
+                case OptionsEnum.DuckFeather:
+                    _isChecked = _config.AnimalProducts["Duck feather"];
+                    break;
+                case OptionsEnum.RabitsWool:
+                    _isChecked = _config.AnimalProducts["Rabit's wool"];
+                    break;
+                case OptionsEnum.RabitsFoot:
+                    _isChecked = _config.AnimalProducts["Rabit's foot"];
+                    break;
+                case OptionsEnum.Truffle:
+                    _isChecked = _config.AnimalProducts["Truffle"];
+                    break;
+                case OptionsEnum.SlimeBall:
+                    _isChecked = _config.AnimalProducts["Slime ball"];
                     break;
 
                 // Machines
@@ -220,9 +245,8 @@ namespace DailyTasksReport.UI
 
                 // Animal products
                 case OptionsEnum.AllAnimalProducts:
-                    _config.AnimalProducts["Cow milk"] = _isChecked;
-                    _config.AnimalProducts["Goat milk"] = _isChecked;
-                    _config.AnimalProducts["Sheep wool"] = _isChecked;
+                    foreach (var key in _config.AnimalProducts.Keys.ToList())
+                        _config.AnimalProducts[key] = _isChecked;
                     break;
                 case OptionsEnum.CowMilk:
                     _config.AnimalProducts["Cow milk"] = _isChecked;
@@ -232,6 +256,30 @@ namespace DailyTasksReport.UI
                     break;
                 case OptionsEnum.SheepWool:
                     _config.AnimalProducts["Sheep wool"] = _isChecked;
+                    break;
+                case OptionsEnum.ChickenEgg:
+                    _config.AnimalProducts["Chicken egg"] = _isChecked;
+                    break;
+                case OptionsEnum.DinosaurEgg:
+                    _config.AnimalProducts["Dinosaur egg"] = _isChecked;
+                    break;
+                case OptionsEnum.DuckEgg:
+                    _config.AnimalProducts["Duck egg"] = _isChecked;
+                    break;
+                case OptionsEnum.DuckFeather:
+                    _config.AnimalProducts["Duck feather"] = _isChecked;
+                    break;
+                case OptionsEnum.RabitsWool:
+                    _config.AnimalProducts["Rabit's wool"] = _isChecked;
+                    break;
+                case OptionsEnum.RabitsFoot:
+                    _config.AnimalProducts["Rabit's foot"] = _isChecked;
+                    break;
+                case OptionsEnum.Truffle:
+                    _config.AnimalProducts["Truffle"] = _isChecked;
+                    break;
+                case OptionsEnum.SlimeBall:
+                    _config.AnimalProducts["Slime ball"] = _isChecked;
                     break;
 
                 // Machines

@@ -2,6 +2,8 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -45,16 +47,13 @@ namespace DailyTasksReport.UI
             if (greyedOut || _listening || !_buttonBounds.Contains(x, y))
                 return;
             _listening = true;
-            SettingsMenu.KeyReceiver = this;
+            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             Game1.playSound("breathin");
         }
 
-        public override void receiveKeyPress(Keys key)
+        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
         {
-            if (greyedOut || !_listening)
-                return;
-
-            if (key == Keys.Escape)
+            if (e.Button == (SButton) Keys.Escape)
             {
                 Game1.playSound("bigDeSelect");
             }
@@ -76,7 +75,8 @@ namespace DailyTasksReport.UI
                 Game1.playSound("coin");
             }
             _listening = false;
-            SettingsMenu.KeyReceiver = null;
+            InputEvents.ButtonPressed -= InputEvents_ButtonPressed;
+            e.SuppressButton();
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)

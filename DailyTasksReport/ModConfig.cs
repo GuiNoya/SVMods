@@ -38,16 +38,17 @@ namespace DailyTasksReport
         [JsonProperty(ObjectCreationHandling = ObjectCreationHandling.Auto)]
         public Dictionary<string, bool> AnimalProducts { get; set; } = new Dictionary<string, bool>
         {
-            //{ "Chicken egg", true },
-            //{ "Dinosaur egg", true }
-            //{ "Duck egg", true},
-            //{ "Duck feather", true },
             {"Cow milk", true},
             {"Goat milk", true},
-            {"Sheep wool", true}
-            //{ "Truffle", true},
-            //{ "Rabit's foot", true },
-            //{ "Slime", true }
+            {"Sheep wool", true},
+            {"Chicken egg", true},
+            {"Dinosaur egg", true},
+            {"Duck egg", true},
+            {"Duck feather", true},
+            {"Rabit's wool", true},
+            {"Rabit's foot", true},
+            {"Truffle", true},
+            {"Slime ball", true}
         };
 
         /// <summary> Check or not if the feeding benches are not full. </summary>

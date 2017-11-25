@@ -32,8 +32,8 @@
         SheepWool = 207,
         Truffle = 208,
         RabitsWool = 209,
-        Rabitsfoot = 210,
-        Slime = 211,
+        RabitsFoot = 210,
+        SlimeBall = 211,
 
         //Machines
         AllMachines = 300,

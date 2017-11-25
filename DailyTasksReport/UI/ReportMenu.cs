@@ -40,6 +40,7 @@ namespace DailyTasksReport.UI
                     11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(352, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 101,
+                upNeighborID = 103,
                 rightNeighborID = 102
             };
 
@@ -49,20 +50,33 @@ namespace DailyTasksReport.UI
                     11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(365, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 102,
+                upNeighborID = 103,
                 leftNeighborID = 101
+            };
+
+            _settingsButton = new ClickableTextureComponent(
+                new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
+                    12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
+                (float) (Game1.pixelZoom * 0.85))
+            {
+                myID = 103,
+                upNeighborID = 100,
+                downNeighborID = 102
             };
 
             _mailMessage =
                 SpriteText.getStringBrokenIntoSectionsOfHeight(text, width - Game1.tileSize / 2,
                     height - Game1.tileSize * 2);
 
-            _settingsButton = new ClickableTextureComponent(
-                new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
-                    12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
-                (float) (Game1.pixelZoom * 0.85));
+            upperRightCloseButton.myID = 100;
+            upperRightCloseButton.downNeighborID = 103;
+
+            if (!Game1.options.SnappyMenus || !Game1.options.gamepadControls) return;
+            allClickableComponents = new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
+            snapToDefaultClickableComponent();
         }
 
-        public override void snapToDefaultClickableComponent()
+        public sealed override void snapToDefaultClickableComponent()
         {
             currentlySnappedComponent = getComponentWithID(102);
             snapCursorToCurrentSnappedComponent();
@@ -79,6 +93,7 @@ namespace DailyTasksReport.UI
                     11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(352, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 101,
+                upNeighborID = 103,
                 rightNeighborID = 102
             };
 
@@ -88,15 +103,48 @@ namespace DailyTasksReport.UI
                     11 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(365, 495, 12, 11), Game1.pixelZoom)
             {
                 myID = 102,
+                upNeighborID = 103,
                 leftNeighborID = 101
             };
 
             _settingsButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
                     12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
-                (float) (Game1.pixelZoom * 0.85));
-
+                (float) (Game1.pixelZoom * 0.85))
+            {
+                myID = 103,
+                upNeighborID = 100,
+                downNeighborID = 102
+            };
+            
             initializeUpperRightCloseButton();
+
+            upperRightCloseButton.myID = 100;
+            upperRightCloseButton.downNeighborID = 103;
+
+            if (!Game1.options.SnappyMenus) return;
+
+            allClickableComponents = new List<ClickableComponent> { upperRightCloseButton, _backButton, _forwardButton, _settingsButton };
+
+            switch (currentlySnappedComponent.myID)
+            {
+                case 100:
+                    currentlySnappedComponent = upperRightCloseButton;
+                    break;
+                case 101:
+                    currentlySnappedComponent = _backButton;
+                    break;
+                case 102:
+                    currentlySnappedComponent = _forwardButton;
+                    break;
+                case 103:
+                    currentlySnappedComponent = _settingsButton;
+                    break;
+                default:
+                    snapToDefaultClickableComponent();
+                    break;
+            }
+            snapCursorToCurrentSnappedComponent();
         }
 
         public override void receiveGamePadButton(Buttons b)

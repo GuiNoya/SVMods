@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -17,6 +18,13 @@ namespace SelfServiceShop
     // ReSharper disable once UnusedMember.Global
     public class ModEntry : Mod
     {
+        private static readonly NPC Ghost = new NPC
+        {
+            sprite = new AnimatedSprite(Game1.content.Load<Texture2D>("LooseSprites\\cloud"), 0, 0, 0)
+        };
+
+        private static readonly Texture2D PortraitRobin = Game1.content.Load<Texture2D>("Portraits\\Robin");
+        private static readonly Texture2D PortraitMarnie = Game1.content.Load<Texture2D>("Portraits\\Marnie");
         private ModConfig _config;
         private Keys _keyPressed = Keys.None;
         private ButtonState _rmbPreviousState = ButtonState.Released;
@@ -157,7 +165,49 @@ namespace SelfServiceShop
                         SuppressButton();
                     }
                     break;
+                // FarmExpansion mod compatibility
+                // Not the way I want, but it's the way I found
+                case "FECarpenter":
+                    if (_config.Carpenter &&
+                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Exists(n => n.name == "Robin")))
+                    {
+                        var robin = Game1.currentLocation.characters.Find(n => n.name == "Robin");
+                        if (robin == null || Vector2.Distance(robin.getTileLocation(), grabTile) > 3f)
+                        {
+                            Ghost.name = "Robin";
+                            Ghost.setTilePosition((int) grabTile.X, (int) grabTile.Y - 1);
+                            Ghost.Portrait = PortraitRobin;
+                            Game1.currentLocation.characters.Insert(0, Ghost);
+                            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+                        }
+
+                        SuppressButton();
+                    }
+                    break;
+                case "FEAnimalShop":
+                    if (_config.Ranch &&
+                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Exists(n => n.name == "Marnie")))
+                    {
+                        var marnie = Game1.currentLocation.characters.Find(n => n.name == "Marnie");
+                        if (marnie == null ||
+                            !marnie.getTileLocation().Equals(new Vector2(grabTile.X, grabTile.Y - 1)))
+                        {
+                            Ghost.name = "Marnie";
+                            Ghost.setTilePosition((int) grabTile.X, (int) grabTile.Y - 1);
+                            Ghost.Portrait = PortraitMarnie;
+                            Game1.currentLocation.characters.Insert(0, Ghost);
+                            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+                        }
+                        SuppressButton();
+                    }
+                    break;
             }
+        }
+
+        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        {
+            Game1.currentLocation.characters.Remove(Ghost);
+            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
         }
 
         private static bool IsNpcInLocation(string name, string locationName = "")
@@ -168,9 +218,8 @@ namespace SelfServiceShop
 
         private void Carpenters()
         {
-            if (Game1.player.currentUpgrade != null)
-                return;
-            if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction())
+            if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction() &&
+                Game1.player.currentUpgrade == null)
             {
                 Response[] answerChoices;
                 if (Game1.player.houseUpgradeLevel < 3)
