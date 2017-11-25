@@ -148,11 +148,11 @@ namespace DailyTasksReport.Tasks
                 return;
 
             var farm = Game1.locations.Find(l => l is Farm) as Farm;
-            
-            // Checking animals
-            CheckAnimals(farm, null);
 
             // ReSharper disable once PossibleNullReferenceException
+            // Checking animals
+            CheckAnimals(farm, farm.animals.Values);
+            
             // Checking animal products that can be collected
             foreach (var building in farm.buildings)
             {
@@ -161,7 +161,7 @@ namespace DailyTasksReport.Tasks
                 if (building.indoors is AnimalHouse animalHouse)
                 {
                     // Check animals
-                    CheckAnimals(null, animalHouse);
+                    CheckAnimals(animalHouse, animalHouse.animals.Values);
 
                     // Check for object in Coop
                     if (building is Coop && _checkAnyProductToCollectInCoop)
@@ -203,18 +203,10 @@ namespace DailyTasksReport.Tasks
             
             CheckForTruffles(farm);
         }
-
-        private void CheckAnimals(Farm farm, AnimalHouse animalHouse)
+        
+        private void CheckAnimals(GameLocation location, Dictionary<long, FarmAnimal>.ValueCollection animals)
         {
-            dynamic location;
-            if (farm != null)
-                location = farm;
-            else if (animalHouse != null)
-                location = animalHouse;
-            else
-                return;
-
-            foreach (var animal in location.animals.Values)
+            foreach (var animal in animals)
             {
                 TaskItem<FarmAnimal> item = null;
                 if (_config.UnpettedAnimals && !animal.wasPet)
@@ -232,7 +224,7 @@ namespace DailyTasksReport.Tasks
                                                      animal));
             }
         }
-
+        
         private void CheckForTruffles(GameLocation farm)
         {
             if (!_config.AnimalProducts["Truffle"]) return;
