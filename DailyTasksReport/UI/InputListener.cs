@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
@@ -47,13 +47,14 @@ namespace DailyTasksReport.UI
             if (greyedOut || _listening || !_buttonBounds.Contains(x, y))
                 return;
             _listening = true;
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            ControlEvents.KeyPressed += ControlEvents_KeyPressed;
             Game1.playSound("breathin");
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
         {
-            if (e.Button == (SButton) Keys.Escape)
+            if (e.KeyPressed == Keys.None) return;
+            if (e.KeyPressed == Keys.Escape)
             {
                 Game1.playSound("bigDeSelect");
             }
@@ -63,20 +64,20 @@ namespace DailyTasksReport.UI
                 switch (_option)
                 {
                     case OptionsEnum.OpenReportKey:
-                        _config.OpenReportKey = key.ToString();
+                        _config.OpenReportKey = e.KeyPressed.ToString();
                         break;
                     case OptionsEnum.OpenSettings:
-                        _config.OpenSettings = key.ToString();
+                        _config.OpenSettings = e.KeyPressed.ToString();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
                 }
-                _buttonName = key.ToString();
+                _buttonName = e.KeyPressed.ToString();
                 Game1.playSound("coin");
             }
             _listening = false;
-            InputEvents.ButtonPressed -= InputEvents_ButtonPressed;
-            e.SuppressButton();
+            ControlEvents.KeyPressed -= ControlEvents_KeyPressed;
+            Game1.oldKBState = new KeyboardState(Game1.oldKBState.GetPressedKeys().Union(new[] { e.KeyPressed }).ToArray());
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)
