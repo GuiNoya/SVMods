@@ -20,7 +20,7 @@ namespace SelfServiceShop
     {
         private static readonly NPC Ghost = new NPC
         {
-            sprite = new AnimatedSprite(Game1.content.Load<Texture2D>("LooseSprites\\cloud"), 0, 0, 0)
+            sprite = new AnimatedSprite(new Texture2D(Game1.graphics.GraphicsDevice, 1, 1))
         };
 
         private static readonly Texture2D PortraitRobin = Game1.content.Load<Texture2D>("Portraits\\Robin");

@@ -15,9 +15,9 @@ namespace DailyTasksReport
         internal static IReflectionHelper ReflectionHelper;
 
         private ReportBuilder _report;
+        private bool _refreshReport;
 
         internal ModConfig Config;
-        internal bool RefreshReport;
 
         /*********
         ** Public methods
@@ -31,19 +31,25 @@ namespace DailyTasksReport
 
             Config = helper.ReadConfig<ModConfig>();
 
+            if (Config.Cask < 0 || Config.Cask > 4)
+            {
+                Monitor.Log("Wrong configuration for Casks, setting to iridium quality...", LogLevel.Error);
+                Config.Cask = 4;
+            }
+
             _report = new ReportBuilder(this);
 
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
-
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
-            if (RefreshReport && e.PriorMenu is SettingsMenu && e.NewMenu is ReportMenu)
-            {
-                RefreshReport = false;
-                OpenReport(true);
-            }
+            if (_refreshReport)
+                if (e.PriorMenu is SettingsMenu && SettingsMenu.PreviousMenu is ReportMenu)
+                    OpenReport(true);
+                _refreshReport = false;
         }
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
@@ -55,6 +61,11 @@ namespace DailyTasksReport
                 OpenReport();
             else if (e.KeyPressed.ToString() == Config.OpenSettings)
                 SettingsMenu.OpenMenu(this);
+        }
+
+        private void SettingsMenu_ReportConfigChanged(object sender, System.EventArgs e)
+        {
+            _refreshReport = true;
         }
 
         private void OpenReport(bool skipAnimation = false)
