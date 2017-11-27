@@ -112,7 +112,7 @@ namespace DailyTasksReport.UI
 
                 // Machines
                 case OptionsEnum.AllMachines:
-                    _isChecked = !_config.Machines.ContainsValue(false);
+                    _isChecked = !_config.Machines.ContainsValue(false) && _config.Cask > 0;
                     break;
                 case OptionsEnum.BeeHouse:
                     _isChecked = _config.Machines["Bee House"];
@@ -286,6 +286,10 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.AllMachines:
                     foreach (var key in _config.Machines.Keys.ToList())
                         _config.Machines[key] = _isChecked;
+                    if (!_isChecked)
+                        _config.Cask = 0;
+                    else if (_config.Cask == 0)
+                        _config.Cask = 4;
                     break;
                 case OptionsEnum.BeeHouse:
                     _config.Machines["Bee House"] = _isChecked;

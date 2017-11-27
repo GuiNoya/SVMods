@@ -34,7 +34,7 @@ namespace DailyTasksReport.Tasks
         public override string GeneralInfo(out int usedLines)
         {
             usedLines = 0;
-            if (!_checkAnyBigCraftable && !_config.UncollectedCrabpots && !_config.NotBaitedCrabpots) return "";
+            if (!_checkAnyBigCraftable && !_config.UncollectedCrabpots && !_config.NotBaitedCrabpots && _config.Cask <= 0) return "";
 
             Clear();
             DoCheck();
@@ -100,14 +100,20 @@ namespace DailyTasksReport.Tasks
 
                 foreach (var item in _uncollectedMachines)
                 {
+                    var quality = "";
+                    if (item.Object is Cask cask)
+                        quality = cask.heldObject.quality == 1 ? "Silver "
+                                : cask.heldObject.quality == 2 ? "Gold "
+                                : cask.heldObject.quality == 4 ? "Iridium "
+                                : "";
                     stringBuilder.Append(
-                        $"{item.Name} with {item.Object.heldObject.name} at {item.Location.name} ({item.Position.X}, {item.Position.Y})^");
+                        $"{item.Name} with {quality}{item.Object.heldObject.name} at {item.Location.name} ({item.Position.X}, {item.Position.Y})^");
                     linesCount++;
                 }
 
                 NextPage(ref stringBuilder, ref linesCount);
             }
-
+            
             return stringBuilder.ToString();
         }
 
@@ -120,7 +126,7 @@ namespace DailyTasksReport.Tasks
 
         private void DoCheck()
         {
-            if (!_checkAnyBigCraftable && !_config.UncollectedCrabpots && !_config.NotBaitedCrabpots) return;
+            if (!_checkAnyBigCraftable && !_config.UncollectedCrabpots && !_config.NotBaitedCrabpots && _config.Cask <= 0) return;
 
             var haveLuremasterProfession = Game1.player.professions.Contains(11);
 
@@ -143,6 +149,15 @@ namespace DailyTasksReport.Tasks
                     {
                         _uncollectedMachines.Add(new TaskItem<Object>(location, @object.Key, @object.Value.name,
                             @object.Value));
+                        continue;
+                    }
+
+                    if (_config.Cask > 0 && @object.Value is Cask cask)
+                    {
+                        if (cask.heldObject?.quality >= _config.Cask)
+                        {
+                            _uncollectedMachines.Add(new TaskItem<Object>(location, @object.Key, @object.Value.name, @object.Value));
+                        }
                     }
                 }
 

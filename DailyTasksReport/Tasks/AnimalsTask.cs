@@ -158,46 +158,47 @@ namespace DailyTasksReport.Tasks
             {
                 if (building.isUnderConstruction()) continue;
 
-                if (building.indoors is AnimalHouse animalHouse)
+                switch (building.indoors)
                 {
-                    // Check animals
-                    CheckAnimals(animalHouse, animalHouse.animals.Values);
+                    case AnimalHouse animalHouse:
+                        // Check animals
+                        CheckAnimals(animalHouse, animalHouse.animals.Values);
 
-                    // Check for object in Coop
-                    if (building is Coop && _checkAnyProductToCollectInCoop)
-                    {
-                        foreach (var pair in animalHouse.objects)
+                        // Check for object in Coop
+                        if (building is Coop && _checkAnyProductToCollectInCoop)
                         {
-                            if (Array.BinarySearch(Eggs, pair.Value.parentSheetIndex) >= 0 && _config.AnimalProducts["Chicken egg"] ||
-                                pair.Value.parentSheetIndex == 442 && _config.AnimalProducts["Duck egg"] ||
-                                pair.Value.parentSheetIndex == 107 && _config.AnimalProducts["Dinosaur egg"] ||
-                                pair.Value.parentSheetIndex == 444 && _config.AnimalProducts["Duck feather"] ||
-                                pair.Value.parentSheetIndex == 446 && _config.AnimalProducts["Rabit's foot"] ||
-                                pair.Value.parentSheetIndex == 440 && _config.AnimalProducts["Rabit's wool"])
+                            foreach (var pair in animalHouse.objects)
                             {
-                                _animalProductsToCollect.Add(new TaskItem<Object>(animalHouse, pair.Key, pair.Value.name, pair.Value));
+                                if (Array.BinarySearch(Eggs, pair.Value.parentSheetIndex) >= 0 && _config.AnimalProducts["Chicken egg"] ||
+                                    pair.Value.parentSheetIndex == 442 && _config.AnimalProducts["Duck egg"] ||
+                                    pair.Value.parentSheetIndex == 107 && _config.AnimalProducts["Dinosaur egg"] ||
+                                    pair.Value.parentSheetIndex == 444 && _config.AnimalProducts["Duck feather"] ||
+                                    pair.Value.parentSheetIndex == 446 && _config.AnimalProducts["Rabit's foot"] ||
+                                    pair.Value.parentSheetIndex == 440 && _config.AnimalProducts["Rabit's wool"])
+                                {
+                                    _animalProductsToCollect.Add(new TaskItem<Object>(animalHouse, pair.Key, pair.Value.name, pair.Value));
+                                }
                             }
                         }
-                    }
                     
-                    // Check for hay
-                    if (_config.MissingHay)
-                    {
-                        var hays = animalHouse.numberOfObjectsWithName("Hay");
-                        if (hays < animalHouse.animalLimit)
-                            _missingHay.Add(Tuple.Create(building, animalHouse.animalLimit - hays));
-                    }
-                }
-                // Check Slime hutch
-                else if (building.indoors is SlimeHutch slimeHutch && _config.AnimalProducts["Slime ball"])
-                {
-                    foreach (var pair in building.indoors.objects)
-                    {
-                        if (pair.Value.parentSheetIndex >= 56 && pair.Value.parentSheetIndex <= 61)
+                        // Check for hay
+                        if (_config.MissingHay)
                         {
-                            _animalProductsToCollect.Add(new TaskItem<Object>(slimeHutch, pair.Key, pair.Value.name, pair.Value));
+                            var hays = animalHouse.numberOfObjectsWithName("Hay");
+                            if (hays < animalHouse.animalLimit)
+                                _missingHay.Add(Tuple.Create(building, animalHouse.animalLimit - hays));
                         }
-                    }
+                        break;
+
+                    case SlimeHutch slimeHutch when _config.AnimalProducts["Slime ball"]:
+                        foreach (var pair in building.indoors.objects)
+                        {
+                            if (pair.Value.parentSheetIndex >= 56 && pair.Value.parentSheetIndex <= 61)
+                            {
+                                _animalProductsToCollect.Add(new TaskItem<Object>(slimeHutch, pair.Key, pair.Value.name, pair.Value));
+                            }
+                        }
+                        break;
                 }
             }
             

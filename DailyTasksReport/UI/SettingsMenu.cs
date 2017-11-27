@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
@@ -12,7 +14,7 @@ namespace DailyTasksReport.UI
     {
         private const int ItemsPerPage = 8;
 
-        private static IClickableMenu _previousMenu;
+        internal static IClickableMenu PreviousMenu;
         private readonly ClickableTextureComponent _downArrow;
         private readonly List<OptionsElement> _options = new List<OptionsElement>();
 
@@ -23,6 +25,7 @@ namespace DailyTasksReport.UI
         private readonly ClickableTextureComponent _upArrow;
         private readonly int _yMargin = Game1.tileSize / 4;
 
+        private bool _changedOptions;
         private int _currentIndex;
         private Rectangle _scrollBarRunner;
         private int _yScrollBarOffsetHeld = -1;
@@ -107,6 +110,7 @@ namespace DailyTasksReport.UI
             // Machines
             _options.Add(new Checkbox("Machines:", OptionsEnum.AllMachines, parent.Config));
             _options.Add(new Checkbox("Bee house", OptionsEnum.BeeHouse, parent.Config, 1));
+            _options.Add(new QualityOption("Cask", OptionsEnum.Cask, _parent.Config, 1));
             _options.Add(new Checkbox("Charcoal Kiln", OptionsEnum.CharcoalKiln, parent.Config, 1));
             _options.Add(new Checkbox("Cheese Press", OptionsEnum.CheesePress, parent.Config, 1));
             _options.Add(new Checkbox("Crystalarium", OptionsEnum.Crystalarium, parent.Config, 1));
@@ -126,10 +130,34 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Tapper", OptionsEnum.Tapper, parent.Config, 1));
             _options.Add(new Checkbox("Worm bin", OptionsEnum.WormBin, parent.Config, 1));
 
+            ReportConfigChanged += SettingsMenu_ReportConfigChanged;
+            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+
             if (!Game1.options.snappyMenus || !Game1.options.gamepadControls) return;
             allClickableComponents = new List<ClickableComponent>(_slots) {upperRightCloseButton};
             currentlySnappedComponent = allClickableComponents[0];
             snapCursorToCurrentSnappedComponent();
+        }
+
+        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        {
+            if (e.PriorMenu == this)
+            {
+                ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
+                MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
+            }
+
+            if (PreviousMenu == null) return;
+            if (!_changedOptions)
+                Game1.activeClickableMenu = PreviousMenu;
+            PreviousMenu = null;
+        }
+
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
+        {
+            _changedOptions = true;
+            RefreshOptionStatus();
+            _parent.Helper.WriteConfig(_parent.Config);
         }
 
         public sealed override void snapToDefaultClickableComponent()
@@ -152,6 +180,9 @@ namespace DailyTasksReport.UI
                         Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4 +
                             cb.ItemLevel * Game1.pixelZoom * 7, currentlySnappedComponent.bounds.Center.Y);
                         break;
+                    case QualityOption qo:
+                        qo.CursorAboveOption();
+                        break;
                     default:
                         Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4,
                             currentlySnappedComponent.bounds.Center.Y);
@@ -165,6 +196,7 @@ namespace DailyTasksReport.UI
         {
             if (oldId == ItemsPerPage - 1 && direction == 2 && _currentIndex < _options.Count - ItemsPerPage)
             {
+                // Go down
                 ++_currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shiny4");
@@ -173,21 +205,34 @@ namespace DailyTasksReport.UI
             {
                 if (_currentIndex > 0)
                 {
+                    // Go up
                     --_currentIndex;
                     AdjustScrollBarPosition();
                     Game1.playSound("shiny4");
                 }
                 else
                 {
+                    // Go to close button
                     currentlySnappedComponent = allClickableComponents[ItemsPerPage];
                     snapCursorToCurrentSnappedComponent();
                 }
             }
         }
 
+        public override void receiveKeyPress(Keys key)
+        {
+            base.receiveKeyPress(key);
+
+            if (!Game1.options.snappyMenus || !Game1.options.gamepadControls)
+                return;
+
+            if (currentlySnappedComponent.myID >= 0 && currentlySnappedComponent.myID < ItemsPerPage)
+                _options[currentlySnappedComponent.myID + _currentIndex].receiveKeyPress(key);
+        }
+
         public override void draw(SpriteBatch b)
         {
-            _previousMenu?.draw(b);
+            PreviousMenu?.draw(b);
 
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             drawTextureBox(Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
@@ -247,24 +292,15 @@ namespace DailyTasksReport.UI
                 return;
             }
 
-            var optionClicked = false;
             for (var i = 0; i < _slots.Count; ++i)
                 // ReSharper disable once InvertIf
                 if (_slots[i].bounds.Contains(x, y) &&
                     _options[_currentIndex + i].bounds.Contains(x - _slots[i].bounds.X, y - _slots[i].bounds.Y))
                 {
                     _options[_currentIndex + i].receiveLeftClick(x - _slots[i].bounds.X, y - _slots[i].bounds.Y);
-                    optionClicked = true;
-                    _parent.RefreshReport = true;
                     break;
                 }
-
-            if (optionClicked)
-            {
-                RefreshOptionStatus();
-                _parent.Helper.WriteConfig(_parent.Config);
-            }
-
+            
             // Check the close button
             base.receiveLeftClick(x, y, playSound);
         }
@@ -312,8 +348,15 @@ namespace DailyTasksReport.UI
         private void RefreshOptionStatus()
         {
             foreach (var option in _options)
-                if (option is Checkbox cb)
-                    cb.RefreshStatus();
+                switch (option)
+                {
+                    case Checkbox cb:
+                        cb.RefreshStatus();
+                        break;
+                    case QualityOption qo:
+                        qo.RefreshStatus();
+                        break;
+                }
         }
 
         public override void receiveRightClick(int x, int y, bool playSound = true)
@@ -349,27 +392,17 @@ namespace DailyTasksReport.UI
             if (!(Game1.activeClickableMenu is SettingsMenu)) return;
 
             Game1.activeClickableMenu = new SettingsMenu(_parent, _currentIndex);
-            _previousMenu?.gameWindowSizeChanged(oldBounds, newBounds);
+            PreviousMenu?.gameWindowSizeChanged(oldBounds, newBounds);
         }
 
         public static void OpenMenu(ModEntry parent)
         {
-            _previousMenu = Game1.activeClickableMenu;
+            PreviousMenu = Game1.activeClickableMenu;
             if (Game1.activeClickableMenu != null)
                 Game1.exitActiveMenu();
-            Game1.activeClickableMenu = new SettingsMenu(parent)
-            {
-                exitFunction = OnExitFunc
-            };
+            Game1.activeClickableMenu = new SettingsMenu(parent);
         }
-
-        private static void OnExitFunc()
-        {
-            if (_previousMenu == null) return;
-            Game1.activeClickableMenu = _previousMenu;
-            _previousMenu = null;
-        }
-
+        
         public static event EventHandler ReportConfigChanged;
 
         internal static void RaiseReportConfigChanged()

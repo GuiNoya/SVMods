@@ -67,7 +67,6 @@ namespace DailyTasksReport
         public Dictionary<string, bool> Machines { get; set; } = new Dictionary<string, bool>
         {
             {"Bee House", true},
-            //{ "Cask", true },
             {"Charcoal Kiln", true},
             {"Cheese Press", true},
             {"Crystalarium", true},
@@ -87,5 +86,8 @@ namespace DailyTasksReport
             {"Tapper", true},
             {"Worm Bin", true}
         };
+
+        // <summary> Product quality to check in casks. </summary>
+        public int Cask { get; set; } = 4;
     }
 }
