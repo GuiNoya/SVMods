@@ -153,6 +153,25 @@ namespace SelfServiceShop
                         Game1.activeClickableMenu = new ShopMenu(Utility.getFishShopStock(Game1.player), 0, "Willy");
                     }
                     break;
+                case "Blacksmith":
+                    if (_config.Blacksmith)
+                    {
+                        if (_config.ShopsAlwaysOpen)
+                        {
+                            Blacksmith(Game1.getCharacterFromName("Clint"));
+                        }
+                        else
+                        {
+                            NPC clint;
+                            if (Game1.currentLocation.characters.Find(c => c.name == "Clint") is NPC npc)
+                                clint = npc;
+                            else
+                                break;
+                            Blacksmith(clint);
+                        }
+                        SuppressButton();
+                    }
+                    break;
                 case "IceCreamStand":
                     if (_config.IceCreamStand &&
                         (_config.ShopsAlwaysOpen || _config.IceCreamInAllSeasons || SDate.Now().Season == "summer"))
@@ -165,7 +184,7 @@ namespace SelfServiceShop
                         SuppressButton();
                     }
                     break;
-                // FarmExpansion mod compatibility
+                // FarmExpansion mod compatibility (versions >= 3.0 and < 3.1)
                 // Not the way I want, but it's the way I found
                 case "FECarpenter":
                     if (_config.Carpenter &&
@@ -178,7 +197,7 @@ namespace SelfServiceShop
                             Ghost.setTilePosition((int) grabTile.X, (int) grabTile.Y - 1);
                             Ghost.Portrait = PortraitRobin;
                             Game1.currentLocation.characters.Insert(0, Ghost);
-                            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+                            MenuEvents.MenuChanged += MenuEvents_MenuChangedGhost;
                         }
 
                         SuppressButton();
@@ -196,7 +215,7 @@ namespace SelfServiceShop
                             Ghost.setTilePosition((int) grabTile.X, (int) grabTile.Y - 1);
                             Ghost.Portrait = PortraitMarnie;
                             Game1.currentLocation.characters.Insert(0, Ghost);
-                            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+                            MenuEvents.MenuChanged += MenuEvents_MenuChangedGhost;
                         }
                         SuppressButton();
                     }
@@ -204,10 +223,10 @@ namespace SelfServiceShop
             }
         }
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private static void MenuEvents_MenuChangedGhost(object sender, EventArgsClickableMenuChanged e)
         {
             Game1.currentLocation.characters.Remove(Ghost);
-            MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
+            MenuEvents.MenuChanged -= MenuEvents_MenuChangedGhost;
         }
 
         private static bool IsNpcInLocation(string name, string locationName = "")
@@ -216,7 +235,7 @@ namespace SelfServiceShop
                 .characters.Exists(c => c.name == name);
         }
 
-        private void Carpenters()
+        private static void Carpenters()
         {
             if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction() &&
                 Game1.player.currentUpgrade == null)
@@ -252,7 +271,7 @@ namespace SelfServiceShop
             Game1.activeClickableMenu = new ShopMenu(Utility.getCarpenterStock(), 0, "Robin");
         }
 
-        private void AnimalShop()
+        private static void AnimalShop()
         {
             Game1.currentLocation.createQuestionDialogue("", new[]
             {
@@ -260,6 +279,71 @@ namespace SelfServiceShop
                 new Response("Purchase", Game1.content.LoadString("Strings\\Locations:AnimalShop_Marnie_Animals")),
                 new Response("Leave", Game1.content.LoadString("Strings\\Locations:AnimalShop_Marnie_Leave"))
             }, "Marnie");
+        }
+
+        private static void Blacksmith(NPC clint)
+        {
+            if (Game1.player.toolBeingUpgraded == null)
+            {
+                Response[] answerChoices;
+                if (Game1.player.hasItemInInventory(535, 1) || Game1.player.hasItemInInventory(536, 1) ||
+                    Game1.player.hasItemInInventory(537, 1) || Game1.player.hasItemInInventory(749, 1))
+                    answerChoices = new[]
+                    {
+                        new Response("Shop", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Shop")),
+                        new Response("Upgrade",
+                            Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Upgrade")),
+                        new Response("Process", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Geodes")),
+                        new Response("Leave", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Leave"))
+                    };
+                else
+                    answerChoices = new[]
+                    {
+                        new Response("Shop", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Shop")),
+                        new Response("Upgrade",
+                            Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Upgrade")),
+                        new Response("Leave", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Leave"))
+                    };
+                Game1.currentLocation.createQuestionDialogue("", answerChoices, "Blacksmith");
+                return;
+            }
+
+            if (Game1.player.daysLeftForToolUpgrade <= 0)
+            {
+                if (Game1.player.freeSpotsInInventory() > 0)
+                {
+                    Game1.player.holdUpItemThenMessage(Game1.player.toolBeingUpgraded);
+                    Game1.player.addItemToInventoryBool(Game1.player.toolBeingUpgraded);
+                    Game1.player.toolBeingUpgraded = null;
+                    return;
+                }
+                Game1.drawDialogue(clint, Game1.content.LoadString("Data\\ExtraDialogue:Clint_NoInventorySpace"));
+                return;
+            }
+            Game1.drawDialogue(clint,
+                Game1.content.LoadString("Data\\ExtraDialogue:Clint_StillWorking",
+                    (object) Game1.player.toolBeingUpgraded.DisplayName));
+            MenuEvents.MenuClosed += MenuEvents_MenuClosedBlacksmith;
+        }
+
+        private static void MenuEvents_MenuClosedBlacksmith(object sender, EventArgsClickableMenuClosed e)
+        {
+            if (Game1.player.hasItemInInventory(535, 1) || Game1.player.hasItemInInventory(536, 1) ||
+                Game1.player.hasItemInInventory(537, 1) || Game1.player.hasItemInInventory(749, 1))
+            {
+                var answerChoices = new[]
+                {
+                    new Response("Shop", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Shop")),
+                    new Response("Process", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Geodes")),
+                    new Response("Leave", Game1.content.LoadString("Strings\\Locations:Blacksmith_Clint_Leave"))
+                };
+                Game1.currentLocation.createQuestionDialogue("", answerChoices, "Blacksmith");
+            }
+            else
+            {
+                Game1.activeClickableMenu = new ShopMenu(Utility.getBlacksmithStock(), 0, "Clint");
+            }
+            MenuEvents.MenuClosed -= MenuEvents_MenuClosedBlacksmith;
         }
 
         // From SMAPI 2.0 (SMAPI/Events/EventsArgsInput.cs) and https://github.com/Pathoschild/SMAPI/issues/384
