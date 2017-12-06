@@ -44,8 +44,8 @@ namespace DailyTasksReport
             {"Dinosaur egg", true},
             {"Duck egg", true},
             {"Duck feather", true},
-            {"Rabit's wool", true},
-            {"Rabit's foot", true},
+            {"Rabbit's wool", true},
+            {"Rabbit's foot", true},
             {"Truffle", true},
             {"Slime ball", true}
         };
@@ -89,5 +89,72 @@ namespace DailyTasksReport
 
         // <summary> Product quality to check in casks. </summary>
         public int Cask { get; set; } = 4;
+
+        internal bool Check(IMonitor monitor)
+        {
+            var changed = false;
+
+            if (Cask < 0 || Cask > 4)
+            {
+                monitor.Log("Wrong configuration for Casks, setting to iridium quality...", LogLevel.Error);
+                Cask = 4;
+                changed = true;
+            }
+
+            if (AnimalProducts.TryGetValue("Rabit's wool", out var enabled))
+            {
+                AnimalProducts.Remove("Rabit's wool");
+                AnimalProducts["Rabbit's wool"] = enabled;
+                changed = true;
+            }
+
+            if (AnimalProducts.TryGetValue("Rabit's foot", out enabled))
+            {
+                AnimalProducts.Remove("Rabit's foot");
+                AnimalProducts["Rabbit's foot"] = enabled;
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        internal bool ProductFromAnimal(int produceIndex)
+        {
+            return AnimalProducts[LookupProductFromAnimal[produceIndex]];
+        }
+
+        internal bool ProductToCollect(int objectIndex)
+        {
+            return AnimalProducts[LookupProductToCollect[objectIndex]];
+        }
+
+        private static readonly Dictionary<int, string> LookupProductFromAnimal = new Dictionary<int, string>
+        {
+            {184, "Cow milk"},
+            {186, "Cow milk"},
+            {436, "Goat milk"},
+            {438, "Goat milk"},
+            {440, "Sheep wool"}
+        };
+
+        private static readonly Dictionary<int, string> LookupProductToCollect = new Dictionary<int, string>
+        {
+            {174, "Chicken egg"},
+            {176, "Chicken egg"},
+            {180, "Chicken egg"},
+            {182, "Chicken egg"},
+            {107, "Dinosaur egg"},
+            {442, "Duck egg"},
+            {444, "Duck feather"},
+            {440, "Rabbit's wool"},
+            {446, "Rabbit's foot"},
+            {430, "Truffle"},
+            {56, "Slime ball"},
+            {57, "Slime ball"},
+            {58, "Slime ball"},
+            {59, "Slime ball"},
+            {60, "Slime ball"},
+            {61, "Slime ball"}
+        };
     }
 }

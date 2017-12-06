@@ -34,7 +34,6 @@ namespace DailyTasksReport.UI
 
         internal void RefreshStatus()
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_option)
             {
                 case OptionsEnum.ShowDetailedInfo:
@@ -97,11 +96,11 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.DuckFeather:
                     _isChecked = _config.AnimalProducts["Duck feather"];
                     break;
-                case OptionsEnum.RabitsWool:
-                    _isChecked = _config.AnimalProducts["Rabit's wool"];
+                case OptionsEnum.RabbitsWool:
+                    _isChecked = _config.AnimalProducts["Rabbit's wool"];
                     break;
-                case OptionsEnum.RabitsFoot:
-                    _isChecked = _config.AnimalProducts["Rabit's foot"];
+                case OptionsEnum.RabbitsFoot:
+                    _isChecked = _config.AnimalProducts["Rabbit's foot"];
                     break;
                 case OptionsEnum.Truffle:
                     _isChecked = _config.AnimalProducts["Truffle"];
@@ -205,7 +204,6 @@ namespace DailyTasksReport.UI
             _isChecked = !_isChecked;
 
             // Change options
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_option)
             {
                 case OptionsEnum.ShowDetailedInfo:
@@ -269,11 +267,11 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.DuckFeather:
                     _config.AnimalProducts["Duck feather"] = _isChecked;
                     break;
-                case OptionsEnum.RabitsWool:
-                    _config.AnimalProducts["Rabit's wool"] = _isChecked;
+                case OptionsEnum.RabbitsWool:
+                    _config.AnimalProducts["Rabbit's wool"] = _isChecked;
                     break;
-                case OptionsEnum.RabitsFoot:
-                    _config.AnimalProducts["Rabit's foot"] = _isChecked;
+                case OptionsEnum.RabbitsFoot:
+                    _config.AnimalProducts["Rabbit's foot"] = _isChecked;
                     break;
                 case OptionsEnum.Truffle:
                     _config.AnimalProducts["Truffle"] = _isChecked;
@@ -351,7 +349,7 @@ namespace DailyTasksReport.UI
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a checkbox.");
             }
-            SettingsMenu.RaiseReportConfigChanged();
+            SettingsMenu.RaiseReportConfigChanged(new SettingsChangedEventArgs(_option));
         }
     }
 }

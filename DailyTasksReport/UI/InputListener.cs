@@ -28,7 +28,6 @@ namespace DailyTasksReport.UI
             _config = config;
             _option = whichOption;
 
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (whichOption)
             {
                 case OptionsEnum.OpenReportKey:
@@ -59,7 +58,6 @@ namespace DailyTasksReport.UI
             }
             else
             {
-                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (_option)
                 {
                     case OptionsEnum.OpenReportKey:

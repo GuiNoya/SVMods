@@ -6,5 +6,5 @@
 	"UniqueID": "GuiNoya.SelfServiceShop",
 	"EntryDll": "SelfServiceShop.dll",
 	"MinimumApiVersion": "2.1",
-	"UpdateKeys": [ "Nexus:1622", "GitHub:GuiNoya/SVMods" ]
+	"UpdateKeys": [ "Nexus:1622" ]
 }

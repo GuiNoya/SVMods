@@ -1,24 +1,23 @@
 ﻿using Microsoft.Xna.Framework;
 using StardewValley;
 
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
-
 namespace DailyTasksReport.Tasks
 {
-    public class TaskItem<TObject>
+    public class SimpleTaskItem
     {
         public GameLocation Location { get; set; }
         public Vector2 Position { get; set; }
-        public string Name { get; set; }
-        public TObject Object { get; set; }
-        
-        public TaskItem(GameLocation location, Vector2 position, string name, TObject @object)
+    }
+
+    public class TaskItem<TObject> : SimpleTaskItem
+    {
+        public TaskItem(GameLocation location, Vector2 position, TObject @object)
         {
             Location = location;
             Position = position;
-            Name = name;
             Object = @object;
         }
+
+        public TObject Object { get; set; }
     }
 }

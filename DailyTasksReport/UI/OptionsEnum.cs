@@ -31,8 +31,8 @@
         GoatMilk = 206,
         SheepWool = 207,
         Truffle = 208,
-        RabitsWool = 209,
-        RabitsFoot = 210,
+        RabbitsWool = 209,
+        RabbitsFoot = 210,
         SlimeBall = 211,
 
         //Machines

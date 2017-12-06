@@ -6,5 +6,5 @@
 	"UniqueID": "GuiNoya.ZoomLevelKeybind",
 	"EntryDll": "ZoomLevelKeybind.dll",
 	"MinimumApiLevel": "2.1",
-	"UpdateKeys": [ "Nexus:1621", "GitHub:GuiNoya/SVMods" ]
+	"UpdateKeys": [ "Nexus:1621" ]
 }

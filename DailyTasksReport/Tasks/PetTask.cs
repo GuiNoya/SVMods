@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using StardewModdingAPI;
+using DailyTasksReport.UI;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
@@ -9,20 +9,26 @@ namespace DailyTasksReport.Tasks
     public class PetTask : Task
     {
         private readonly ModConfig _config;
+        private Pet _pet;
         private bool _petBowlFilled;
-        private bool _petFound;
         private bool _petPetted;
 
         internal PetTask(ModConfig config)
         {
             _config = config;
+
+            SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
-        private void DoCheck()
+        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
         {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree)
-                return;
+            var a = e.OptionChanged == OptionsEnum.UnpettedPet || e.OptionChanged == OptionsEnum.UnfilledPetBowl;
+            var b = _config.UnpettedPet || _config.UnfilledPetBowl;
+            Enabled = a && b;
+        }
 
+        public override void FirstScan()
+        {
             var location = Game1.locations.Find(l => l is Farm);
 
             // Bowl
@@ -32,9 +38,28 @@ namespace DailyTasksReport.Tasks
             // Pet
 
             CheckPetted(location);
-
-            if (!_petFound)
+            if (_pet == null)
                 CheckPetted(Game1.locations.Find(l => l is FarmHouse));
+
+            if (_pet == null || _petBowlFilled && _petPetted)
+                Enabled = false;
+        }
+
+        private void UpdateInfo()
+        {
+            var wasPettedToday = ModEntry.ReflectionHelper.GetPrivateValue<bool>(_pet, "wasPetToday");
+            if (wasPettedToday)
+                _petPetted = true;
+
+            if (!_petBowlFilled)
+            {
+                var f = Game1.locations.Find(l => l is Farm);
+                if (f.getTileIndexAt(54, 7, "Buildings") == 1939)
+                    _petBowlFilled = true;
+            }
+
+            if (_petBowlFilled && _petPetted)
+                Enabled = false;
         }
 
         private void CheckPetted(GameLocation location)
@@ -43,10 +68,10 @@ namespace DailyTasksReport.Tasks
             {
                 if (!(npc is Pet pet)) continue;
 
+                _pet = pet;
                 var wasPettedToday = ModEntry.ReflectionHelper.GetPrivateValue<bool>(pet, "wasPetToday");
                 if (wasPettedToday)
                     _petPetted = true;
-                _petFound = true;
                 return;
             }
         }
@@ -55,14 +80,10 @@ namespace DailyTasksReport.Tasks
         {
             usedLines = 0;
 
-            if (!_config.UnpettedPet && !_config.UnfilledPetBowl)
+            if (!Enabled)
                 return "";
 
-            Clear();
-            DoCheck();
-
-            if (!_petFound)
-                return "";
+            UpdateInfo();
 
             var stringBuilder = new StringBuilder();
 
@@ -79,14 +100,17 @@ namespace DailyTasksReport.Tasks
             return stringBuilder.ToString();
         }
 
-        public override string DetailedInfo()
+        public override string DetailedInfo(out int usedLines, out bool skipNextPage)
         {
+            usedLines = 0;
+            skipNextPage = true;
             return "";
         }
 
         public override void Clear()
         {
-            _petFound = false;
+            Enabled = _config.UnpettedPet || _config.UnfilledPetBowl;
+            _pet = null;
             _petBowlFilled = false;
             _petPetted = false;
         }

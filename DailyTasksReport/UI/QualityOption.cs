@@ -29,14 +29,17 @@ namespace DailyTasksReport.UI
             _config = config;
             _option = whichOption;
             bounds.X += itemLevel * Game1.pixelZoom * 7;
-            this.whichOption = (int)whichOption;
+            this.whichOption = (int) whichOption;
 
-            var biggestOption = (int)Game1.dialogueFont.MeasureString(DisplayOptions[0]).X + 4 * Game1.pixelZoom;
+            var biggestOption = (int) Game1.dialogueFont.MeasureString(DisplayOptions[0]).X + 4 * Game1.pixelZoom;
             foreach (var displayOption in DisplayOptions)
-                biggestOption = Math.Max((int)Game1.dialogueFont.MeasureString(displayOption).X + 4 * Game1.pixelZoom, biggestOption);
+                biggestOption = Math.Max((int) Game1.dialogueFont.MeasureString(displayOption).X + 4 * Game1.pixelZoom,
+                    biggestOption);
+
             bounds = new Rectangle(bounds.X, bounds.Y, 7 * Game1.pixelZoom * 2 + biggestOption, 8 * Game1.pixelZoom);
             _minusButton = new Rectangle(bounds.X, 4 + Game1.pixelZoom * 4, 7 * Game1.pixelZoom, 8 * Game1.pixelZoom);
-            _plusButton = new Rectangle(bounds.Right - 8 * Game1.pixelZoom, 4 + Game1.pixelZoom * 4, 7 * Game1.pixelZoom, 8 * Game1.pixelZoom);
+            _plusButton = new Rectangle(bounds.Right - 8 * Game1.pixelZoom, 4 + Game1.pixelZoom * 4,
+                7 * Game1.pixelZoom, 8 * Game1.pixelZoom);
 
             RefreshStatus();
         }
@@ -84,7 +87,7 @@ namespace DailyTasksReport.UI
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a QualityOption.");
             }
-            SettingsMenu.RaiseReportConfigChanged();
+            SettingsMenu.RaiseReportConfigChanged(new SettingsChangedEventArgs(_option));
         }
 
         public override void receiveKeyPress(Keys key)
@@ -115,15 +118,21 @@ namespace DailyTasksReport.UI
             _isMouseOnMinusButton = true;
             _isMouseOnPlusButton = false;
         }
-        
+
         public override void draw(SpriteBatch b, int slotX, int slotY)
         {
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + _minusButton.X, slotY + _minusButton.Y), MinusButtonSource, Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == 0 ? 0.5f : 1f), 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
-            b.Draw(Game1.mouseCursors, new Vector2(slotX + _plusButton.X, slotY + _plusButton.Y), PlusButtonSource, Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == DisplayOptions.Count - 1 ? 0.5f : 1f), 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
-            b.DrawString(Game1.dialogueFont, _selectedQuality >= DisplayOptions.Count || _selectedQuality == -1 ? "" : DisplayOptions[_selectedQuality], new Vector2(slotX + _minusButton.X + _minusButton.Width + Game1.pixelZoom, slotY + _minusButton.Y - Game1.pixelZoom), Game1.textColor);
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + _minusButton.X, slotY + _minusButton.Y), MinusButtonSource,
+                Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == 0 ? 0.5f : 1f), 0.0f, Vector2.Zero,
+                Game1.pixelZoom, SpriteEffects.None, 0.4f);
+            b.Draw(Game1.mouseCursors, new Vector2(slotX + _plusButton.X, slotY + _plusButton.Y), PlusButtonSource,
+                Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == DisplayOptions.Count - 1 ? 0.5f : 1f),
+                0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+            b.DrawString(Game1.dialogueFont,
+                _selectedQuality >= DisplayOptions.Count || _selectedQuality == -1 ? "" : DisplayOptions[_selectedQuality],
+                new Vector2(slotX + _minusButton.X + _minusButton.Width + Game1.pixelZoom,
+                    slotY + _minusButton.Y - Game1.pixelZoom), Game1.textColor);
 
             if (Game1.options.snappyMenus && Game1.options.gamepadControls)
-            {
                 if (_isMouseOnMinusButton)
                 {
                     Game1.setMousePosition(slotX + _minusButton.Center.X, slotY + _minusButton.Center.Y);
@@ -134,7 +143,6 @@ namespace DailyTasksReport.UI
                     Game1.setMousePosition(slotX + _plusButton.Center.X, slotY + _plusButton.Center.Y);
                     _isMouseOnPlusButton = false;
                 }
-            }
 
             base.draw(b, slotX, slotY);
         }
