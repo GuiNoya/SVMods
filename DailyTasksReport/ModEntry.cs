@@ -86,9 +86,8 @@ namespace DailyTasksReport
 
         private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
         {
-            if (_refreshReport)
-                if (e.PriorMenu is SettingsMenu && SettingsMenu.PreviousMenu is ReportMenu)
-                    OpenReport(true);
+            if (_refreshReport && e.PriorMenu is SettingsMenu && SettingsMenu.PreviousMenu is ReportMenu)
+                OpenReport(true);
             _refreshReport = false;
         }
 
@@ -98,9 +97,18 @@ namespace DailyTasksReport
                 return;
 
             if (e.Button == Config.OpenReportKey)
+            {
                 OpenReport();
+            }
             else if (e.Button == Config.OpenSettings)
+            {
                 SettingsMenu.OpenMenu(this);
+            }
+            else if (e.Button == Config.ToggleBubbles)
+            {
+                Config.DisplayBubbles = !Config.DisplayBubbles;
+                Helper.WriteConfig(Config);
+            }
         }
 
         private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
@@ -120,7 +128,8 @@ namespace DailyTasksReport
 
         private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
         {
-            if (!Context.IsWorldReady || !Context.IsPlayerFree || Game1.activeClickableMenu != null) return;
+            if (!Config.DisplayBubbles || !Context.IsWorldReady || Game1.currentMinigame != null ||
+                Game1.showingEndOfNightStuff || Game1.CurrentEvent != null) return;
             _tasks.ForEach(t => t.Draw(Game1.spriteBatch));
         }
     }

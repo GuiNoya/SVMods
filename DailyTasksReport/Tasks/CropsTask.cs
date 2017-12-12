@@ -17,9 +17,11 @@ namespace DailyTasksReport.Tasks
         private readonly int _index;
         private readonly string _locationName;
         private bool _anyCrop;
-        
+
         // 0 = Farm, 1 = Greenhouse
-        private static readonly List<Tuple<Vector2, HoeDirt>>[] Crops = {new List<Tuple<Vector2, HoeDirt>>(), new List<Tuple<Vector2, HoeDirt>>()};
+        private static readonly List<Tuple<Vector2, HoeDirt>>[] Crops =
+            {new List<Tuple<Vector2, HoeDirt>>(), new List<Tuple<Vector2, HoeDirt>>()};
+
         private static bool _doneScan;
         private static CropsTaskId _who = CropsTaskId.None;
 
@@ -67,7 +69,7 @@ namespace DailyTasksReport.Tasks
             }
         }
 
-        public override void FirstScan()
+        protected override void FirstScan()
         {
             if (_who == CropsTaskId.None)
                 _who = _id;
@@ -203,21 +205,27 @@ namespace DailyTasksReport.Tasks
 
         public override void Draw(SpriteBatch b)
         {
-            if ((Game1.currentLocation is Farm || Game1.currentLocation.name == "Greenhouse") && _who == _id)
-            {
-                var x = Game1.viewport.X / Game1.tileSize;
-                var xLimit = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize;
-                var yStart = Game1.viewport.Y / Game1.tileSize;
-                var yLimit = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize;
-                for (; x < xLimit; ++x)
-                for (var y = yStart; y < yLimit; ++y)
-                    if (Game1.currentLocation.terrainFeatures.TryGetValue(new Vector2(x, y), out var _))
-                    {
-                        var v = new Vector2(x * Game1.tileSize - Game1.viewport.X,
-                                            y * Game1.tileSize - Game1.viewport.Y);
-                         b.Draw(Game1.mouseCursors, v, new Rectangle(141, 465, 20, 24), Color.White * 0.65f);
-                    }
-            }
+            if (!(Game1.currentLocation is Farm) && Game1.currentLocation.name != "Greenhouse" || _who != _id) return;
+
+            var x = Game1.viewport.X / Game1.tileSize;
+            var xLimit = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize;
+            var yStart = Game1.viewport.Y / Game1.tileSize;
+            var yLimit = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
+            for (; x <= xLimit; ++x)
+            for (var y = yStart; y <= yLimit; ++y)
+                if (Game1.currentLocation.terrainFeatures.TryGetValue(new Vector2(x, y), out var t) &&
+                    t is HoeDirt dirt && dirt.crop != null)
+                {
+                    var v = new Vector2(x * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8,
+                        y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 2 / 4);
+
+                    if (dirt.crop.dead && _config.DeadCrops)
+                        DrawBubble(b, Game1.mouseCursors, new Rectangle(269, 471, 14, 15), v);
+                    else if (dirt.readyForHarvest() && _config.UnharvestedCrops)
+                        DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
+                    else if (dirt.state == HoeDirt.dry && _config.UnwateredCrops)
+                        DrawBubble(b, Game1.toolSpriteSheet, new Rectangle(49, 226, 15, 13), v);
+                }
         }
 
         public override void Clear()

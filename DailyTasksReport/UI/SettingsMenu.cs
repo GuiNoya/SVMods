@@ -83,7 +83,10 @@ namespace DailyTasksReport.UI
                 parent.Config));
             _options.Add(new InputListener("Open Settings Key", OptionsEnum.OpenSettings, _slots[0].bounds.Width,
                 parent.Config));
+            _options.Add(new InputListener("Toggle Bubbles Key", OptionsEnum.ToggleBubbles, _slots[0].bounds.Width,
+                _parent.Config));
             _options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.Config));
+            _options.Add(new Checkbox("Display bubbles", OptionsEnum.DisplayBubbles, parent.Config));
             _options.Add(new OptionsElement("Report:"));
             _options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.Config));
             _options.Add(new Checkbox("Unharvested crops", OptionsEnum.UnharvestedCrops, parent.Config));
@@ -182,7 +185,7 @@ namespace DailyTasksReport.UI
                     case Checkbox cb:
                         Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4 +
                                                cb.ItemLevel * Game1.pixelZoom * 7,
-                                               currentlySnappedComponent.bounds.Center.Y);
+                            currentlySnappedComponent.bounds.Center.Y);
                         break;
                     case QualityOption qo:
                         qo.CursorAboveOption();

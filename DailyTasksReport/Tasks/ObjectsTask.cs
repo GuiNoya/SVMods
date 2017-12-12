@@ -5,11 +5,13 @@ using System.Linq;
 using System.Text;
 using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using Object = StardewValley.Object;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace DailyTasksReport.Tasks
 {
@@ -19,11 +21,13 @@ namespace DailyTasksReport.Tasks
         private readonly ObjectsTaskId _id;
         private bool _anyObject;
 
+        private static ObjectsTaskId _who = ObjectsTaskId.None;
+        private static bool _hasLuremaster;
+
         private static readonly Dictionary<GameLocation, List<Vector2>> Machines =
             new Dictionary<GameLocation, List<Vector2>>();
         private static readonly Dictionary<GameLocation, List<Vector2>> CrabPots =
             new Dictionary<GameLocation, List<Vector2>>();
-        private static ObjectsTaskId _who = ObjectsTaskId.None;
 
         internal ObjectsTask(ModConfig config, ObjectsTaskId id)
         {
@@ -42,7 +46,8 @@ namespace DailyTasksReport.Tasks
                     Enabled = _config.UncollectedCrabpots;
                     break;
                 case ObjectsTaskId.NotBaitedCrabpots:
-                    Enabled = _config.NotBaitedCrabpots && !Game1.player.professions.Contains(11);
+                    _hasLuremaster = Game1.player.professions.Contains(11);
+                    Enabled = _config.NotBaitedCrabpots && !_hasLuremaster;
                     break;
                 case ObjectsTaskId.UncollectedMachines:
                     Enabled = _config.Machines.ContainsValue(true) || _config.Cask > 0;
@@ -52,7 +57,7 @@ namespace DailyTasksReport.Tasks
             }
         }
 
-        public override void FirstScan()
+        protected override void FirstScan()
         {
             if (_who == ObjectsTaskId.None)
                 _who = _id;
@@ -158,7 +163,7 @@ namespace DailyTasksReport.Tasks
                     }
                     break;
                 case ObjectsTaskId.NotBaitedCrabpots:
-                    if (Game1.player.professions.Contains(11)) break;
+                    if (_hasLuremaster) break;
                     count = (from pair in CrabPots
                         from pos in pair.Value
                         where (pair.Key.objects[pos] as CrabPot)?.bait == null
@@ -249,12 +254,44 @@ namespace DailyTasksReport.Tasks
                 var quality = "";
                 if (machine is Cask cask)
                     quality = cask.heldObject.quality == 1 ? "Silver "
-                            : cask.heldObject.quality == 2 ? "Gold "
-                            : cask.heldObject.quality == 4 ? "Iridium "
-                            : "";
+                        : cask.heldObject.quality == 2 ? "Gold "
+                        : cask.heldObject.quality == 4 ? "Iridium "
+                        : "";
                 stringBuilder.Append(
                     $"{machine.name} with {quality}{machine.heldObject.name} at {location.Key.name} ({position.X}, {position.Y})^");
                 usedLines++;
+            }
+        }
+
+        public override void Draw(SpriteBatch b)
+        {
+            if (_who != _id) return;
+
+            var x = Game1.viewport.X / Game1.tileSize;
+            var xLimit = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize;
+            var yStart = Game1.viewport.Y / Game1.tileSize;
+            var yLimit = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
+            for (; x <= xLimit; ++x)
+            for (var y = yStart; y <= yLimit; ++y)
+            {
+                if (!Game1.currentLocation.objects.TryGetValue(new Vector2(x, y), out var o)) continue;
+
+                var v = new Vector2(o.tileLocation.X * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8f,
+                    o.tileLocation.Y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 5 / 4f);
+
+                switch (o)
+                {
+                    case Cask cask when cask.heldObject?.quality > 0 && cask.heldObject.quality >= _config.Cask &&
+                                        cask.heldObject.quality < 4:
+                        DrawBubble(b, Game1.objectSpriteSheet,
+                            Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet,
+                                cask.heldObject.parentSheetIndex, 16, 16), v);
+                        break;
+
+                    case CrabPot cp when cp.bait == null && _config.NotBaitedCrabpots && !_hasLuremaster:
+                        DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(209, 450, 13, 13), v);
+                        break;
+                }
             }
         }
 
@@ -266,7 +303,8 @@ namespace DailyTasksReport.Tasks
                     Enabled = _config.UncollectedCrabpots;
                     break;
                 case ObjectsTaskId.NotBaitedCrabpots:
-                    Enabled = _config.NotBaitedCrabpots && !Game1.player.professions.Contains(11);
+                    _hasLuremaster = Game1.player.professions.Contains(11);
+                    Enabled = _config.NotBaitedCrabpots && !_hasLuremaster;
                     break;
                 case ObjectsTaskId.UncollectedMachines:
                     Enabled = _config.Machines.ContainsValue(true) || _config.Cask > 0;

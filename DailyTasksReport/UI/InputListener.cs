@@ -36,6 +36,9 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.OpenSettings:
                     _buttonName = config.OpenSettings.ToString();
                     break;
+                case OptionsEnum.ToggleBubbles:
+                    _buttonName = config.ToggleBubbles.ToString();
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
             }
@@ -65,6 +68,9 @@ namespace DailyTasksReport.UI
                         break;
                     case OptionsEnum.OpenSettings:
                         _config.OpenSettings = e.Button;
+                        break;
+                    case OptionsEnum.ToggleBubbles:
+                        _config.ToggleBubbles = e.Button;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");

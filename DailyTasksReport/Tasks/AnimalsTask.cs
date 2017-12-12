@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Buildings;
@@ -24,6 +25,7 @@ namespace DailyTasksReport.Tasks
 
         private readonly ModConfig _config;
         private readonly AnimalsTaskId _id;
+        private static AnimalsTaskId _who = AnimalsTaskId.None;
         private static Farm _farm;
 
         internal AnimalsTask(ModConfig config, AnimalsTaskId id)
@@ -96,10 +98,11 @@ namespace DailyTasksReport.Tasks
             }
         }
 
-        public override void FirstScan()
+        protected override void FirstScan()
         {
-            if (UnpettedAnimals.Count + AnimalProductsToCollect.Count + TrufflesToCollect.Count +
-                AnimalProductsToHarvest.Count + MissingHay.Count > 0)
+            if (_who == AnimalsTaskId.None)
+                _who = _id;
+            else if (_who != _id)
                 return;
 
             _farm = Game1.locations.Find(l => l is Farm) as Farm;
@@ -286,8 +289,8 @@ namespace DailyTasksReport.Tasks
                     break;
 
                 case AnimalsTaskId.AnimalProducts:
-                    if (AnimalProductsToCollect.Count + TrufflesToCollect.Count + AnimalProductsToHarvest.Count ==
-                        0) return "";
+                    if (AnimalProductsToCollect.Count + TrufflesToCollect.Count + AnimalProductsToHarvest.Count == 0)
+                        return "";
 
                     stringBuilder.Append("Animal products:^");
                     usedLines++;
@@ -341,6 +344,78 @@ namespace DailyTasksReport.Tasks
             return stringBuilder.ToString();
         }
 
+        public override void Draw(SpriteBatch b)
+        {
+            if (_id != _who || !(Game1.currentLocation is Farm) && !(Game1.currentLocation is AnimalHouse)) return;
+
+            // Truffles
+            if (_config.AnimalProducts["Truffle"] && Game1.currentLocation is Farm)
+            {
+                var x = Game1.viewport.X / Game1.tileSize;
+                var xLimit = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize;
+                var yStart = Game1.viewport.Y / Game1.tileSize;
+                var yLimit = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
+                for (; x <= xLimit; ++x)
+                for (var y = yStart; y <= yLimit; ++y)
+                {
+                    if (!Game1.currentLocation.objects.TryGetValue(new Vector2(x, y), out var o)) continue;
+
+                    var v = new Vector2(o.tileLocation.X * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8f,
+                        o.tileLocation.Y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 2 / 4f);
+                    if (o.name == "Truffle")
+                        DrawBubble(Game1.spriteBatch, Game1.objectSpriteSheet, new Rectangle(352, 273, 14, 14), v);
+                }
+            }
+
+            // Animals
+
+            var animalDict = (Game1.currentLocation as Farm)?.animals ??
+                             (Game1.currentLocation as AnimalHouse)?.animals;
+
+            if (animalDict == null) return;
+
+            foreach (var animal in animalDict)
+            {
+                var needsPet = _config.UnpettedAnimals && !animal.Value.wasPet;
+                var hasProduct = animal.Value.currentProduce != 430 &&
+                                 _config.ProductFromAnimal(animal.Value.currentProduce);
+
+                var v = new Vector2(animal.Value.getStandingX() - Game1.viewport.X,
+                    animal.Value.getStandingY() - Game1.viewport.Y);
+                if (animal.Value.home is Coop)
+                {
+                    v.X -= Game1.tileSize * 0.3f;
+                    v.Y -= Game1.tileSize * 6 / 4f;
+                }
+                else
+                {
+                    v.X -= Game1.tileSize * 0.2f;
+                    v.Y -= Game1.tileSize * 2f;
+                }
+
+                if (needsPet)
+                {
+                    if (hasProduct)
+                    {
+                        DrawBubble2Icons(Game1.spriteBatch, Game1.mouseCursors, new Rectangle(117, 7, 9, 8),
+                            Game1.objectSpriteSheet,
+                            Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet,
+                                animal.Value.currentProduce, 16, 16),
+                            v);
+                        continue;
+                    }
+                    DrawBubble(Game1.spriteBatch, Game1.mouseCursors, new Rectangle(117, 7, 9, 8), v);
+                }
+                else if (hasProduct)
+                {
+                    DrawBubble(Game1.spriteBatch, Game1.objectSpriteSheet,
+                        Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, animal.Value.currentProduce,
+                            16, 16),
+                        v);
+                }
+            }
+        }
+
         public override void Clear()
         {
             switch (_id)
@@ -367,6 +442,7 @@ namespace DailyTasksReport.Tasks
 
     public enum AnimalsTaskId
     {
+        None = -1,
         UnpettedAnimals = 0,
         AnimalProducts = 1,
         MissingHay = 2

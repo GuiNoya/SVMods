@@ -5,9 +5,11 @@
         // Special options
         OpenReportKey = 1,
         OpenSettings = 2,
+        ToggleBubbles = 3,
 
         // Basic options
         ShowDetailedInfo = 50,
+        DisplayBubbles = 51,
 
         // What to report
         UnwateredCrops = 100,

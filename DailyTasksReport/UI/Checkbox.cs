@@ -39,6 +39,9 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.ShowDetailedInfo:
                     _isChecked = _config.ShowDetailedInfo;
                     break;
+                case OptionsEnum.DisplayBubbles:
+                    _isChecked = _config.DisplayBubbles;
+                    break;
 
                 case OptionsEnum.UnwateredCrops:
                     _isChecked = _config.UnwateredCrops;
@@ -209,6 +212,9 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.ShowDetailedInfo:
                     _config.ShowDetailedInfo = _isChecked;
                     break;
+                case OptionsEnum.DisplayBubbles:
+                    _config.DisplayBubbles = _isChecked;
+                    return;
 
                 case OptionsEnum.UnwateredCrops:
                     _config.UnwateredCrops = _isChecked;

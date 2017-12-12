@@ -12,8 +12,14 @@ namespace DailyTasksReport
         /// <summary> The input to open the settings menu. </summary>
         public SButton OpenSettings { get; set; } = SButton.None;
 
+        /// <summary> The input to toggle the display of bubble notifications. </summary>
+        public SButton ToggleBubbles { get; set; } = SButton.None;
+
         /// <summary> Show detailed info on the next pages. </summary>
         public bool ShowDetailedInfo { get; set; } = true;
+
+        /// <summary> Display bubbles for items in the report that normally does not display bubbles. </summary>
+        public bool DisplayBubbles { get; set; } = false;
 
         /// <summary> Check or not for unwatered crops in farm and greenhouse. </summary>
         public bool UnwateredCrops { get; set; } = true;
@@ -120,7 +126,7 @@ namespace DailyTasksReport
 
         internal bool ProductFromAnimal(int produceIndex)
         {
-            return AnimalProducts[LookupProductFromAnimal[produceIndex]];
+            return produceIndex > 0 && AnimalProducts[LookupProductFromAnimal[produceIndex]];
         }
 
         internal bool ProductToCollect(int objectIndex)

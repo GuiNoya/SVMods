@@ -29,7 +29,7 @@ namespace DailyTasksReport.Tasks
             Enabled = _config.FarmCave && (Game1.player.caveChoice != 0 || Game1.player.totalMoneyEarned >= 25000);
         }
 
-        public override void FirstScan()
+        protected override void FirstScan()
         {
         }
 
