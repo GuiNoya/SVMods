@@ -213,7 +213,9 @@ namespace DailyTasksReport.Tasks
         private static void CheckAnimalProductsInCoop(GameLocation coop)
         {
             foreach (var pair in coop.objects)
-                if (Array.BinarySearch(CollectableAnimalProducts, pair.Value.parentSheetIndex) >= 0)
+                if (Array.BinarySearch(CollectableAnimalProducts, pair.Value.parentSheetIndex) >= 0 &&
+                    (int) pair.Key.X <= coop.map.DisplayWidth / Game1.tileSize &&
+                    (int) pair.Key.Y <= coop.map.DisplayHeight / Game1.tileSize)
                     AnimalProductsToCollect.Add(new TaskItem<Object>(coop, pair.Key, pair.Value));
         }
 
@@ -255,7 +257,7 @@ namespace DailyTasksReport.Tasks
                         return $"Empty hay spots on feeding benches: {count}^";
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException($"Unknows animal task");
+                    throw new ArgumentOutOfRangeException($"Unknown animal task");
             }
 
             usedLines = 0;
@@ -328,9 +330,8 @@ namespace DailyTasksReport.Tasks
 
                     foreach (var tuple in MissingHay)
                     {
-                        var s = "s";
-                        if (tuple.Item2 == 1)
-                            s = string.Empty;
+                        var s = tuple.Item2 == 1 ? string.Empty : "s";
+
                         stringBuilder.Append(
                             $"{tuple.Item2} hay{s} missing at {tuple.Item1.indoors.Name} ({tuple.Item1.tileX}, {tuple.Item1.tileY})^");
                         usedLines++;
@@ -376,6 +377,8 @@ namespace DailyTasksReport.Tasks
 
             foreach (var animal in animalDict)
             {
+                if (animal.Value.isEmoting) continue;
+
                 var needsPet = _config.UnpettedAnimals && !animal.Value.wasPet;
                 var hasProduct = animal.Value.currentProduce != 430 &&
                                  _config.ProductFromAnimal(animal.Value.currentProduce);
@@ -425,6 +428,7 @@ namespace DailyTasksReport.Tasks
                     break;
                 case AnimalsTaskId.AnimalProducts:
                     Enabled = _config.AnimalProducts.ContainsValue(true);
+
                     break;
                 case AnimalsTaskId.MissingHay:
                     Enabled = _config.MissingHay;
@@ -432,6 +436,9 @@ namespace DailyTasksReport.Tasks
                 default:
                     throw new ArgumentOutOfRangeException($"Animal task not implemented");
             }
+
+            if (_id != _who) return;
+
             UnpettedAnimals.Clear();
             AnimalProductsToHarvest.Clear();
             AnimalProductsToCollect.Clear();
