@@ -400,21 +400,57 @@ namespace DailyTasksReport.Tasks
                 {
                     if (hasProduct)
                     {
-                        DrawBubble2Icons(Game1.spriteBatch, Game1.mouseCursors, new Rectangle(117, 7, 9, 8),
+                        DrawBubble2Icons(b, Game1.mouseCursors, new Rectangle(117, 7, 9, 8),
                             Game1.objectSpriteSheet,
                             Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet,
                                 animal.Value.currentProduce, 16, 16),
                             v);
                         continue;
                     }
-                    DrawBubble(Game1.spriteBatch, Game1.mouseCursors, new Rectangle(117, 7, 9, 8), v);
+                    DrawBubble(b, Game1.mouseCursors, new Rectangle(117, 7, 9, 8), v);
                 }
                 else if (hasProduct)
                 {
-                    DrawBubble(Game1.spriteBatch, Game1.objectSpriteSheet,
+                    DrawBubble(b, Game1.objectSpriteSheet,
                         Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet, animal.Value.currentProduce,
                             16, 16),
                         v);
+                }
+            }
+
+            // Animal Houses
+
+            if (Game1.currentLocation is Farm farm)
+            {
+                foreach (var building in farm.buildings)
+                {
+                    if (building.indoors is AnimalHouse animalHouse)
+                    {
+                        bool anyHayMissing = animalHouse.numberOfObjectsWithName("Hay") < animalHouse.animalLimit;
+                        bool anyProduce = building is Coop && animalHouse.objects.Any(o =>
+                            Array.BinarySearch(CollectableAnimalProducts, o.Value.parentSheetIndex) >= 0);
+
+                        var v = new Vector2(building.tileX * Game1.tileSize - Game1.viewport.X + Game1.tileSize * 1.1f, 
+                            building.tileY * Game1.tileSize - Game1.viewport.Y + Game1.tileSize / 2);
+
+                        if (building is Barn)
+                            v.Y += Game1.tileSize / 2f;
+
+                        if (anyHayMissing)
+                        {
+                            if (anyProduce)
+                            {
+                                DrawBubble2Icons(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10),
+                                    Game1.objectSpriteSheet, new Rectangle(160, 112, 16, 16), v);
+                                continue;
+                            }
+                            DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(160, 112, 16, 16), v);
+                        }
+                        else if (anyProduce)
+                        {
+                            DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
+                        }
+                    }
                 }
             }
         }
