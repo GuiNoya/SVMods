@@ -53,7 +53,7 @@ namespace ZoomLevelKeybind
         private void IncreaseZoom()
         {
             if (_config.UnlimitedZoom)
-                Game1.options.zoomLevel = Game1.options.zoomLevel >= 0.05f ? 0.05f : (float) Math.Round(Game1.options.zoomLevel + 0.05, 2);
+                Game1.options.zoomLevel = Game1.options.zoomLevel >= 3f ? 3f : (float) Math.Round(Game1.options.zoomLevel + 0.05, 2);
             else
                 Game1.options.zoomLevel = Game1.options.zoomLevel >= 1.25f ? 1.25f : (float) Math.Round(Game1.options.zoomLevel + 0.05, 2);
 
