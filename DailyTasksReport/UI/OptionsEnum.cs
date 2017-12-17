@@ -58,6 +58,19 @@
         StatueOfEndlessFortune = 317,
         StatueOfPerfection = 318,
         Tapper = 319,
-        WormBin = 320
+        WormBin = 320,
+
+        //Draw Bubbles
+        DrawUnwateredCrops = 500,
+        DrawUnharvestedCrops = 501,
+        DrawDeadCrops = 502,
+        DrawUnpettedPet = 503,
+        DrawUnpettedAnimals = 504,
+        DrawAnimalsWithProduce = 505,
+        DrawBuildingsWithProduce = 506,
+        DrawBuildingsMissingHay = 507,
+        DrawTruffles = 508,
+        DrawCrabpotsNotBaited = 509,
+        DrawCask = 510
     }
 }

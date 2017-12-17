@@ -350,7 +350,7 @@ namespace DailyTasksReport.Tasks
             if (_id != _who || !(Game1.currentLocation is Farm) && !(Game1.currentLocation is AnimalHouse)) return;
 
             // Truffles
-            if (_config.AnimalProducts["Truffle"] && Game1.currentLocation is Farm)
+            if (_config.DrawBubbleTruffles && Game1.currentLocation is Farm)
             {
                 var x = Game1.viewport.X / Game1.tileSize;
                 var xLimit = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize;
@@ -379,9 +379,10 @@ namespace DailyTasksReport.Tasks
             {
                 if (animal.Value.isEmoting) continue;
 
-                var needsPet = _config.UnpettedAnimals && !animal.Value.wasPet;
+                var needsPet = _config.DrawBubbleUnpettedAnimals && !animal.Value.wasPet;
                 var hasProduct = animal.Value.currentProduce != 430 &&
-                                 _config.ProductFromAnimal(animal.Value.currentProduce);
+                                 animal.Value.currentProduce > 0 &&
+                                 _config.DrawBubbleAnimalsWithProduce;
 
                 var v = new Vector2(animal.Value.getStandingX() - Game1.viewport.X,
                     animal.Value.getStandingY() - Game1.viewport.Y);
@@ -420,39 +421,38 @@ namespace DailyTasksReport.Tasks
 
             // Animal Houses
 
-            if (Game1.currentLocation is Farm farm)
-            {
-                foreach (var building in farm.buildings)
+            if (!(Game1.currentLocation is Farm farm)) return;
+            
+            foreach (var building in farm.buildings)
+                if (building.indoors is AnimalHouse animalHouse)
                 {
-                    if (building.indoors is AnimalHouse animalHouse)
+                    var anyHayMissing = _config.DrawBubbleBuildingsMissingHay &&
+                                        animalHouse.numberOfObjectsWithName("Hay") < animalHouse.animalLimit;
+                    var anyProduce = _config.DrawBubbleBuildingsWithProduce && building is Coop &&
+                                     animalHouse.objects.Any(o =>
+                                         Array.BinarySearch(CollectableAnimalProducts, o.Value.parentSheetIndex) >= 0);
+
+                    var v = new Vector2(building.tileX * Game1.tileSize - Game1.viewport.X + Game1.tileSize * 1.1f,
+                        building.tileY * Game1.tileSize - Game1.viewport.Y + Game1.tileSize / 2);
+
+                    if (building is Barn)
+                        v.Y += Game1.tileSize / 2f;
+
+                    if (anyHayMissing)
                     {
-                        bool anyHayMissing = animalHouse.numberOfObjectsWithName("Hay") < animalHouse.animalLimit;
-                        bool anyProduce = building is Coop && animalHouse.objects.Any(o =>
-                            Array.BinarySearch(CollectableAnimalProducts, o.Value.parentSheetIndex) >= 0);
-
-                        var v = new Vector2(building.tileX * Game1.tileSize - Game1.viewport.X + Game1.tileSize * 1.1f, 
-                            building.tileY * Game1.tileSize - Game1.viewport.Y + Game1.tileSize / 2);
-
-                        if (building is Barn)
-                            v.Y += Game1.tileSize / 2f;
-
-                        if (anyHayMissing)
+                        if (anyProduce)
                         {
-                            if (anyProduce)
-                            {
-                                DrawBubble2Icons(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10),
-                                    Game1.objectSpriteSheet, new Rectangle(160, 112, 16, 16), v);
-                                continue;
-                            }
-                            DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(160, 112, 16, 16), v);
+                            DrawBubble2Icons(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10),
+                                Game1.objectSpriteSheet, new Rectangle(160, 112, 16, 16), v);
+                            continue;
                         }
-                        else if (anyProduce)
-                        {
-                            DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
-                        }
+                        DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(160, 112, 16, 16), v);
+                    }
+                    else if (anyProduce)
+                    {
+                        DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
                     }
                 }
-            }
         }
 
         public override void Clear()

@@ -11,7 +11,6 @@ using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
 using Object = StardewValley.Object;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace DailyTasksReport.Tasks
 {
@@ -281,14 +280,15 @@ namespace DailyTasksReport.Tasks
 
                 switch (o)
                 {
-                    case Cask cask when cask.heldObject?.quality > 0 && cask.heldObject.quality >= _config.Cask &&
+                    case Cask cask when _config.DrawBubbleCask && cask.heldObject?.quality > 0 &&
+                                        cask.heldObject.quality >= _config.Cask &&
                                         cask.heldObject.quality < 4:
                         DrawBubble(b, Game1.objectSpriteSheet,
                             Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet,
                                 cask.heldObject.parentSheetIndex, 16, 16), v);
                         break;
 
-                    case CrabPot cp when cp.bait == null && _config.NotBaitedCrabpots && !_hasLuremaster:
+                    case CrabPot cp when _config.DrawBubbleCrabpotsNotBaited && cp.bait == null && !_hasLuremaster:
                         DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(209, 450, 13, 13), v);
                         break;
                 }

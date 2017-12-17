@@ -53,6 +53,7 @@
     <Compile Include="Tasks\PetTask.cs" />
     <Compile Include="Tasks\Task.cs" />
     <Compile Include="Tasks\TaskItem.cs" />
+    <Compile Include="UI\BubblesMenu.cs" />
     <Compile Include="UI\Checkbox.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModEntry.cs" />

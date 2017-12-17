@@ -40,7 +40,7 @@ namespace DailyTasksReport
 
             // In-game Events 
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
 
             // Draw Events
@@ -84,9 +84,9 @@ namespace DailyTasksReport
 
         // In-game events
 
-        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
         {
-            if (_refreshReport && e.PriorMenu is SettingsMenu && SettingsMenu.PreviousMenu is ReportMenu)
+            if (_refreshReport && e.PriorMenu is SettingsMenu && e.NewMenu is ReportMenu)
                 OpenReport(true);
             _refreshReport = false;
         }

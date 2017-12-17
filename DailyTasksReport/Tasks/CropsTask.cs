@@ -219,11 +219,11 @@ namespace DailyTasksReport.Tasks
                     var v = new Vector2(x * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8,
                         y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 2 / 4);
 
-                    if (dirt.crop.dead && _config.DeadCrops)
+                    if (dirt.crop.dead && _config.DrawBubbleDeadCrops)
                         DrawBubble(b, Game1.mouseCursors, new Rectangle(269, 471, 14, 15), v);
-                    else if (dirt.readyForHarvest() && _config.UnharvestedCrops)
+                    else if (dirt.readyForHarvest() && _config.DrawBubbleUnharvestedCrops)
                         DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
-                    else if (dirt.state == HoeDirt.dry && _config.UnwateredCrops)
+                    else if (dirt.state == HoeDirt.dry && _config.DrawBubbleUnwateredCrops)
                         DrawBubble(b, Game1.toolSpriteSheet, new Rectangle(49, 226, 15, 13), v);
                 }
         }

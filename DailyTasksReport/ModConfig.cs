@@ -96,6 +96,39 @@ namespace DailyTasksReport
         // <summary> Product quality to check in casks. </summary>
         public int Cask { get; set; } = 4;
 
+        /// <summary> Draw bubbles for unwatered crops. </summary>
+        public bool DrawBubbleUnwateredCrops { get; set; } = true;
+
+        /// <summary> Draw bubbles for unharvested crops. </summary>
+        public bool DrawBubbleUnharvestedCrops { get; set; } = true;
+
+        /// <summary> Draw bubbles for dead crops. </summary>
+        public bool DrawBubbleDeadCrops { get; set; } = true;
+
+        /// <summary> Draw bubble if pet was not petted. </summary>
+        public bool DrawBubbleUnpettedPet { get; set; } = true;
+
+        /// <summary> Draw bubbles for unpetted animals. </summary>
+        public bool DrawBubbleUnpettedAnimals { get; set; } = true;
+
+        /// <summary> Draw bubbles for animals with produce. </summary>
+        public bool DrawBubbleAnimalsWithProduce { get; set; } = true;
+
+        /// <summary> Draw bubbles for buildings with produce inside. </summary>
+        public bool DrawBubbleBuildingsWithProduce { get; set; } = true;
+
+        /// <summary> Draw bubbles for buildings with any hay missing. </summary>
+        public bool DrawBubbleBuildingsMissingHay { get; set; } = true;
+
+        /// <summary> Draw bubbles for truffles </summary>
+        public bool DrawBubbleTruffles { get; set; } = true;
+
+        /// <summary> Draw bubbles for unbaited crabpots. </summary>
+        public bool DrawBubbleCrabpotsNotBaited { get; set; } = true;
+
+        /// <summary> Draw bubbles for cask if configuration for lower quality items. </summary>
+        public bool DrawBubbleCask { get; set; } = true;
+
         internal bool Check(IMonitor monitor)
         {
             var changed = false;
