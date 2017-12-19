@@ -14,7 +14,7 @@ namespace DailyTasksReport
         public string OpenSettings { get; set; } = Keys.None.ToString();
 
         /// <summary> The input to toggle the display of bubble notifications. </summary>
-        public SButton ToggleBubbles { get; set; } = SButton.None;
+        public string ToggleBubbles { get; set; } = Keys.None.ToString();
 
         /// <summary> Show the open report button below quests button. </summary>
         public bool DisplayReportButton { get; set; } = true;

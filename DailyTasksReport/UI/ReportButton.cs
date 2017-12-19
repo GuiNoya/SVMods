@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
+using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
@@ -82,7 +82,7 @@ namespace DailyTasksReport.UI
 
         public override void performHoverAction(int x, int y)
         {
-            var keybinding = _parent.Config.OpenReportKey != SButton.None ? $"({_parent.Config.OpenReportKey})" : "";
+            var keybinding = _parent.Config.OpenReportKey != Keys.None.ToString() ? $"({_parent.Config.OpenReportKey})" : "";
             _hoverText = $"Report {keybinding}";
         }
 

@@ -71,7 +71,7 @@ namespace DailyTasksReport.UI
                         _config.OpenSettings = e.KeyPressed.ToString();
                         break;
                     case OptionsEnum.ToggleBubbles:
-                        _config.ToggleBubbles = e.Button;
+                        _config.ToggleBubbles = e.KeyPressed.ToString();
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");

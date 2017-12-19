@@ -113,7 +113,7 @@ namespace DailyTasksReport
             {
                 SettingsMenu.OpenMenu(this);
             }
-            else if (e.Button == Config.ToggleBubbles)
+            else if (e.KeyPressed.ToString() == Config.ToggleBubbles)
             {
                 Config.DisplayBubbles = !Config.DisplayBubbles;
                 Helper.WriteConfig(Config);
