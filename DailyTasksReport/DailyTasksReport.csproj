@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tasks\MiscTask.cs" />
     <Compile Include="Tasks\ObjectsTask.cs" />
     <Compile Include="Tasks\AnimalsTask.cs" />
     <Compile Include="Tasks\CropsTask.cs" />

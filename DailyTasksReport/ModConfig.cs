@@ -21,6 +21,15 @@ namespace DailyTasksReport
         /// <summary> Display bubbles for items in the report that normally does not display bubbles. </summary>
         public bool DisplayBubbles { get; set; } = false;
 
+        /// <summary> Report if there is a new recipe being aired on the queen of sauce. </summary>
+        public bool NewRecipeOnTv { get; set; } = true;
+
+        /// <summary> Report if it's someone's birthday and the farmer did not sent a gift. </summary>
+        public bool Birthdays { get; set; } = true;
+
+        /// <summary> Report if the traveling merchant is in town and was not visited yet. </summary>
+        public bool TravelingMerchant { get; set; } = true;
+
         /// <summary> Check or not for unwatered crops in farm and greenhouse. </summary>
         public bool UnwateredCrops { get; set; } = true;
 

@@ -22,6 +22,9 @@
         FarmCave = 107,
         UncollectedCrabpots = 108,
         NotBaitedCrabpots = 109,
+        NewRecipeOnTv = 110,
+        Birthdays = 111,
+        TravelingMerchant = 112,
 
         //Animal products
         AllAnimalProducts = 200,

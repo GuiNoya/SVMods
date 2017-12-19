@@ -56,6 +56,7 @@ namespace DailyTasksReport
 
         private void SetupTasks()
         {
+            _tasks.Add(new MiscTask(Config));
             _tasks.Add(new CropsTask(Config, CropsTaskId.UnwateredCropFarm));
             _tasks.Add(new CropsTask(Config, CropsTaskId.UnwateredCropGreenhouse));
             _tasks.Add(new CropsTask(Config, CropsTaskId.UnharvestedCropFarm));

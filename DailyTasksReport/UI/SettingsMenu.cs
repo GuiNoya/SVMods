@@ -87,6 +87,9 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Display bubbles", OptionsEnum.DisplayBubbles, parent.Config, true,
                 _slots[0].bounds.Width));
             _options.Add(new OptionsElement("Report:"));
+            _options.Add(new Checkbox("New recipe on TV", OptionsEnum.NewRecipeOnTv, parent.Config));
+            _options.Add(new Checkbox("Birthdays", OptionsEnum.Birthdays, parent.Config));
+            _options.Add(new Checkbox("Traveling merchant in town", OptionsEnum.TravelingMerchant, parent.Config));
             _options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.Config));
             _options.Add(new Checkbox("Unharvested crops", OptionsEnum.UnharvestedCrops, parent.Config));
             _options.Add(new Checkbox("Dead crops", OptionsEnum.DeadCrops, parent.Config));

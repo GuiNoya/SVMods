@@ -91,6 +91,15 @@ namespace DailyTasksReport.UI
                     _isChecked = _config.DisplayBubbles;
                     break;
 
+                case OptionsEnum.NewRecipeOnTv:
+                    _isChecked = _config.NewRecipeOnTv;
+                    break;
+                case OptionsEnum.Birthdays:
+                    _isChecked = _config.Birthdays;
+                    break;
+                case OptionsEnum.TravelingMerchant:
+                    _isChecked = _config.TravelingMerchant;
+                    break;
                 case OptionsEnum.UnwateredCrops:
                     _isChecked = _config.UnwateredCrops;
                     break;
@@ -325,6 +334,15 @@ namespace DailyTasksReport.UI
                     _config.DisplayBubbles = _isChecked;
                     return;
 
+                case OptionsEnum.NewRecipeOnTv:
+                    _config.NewRecipeOnTv = _isChecked;
+                    break;
+                case OptionsEnum.Birthdays:
+                    _config.Birthdays = _isChecked;
+                    break;
+                case OptionsEnum.TravelingMerchant:
+                    _config.TravelingMerchant = _isChecked;
+                    break;
                 case OptionsEnum.UnwateredCrops:
                     _config.UnwateredCrops = _isChecked;
                     break;
