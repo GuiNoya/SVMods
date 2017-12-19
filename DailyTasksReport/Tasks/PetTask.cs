@@ -56,7 +56,7 @@ namespace DailyTasksReport.Tasks
 
         public override void Draw(SpriteBatch b)
         {
-            if (!_config.DrawBubbleUnpettedPet ||
+            if (!_config.DrawBubbleUnpettedPet || _pet == null ||
                 !(Game1.currentLocation is Farm) && !(Game1.currentLocation is FarmHouse)) return;
 
             _petPetted = ModEntry.ReflectionHelper.GetPrivateValue<bool>(_pet, "wasPetToday");
