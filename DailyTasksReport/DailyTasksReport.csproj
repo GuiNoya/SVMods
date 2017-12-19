@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tasks\MiscTask.cs" />
     <Compile Include="Tasks\ObjectsTask.cs" />
     <Compile Include="Tasks\AnimalsTask.cs" />
     <Compile Include="Tasks\CropsTask.cs" />
@@ -53,14 +54,16 @@
     <Compile Include="Tasks\PetTask.cs" />
     <Compile Include="Tasks\Task.cs" />
     <Compile Include="Tasks\TaskItem.cs" />
+    <Compile Include="UI\BubblesMenu.cs" />
     <Compile Include="UI\Checkbox.cs" />
     <Compile Include="ModConfig.cs" />
     <Compile Include="ModEntry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReportBuilder.cs" />
+    <Compile Include="Report.cs" />
     <Compile Include="UI\InputListener.cs" />
     <Compile Include="UI\OptionsEnum.cs" />
     <Compile Include="UI\QualityOption.cs" />
+    <Compile Include="UI\ReportButton.cs" />
     <Compile Include="UI\ReportMenu.cs" />
     <Compile Include="UI\SettingsMenu.cs" />
   </ItemGroup>

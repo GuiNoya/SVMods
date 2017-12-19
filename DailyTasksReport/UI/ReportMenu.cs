@@ -72,7 +72,8 @@ namespace DailyTasksReport.UI
             upperRightCloseButton.downNeighborID = 103;
 
             if (!Game1.options.SnappyMenus || !Game1.options.gamepadControls) return;
-            allClickableComponents = new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
+            allClickableComponents =
+                new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
             snapToDefaultClickableComponent();
         }
 
@@ -84,8 +85,10 @@ namespace DailyTasksReport.UI
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
         {
-            xPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).X;
-            yPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).Y;
+            xPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom,
+                                                                                     180 * Game1.pixelZoom).X;
+            yPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom,
+                                                                                     180 * Game1.pixelZoom).Y;
 
             _backButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + Game1.tileSize / 2,
@@ -116,7 +119,7 @@ namespace DailyTasksReport.UI
                 upNeighborID = 100,
                 downNeighborID = 102
             };
-            
+
             initializeUpperRightCloseButton();
 
             upperRightCloseButton.myID = 100;
@@ -124,7 +127,8 @@ namespace DailyTasksReport.UI
 
             if (!Game1.options.SnappyMenus) return;
 
-            allClickableComponents = new List<ClickableComponent> { upperRightCloseButton, _backButton, _forwardButton, _settingsButton };
+            allClickableComponents =
+                new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
 
             switch (currentlySnappedComponent.myID)
             {
@@ -150,7 +154,6 @@ namespace DailyTasksReport.UI
         public override void receiveGamePadButton(Buttons b)
         {
             base.receiveGamePadButton(b);
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (b)
             {
                 case Buttons.LeftTrigger when _page > 0:
@@ -233,7 +236,6 @@ namespace DailyTasksReport.UI
         {
             base.receiveKeyPress(key);
 
-            // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (key.ToString() == _parent.Config.OpenReportKey && readyToClose())
             {
                 if (_firstKeyEvent)

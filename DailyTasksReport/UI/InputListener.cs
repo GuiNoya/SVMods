@@ -28,7 +28,6 @@ namespace DailyTasksReport.UI
             _config = config;
             _option = whichOption;
 
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (whichOption)
             {
                 case OptionsEnum.OpenReportKey:
@@ -36,6 +35,9 @@ namespace DailyTasksReport.UI
                     break;
                 case OptionsEnum.OpenSettings:
                     _buttonName = config.OpenSettings;
+                    break;
+                case OptionsEnum.ToggleBubbles:
+                    _buttonName = config.ToggleBubbles.ToString();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
@@ -60,7 +62,6 @@ namespace DailyTasksReport.UI
             }
             else
             {
-                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (_option)
                 {
                     case OptionsEnum.OpenReportKey:
@@ -68,6 +69,9 @@ namespace DailyTasksReport.UI
                         break;
                     case OptionsEnum.OpenSettings:
                         _config.OpenSettings = e.KeyPressed.ToString();
+                        break;
+                    case OptionsEnum.ToggleBubbles:
+                        _config.ToggleBubbles = e.Button;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");

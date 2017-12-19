@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using DailyTasksReport.Tasks;
 using DailyTasksReport.UI;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
@@ -7,14 +9,15 @@ using StardewValley;
 
 namespace DailyTasksReport
 {
+    /// <inheritdoc />
     /// <summary>The mod entry point.</summary>
     // ReSharper disable once ClassNeverInstantiated.Global
     public class ModEntry : Mod
     {
-        internal static IMonitor MonitorHelper;
         internal static IReflectionHelper ReflectionHelper;
+        private readonly List<Task> _tasks = new List<Task>();
 
-        private ReportBuilder _report;
+        private bool _firstRun = true;
         private bool _refreshReport;
 
         internal ModConfig Config;
@@ -22,34 +25,79 @@ namespace DailyTasksReport
         /*********
         ** Public methods
         *********/
-        /// <summary>The mod entry point, called after the mod is first loaded.</summary>
-        /// <param name="helper">Provides simplified APIs for writing mods.</param>
+        /// <inheritdoc />
         public override void Entry(IModHelper helper)
         {
-            MonitorHelper = Monitor;
             ReflectionHelper = helper.Reflection;
 
             Config = helper.ReadConfig<ModConfig>();
+            if (Config.Check(Monitor))
+                helper.WriteConfig(Config);
 
-            if (Config.Cask < 0 || Config.Cask > 4)
-            {
-                Monitor.Log("Wrong configuration for Casks, setting to iridium quality...", LogLevel.Error);
-                Config.Cask = 4;
-            }
+            SetupTasks();
 
-            _report = new ReportBuilder(this);
+            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
 
+            // In-game Events 
             ControlEvents.KeyPressed += ControlEvents_KeyPressed;
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
+
+            // Draw Events
+            GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
         }
-        
-        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+
+        private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
         {
-            if (_refreshReport)
-                if (e.PriorMenu is SettingsMenu && SettingsMenu.PreviousMenu is ReportMenu)
-                    OpenReport(true);
-                _refreshReport = false;
+            _tasks.ForEach(t => t.Clear());
+        }
+
+        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        {
+            // If inserted last and player has no quest, DayTimeMoneyBox will receive left click
+            Game1.onScreenMenus.Insert(0, new ReportButton(this, OpenReport));
+        }
+
+        // Setup events
+
+        private void SetupTasks()
+        {
+            _tasks.Add(new MiscTask(Config));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.UnwateredCropFarm));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.UnwateredCropGreenhouse));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.UnharvestedCropFarm));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.UnharvestedCropGreenhouse));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.DeadCropFarm));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.DeadCropGreenhouse));
+            _tasks.Add(new PetTask(Config));
+            _tasks.Add(new AnimalsTask(Config, AnimalsTaskId.UnpettedAnimals));
+            _tasks.Add(new AnimalsTask(Config, AnimalsTaskId.AnimalProducts));
+            _tasks.Add(new AnimalsTask(Config, AnimalsTaskId.MissingHay));
+            _tasks.Add(new FarmCaveTask(Config));
+            _tasks.Add(new ObjectsTask(Config, ObjectsTaskId.UncollectedCrabpots));
+            _tasks.Add(new ObjectsTask(Config, ObjectsTaskId.NotBaitedCrabpots));
+            _tasks.Add(new ObjectsTask(Config, ObjectsTaskId.UncollectedMachines));
+        }
+
+        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        {
+            _tasks.ForEach(t => t.OnDayStarted());
+
+            if (!_firstRun) return;
+
+            Report.GetReportText(_tasks, true); // Let JIT do it's thing
+            _firstRun = false;
+        }
+
+        // In-game events
+
+        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        {
+            if (_refreshReport && e.PriorMenu is SettingsMenu && e.NewMenu is ReportMenu)
+                OpenReport(true);
+            _refreshReport = false;
         }
 
         private void ControlEvents_KeyPressed(object sender, EventArgsKeyPressed e)
@@ -58,12 +106,21 @@ namespace DailyTasksReport
                 return;
 
             if (e.KeyPressed.ToString() == Config.OpenReportKey)
+            {
                 OpenReport();
+            }
             else if (e.KeyPressed.ToString() == Config.OpenSettings)
+            {
                 SettingsMenu.OpenMenu(this);
+            }
+            else if (e.Button == Config.ToggleBubbles)
+            {
+                Config.DisplayBubbles = !Config.DisplayBubbles;
+                Helper.WriteConfig(Config);
+            }
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, System.EventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
         {
             _refreshReport = true;
         }
@@ -72,7 +129,17 @@ namespace DailyTasksReport
         {
             if (Game1.activeClickableMenu != null)
                 Game1.exitActiveMenu();
-            Game1.activeClickableMenu = new ReportMenu(this, _report.GetReportText(), skipAnimation);
+            Game1.activeClickableMenu =
+                new ReportMenu(this, Report.GetReportText(_tasks, Config.ShowDetailedInfo), skipAnimation);
+        }
+
+        // Draw Events
+
+        private void GraphicsEvents_OnPreRenderHudEvent(object sender, EventArgs e)
+        {
+            if (!Config.DisplayBubbles || !Context.IsWorldReady || Game1.currentMinigame != null ||
+                Game1.showingEndOfNightStuff || Game1.CurrentEvent != null) return;
+            _tasks.ForEach(t => t.Draw(Game1.spriteBatch));
         }
     }
 }

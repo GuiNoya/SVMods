@@ -5,9 +5,12 @@
         // Special options
         OpenReportKey = 1,
         OpenSettings = 2,
+        ToggleBubbles = 3,
+        ShowReportButton = 4,
 
         // Basic options
         ShowDetailedInfo = 50,
+        DisplayBubbles = 51,
 
         // What to report
         UnwateredCrops = 100,
@@ -20,6 +23,9 @@
         FarmCave = 107,
         UncollectedCrabpots = 108,
         NotBaitedCrabpots = 109,
+        NewRecipeOnTv = 110,
+        Birthdays = 111,
+        TravelingMerchant = 112,
 
         //Animal products
         AllAnimalProducts = 200,
@@ -31,8 +37,8 @@
         GoatMilk = 206,
         SheepWool = 207,
         Truffle = 208,
-        RabitsWool = 209,
-        RabitsFoot = 210,
+        RabbitsWool = 209,
+        RabbitsFoot = 210,
         SlimeBall = 211,
 
         //Machines
@@ -56,6 +62,19 @@
         StatueOfEndlessFortune = 317,
         StatueOfPerfection = 318,
         Tapper = 319,
-        WormBin = 320
+        WormBin = 320,
+
+        //Draw Bubbles
+        DrawUnwateredCrops = 500,
+        DrawUnharvestedCrops = 501,
+        DrawDeadCrops = 502,
+        DrawUnpettedPet = 503,
+        DrawUnpettedAnimals = 504,
+        DrawAnimalsWithProduce = 505,
+        DrawBuildingsWithProduce = 506,
+        DrawBuildingsMissingHay = 507,
+        DrawTruffles = 508,
+        DrawCrabpotsNotBaited = 509,
+        DrawCask = 510
     }
 }

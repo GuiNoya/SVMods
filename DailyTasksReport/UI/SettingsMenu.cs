@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
@@ -14,7 +13,7 @@ namespace DailyTasksReport.UI
     {
         private const int ItemsPerPage = 8;
 
-        internal static IClickableMenu PreviousMenu;
+        private static IClickableMenu _previousMenu;
         private readonly ClickableTextureComponent _downArrow;
         private readonly List<OptionsElement> _options = new List<OptionsElement>();
 
@@ -25,7 +24,6 @@ namespace DailyTasksReport.UI
         private readonly ClickableTextureComponent _upArrow;
         private readonly int _yMargin = Game1.tileSize / 4;
 
-        private bool _changedOptions;
         private int _currentIndex;
         private Rectangle _scrollBarRunner;
         private int _yScrollBarOffsetHeld = -1;
@@ -41,7 +39,7 @@ namespace DailyTasksReport.UI
             _currentIndex = currentIndex;
 
             Game1.playSound("bigSelect");
-            
+
             upperRightCloseButton.bounds = new Rectangle(xPositionOnScreen + width + Game1.pixelZoom * 4,
                 yPositionOnScreen - Game1.pixelZoom * 20, Game1.pixelZoom * 12, Game1.pixelZoom * 12);
 
@@ -76,13 +74,23 @@ namespace DailyTasksReport.UI
                 };
                 _slots.Add(clickableComponent);
             }
-            
+
 
             // Add options
-            _options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, _slots[0].bounds.Width, parent.Config));
-            _options.Add(new InputListener("Open Settings Key", OptionsEnum.OpenSettings, _slots[0].bounds.Width, parent.Config));
+            _options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, _slots[0].bounds.Width,
+                parent.Config));
+            _options.Add(new InputListener("Open Settings Key", OptionsEnum.OpenSettings, _slots[0].bounds.Width,
+                parent.Config));
+            _options.Add(new InputListener("Toggle Bubbles Key", OptionsEnum.ToggleBubbles, _slots[0].bounds.Width,
+                _parent.Config));
+            _options.Add(new Checkbox("Show report button", OptionsEnum.ShowReportButton, parent.Config));
+            _options.Add(new Checkbox("Display bubbles", OptionsEnum.DisplayBubbles, parent.Config, true,
+                _slots[0].bounds.Width));
             _options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.Config));
             _options.Add(new OptionsElement("Report:"));
+            _options.Add(new Checkbox("New recipe on TV", OptionsEnum.NewRecipeOnTv, parent.Config));
+            _options.Add(new Checkbox("Birthdays", OptionsEnum.Birthdays, parent.Config));
+            _options.Add(new Checkbox("Traveling merchant in town", OptionsEnum.TravelingMerchant, parent.Config));
             _options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.Config));
             _options.Add(new Checkbox("Unharvested crops", OptionsEnum.UnharvestedCrops, parent.Config));
             _options.Add(new Checkbox("Dead crops", OptionsEnum.DeadCrops, parent.Config));
@@ -98,8 +106,8 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Dinosaur egg", OptionsEnum.DinosaurEgg, parent.Config, 1));
             _options.Add(new Checkbox("Duck egg", OptionsEnum.DuckEgg, parent.Config, 1));
             _options.Add(new Checkbox("Duck feather", OptionsEnum.DuckFeather, parent.Config, 1));
-            _options.Add(new Checkbox("Rabit's wool", OptionsEnum.RabitsWool, parent.Config, 1));
-            _options.Add(new Checkbox("Rabit's foot", OptionsEnum.RabitsFoot, parent.Config, 1));
+            _options.Add(new Checkbox("Rabbit's wool", OptionsEnum.RabbitsWool, parent.Config, 1));
+            _options.Add(new Checkbox("Rabbit's foot", OptionsEnum.RabbitsFoot, parent.Config, 1));
             _options.Add(new Checkbox("Truffle", OptionsEnum.Truffle, parent.Config, 1));
             _options.Add(new Checkbox("Slime ball", OptionsEnum.SlimeBall, parent.Config, 1));
             // Other configs
@@ -125,13 +133,13 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Seed Maker", OptionsEnum.SeedMaker, parent.Config, 1));
             _options.Add(new Checkbox("Slime Egg-Press", OptionsEnum.SlimeEggPress, parent.Config, 1));
             _options.Add(new Checkbox("Soda Machine", OptionsEnum.SodaMachine, parent.Config, 1));
-            _options.Add(new Checkbox("Statue Of Endless Fortune", OptionsEnum.StatueOfEndlessFortune, parent.Config, 1));
+            _options.Add(
+                new Checkbox("Statue Of Endless Fortune", OptionsEnum.StatueOfEndlessFortune, parent.Config, 1));
             _options.Add(new Checkbox("Statue Of Perfection", OptionsEnum.StatueOfPerfection, parent.Config, 1));
             _options.Add(new Checkbox("Tapper", OptionsEnum.Tapper, parent.Config, 1));
             _options.Add(new Checkbox("Worm bin", OptionsEnum.WormBin, parent.Config, 1));
 
             ReportConfigChanged += SettingsMenu_ReportConfigChanged;
-            MenuEvents.MenuClosed += MenuEvents_MenuClosed;
 
             if (!Game1.options.snappyMenus || !Game1.options.gamepadControls) return;
             allClickableComponents = new List<ClickableComponent>(_slots) {upperRightCloseButton};
@@ -139,23 +147,8 @@ namespace DailyTasksReport.UI
             snapCursorToCurrentSnappedComponent();
         }
 
-        private void MenuEvents_MenuClosed(object sender, EventArgsClickableMenuClosed e)
+        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
         {
-            if (e.PriorMenu == this)
-            {
-                ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
-                MenuEvents.MenuClosed -= MenuEvents_MenuClosed;
-            }
-
-            if (PreviousMenu == null) return;
-            if (!_changedOptions)
-                Game1.activeClickableMenu = PreviousMenu;
-            PreviousMenu = null;
-        }
-
-        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
-        {
-            _changedOptions = true;
             RefreshOptionStatus();
             _parent.Helper.WriteConfig(_parent.Config);
         }
@@ -177,8 +170,7 @@ namespace DailyTasksReport.UI
                             currentlySnappedComponent.bounds.Center.Y);
                         break;
                     case Checkbox cb:
-                        Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4 +
-                            cb.ItemLevel * Game1.pixelZoom * 7, currentlySnappedComponent.bounds.Center.Y);
+                        cb.CursorAboveOption();
                         break;
                     case QualityOption qo:
                         qo.CursorAboveOption();
@@ -221,10 +213,21 @@ namespace DailyTasksReport.UI
 
         public override void receiveKeyPress(Keys key)
         {
-            base.receiveKeyPress(key);
+            if (Game1.options.doesInputListContain(Game1.options.menuButton, key) && readyToClose())
+            {
+                ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
+                Game1.activeClickableMenu = _previousMenu;
+                _previousMenu = null;
+                exitFunction?.Invoke();
+                if (Game1.options.snappyMenus && Game1.options.gamepadControls)
+                    Game1.activeClickableMenu?.snapCursorToCurrentSnappedComponent();
+                return;
+            }
 
             if (!Game1.options.snappyMenus || !Game1.options.gamepadControls)
                 return;
+
+            applyMovementKey(key);
 
             if (currentlySnappedComponent.myID >= 0 && currentlySnappedComponent.myID < ItemsPerPage)
                 _options[currentlySnappedComponent.myID + _currentIndex].receiveKeyPress(key);
@@ -232,7 +235,7 @@ namespace DailyTasksReport.UI
 
         public override void draw(SpriteBatch b)
         {
-            PreviousMenu?.draw(b);
+            _previousMenu?.draw(b);
 
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             drawTextureBox(Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
@@ -293,16 +296,25 @@ namespace DailyTasksReport.UI
             }
 
             for (var i = 0; i < _slots.Count; ++i)
-                // ReSharper disable once InvertIf
                 if (_slots[i].bounds.Contains(x, y) &&
                     _options[_currentIndex + i].bounds.Contains(x - _slots[i].bounds.X, y - _slots[i].bounds.Y))
                 {
                     _options[_currentIndex + i].receiveLeftClick(x - _slots[i].bounds.X, y - _slots[i].bounds.Y);
                     break;
                 }
-            
+
             // Check the close button
-            base.receiveLeftClick(x, y, playSound);
+            if (upperRightCloseButton == null || !readyToClose() || !upperRightCloseButton.containsPoint(x, y))
+                return;
+
+            if (playSound)
+                Game1.playSound("bigDeSelect");
+            ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
+            Game1.activeClickableMenu = _previousMenu;
+            _previousMenu = null;
+            exitFunction?.Invoke();
+            if (Game1.options.snappyMenus && Game1.options.gamepadControls)
+                Game1.activeClickableMenu?.snapCursorToCurrentSnappedComponent();
         }
 
         public override void releaseLeftClick(int x, int y)
@@ -392,23 +404,32 @@ namespace DailyTasksReport.UI
             if (!(Game1.activeClickableMenu is SettingsMenu)) return;
 
             Game1.activeClickableMenu = new SettingsMenu(_parent, _currentIndex);
-            PreviousMenu?.gameWindowSizeChanged(oldBounds, newBounds);
+            _previousMenu?.gameWindowSizeChanged(oldBounds, newBounds);
         }
 
         public static void OpenMenu(ModEntry parent)
         {
-            PreviousMenu = Game1.activeClickableMenu;
+            _previousMenu = Game1.activeClickableMenu;
             if (Game1.activeClickableMenu != null)
                 Game1.exitActiveMenu();
             Game1.activeClickableMenu = new SettingsMenu(parent);
         }
-        
-        public static event EventHandler ReportConfigChanged;
 
-        internal static void RaiseReportConfigChanged()
+        public static event EventHandler<SettingsChangedEventArgs> ReportConfigChanged;
+
+        internal static void RaiseReportConfigChanged(SettingsChangedEventArgs args)
         {
-            var handler = ReportConfigChanged;
-            handler?.Invoke(null, null);
+            ReportConfigChanged?.Invoke(null, args);
+        }
+    }
+
+    internal class SettingsChangedEventArgs : EventArgs
+    {
+        internal readonly OptionsEnum OptionChanged;
+
+        public SettingsChangedEventArgs(OptionsEnum optionChanged)
+        {
+            OptionChanged = optionChanged;
         }
     }
 }

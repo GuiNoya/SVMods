@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DailyTasksReport.UI;
 using StardewValley;
 using StardewValley.Locations;
 
@@ -15,21 +16,47 @@ namespace DailyTasksReport.Tasks
         private string _farmCaveItemName;
 
         private readonly Dictionary<string, int> _objectsList = new Dictionary<string, int>();
-
+        
         internal FarmCaveTask(ModConfig config)
         {
             _config = config;
+
+            SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
+        }
+
+        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        {
+            Enabled = _config.FarmCave && (Game1.player.caveChoice != 0 || Game1.player.totalMoneyEarned >= 25000);
+        }
+
+        protected override void FirstScan()
+        {
+        }
+
+        private void Update()
+        {
+            var farmCave = Game1.locations.Find(l => l is FarmCave);
+
+            foreach (var obj in farmCave.objects.Values)
+                if (obj.parentSheetIndex == 128 && obj.heldObject != null && obj.readyForHarvest)
+                    if (_objectsList.ContainsKey(obj.heldObject.name))
+                        _objectsList[obj.heldObject.name] += 1;
+                    else
+                        _objectsList[obj.heldObject.name] = 1;
+                else if (Array.BinarySearch(Fruits, obj.parentSheetIndex) >= 0)
+                    if (_objectsList.ContainsKey(obj.name))
+                        _objectsList[obj.name] += 1;
+                    else
+                        _objectsList[obj.name] = 1;
         }
 
         public override string GeneralInfo(out int usedLines)
         {
             usedLines = 0;
-            if (!_config.FarmCave) return "";
+            if (!Enabled) return "";
 
-            _farmCaveItemName = Game1.player.caveChoice == 1 ? "Fruits" : "Mushrooms";
-
-            Clear();
-            DoCheck();
+            _objectsList.Clear();
+            Update();
 
             if (_objectsList.Count == 0) return "";
 
@@ -37,48 +64,32 @@ namespace DailyTasksReport.Tasks
             return $"{_farmCaveItemName} in the farm cave: {_objectsList.Sum(o => o.Value)}^";
         }
 
-        public override string DetailedInfo()
+        public override string DetailedInfo(out int usedLines, out bool skipNextPage)
         {
-            if (!_config.FarmCave || _objectsList.Count == 0) return "";
+            usedLines = 0;
+            skipNextPage = false;
+            if (!Enabled || _objectsList.Count == 0) return "";
 
             var stringBuilder = new StringBuilder();
-            var linesCount = 0;
 
             stringBuilder.Append($"{_farmCaveItemName} in the farm cave:^");
-            linesCount++;
+            usedLines++;
 
             foreach (var pair in _objectsList)
             {
                 var name = Pluralize(pair.Key, pair.Value);
                 stringBuilder.Append($"{pair.Value} {name}^");
-                linesCount++;
+                usedLines++;
             }
-
-            NextPage(ref stringBuilder, ref linesCount);
 
             return stringBuilder.ToString();
         }
 
         public override void Clear()
         {
+            Enabled = _config.FarmCave && (Game1.player.caveChoice != 0 || Game1.player.totalMoneyEarned >= 25000);
+            _farmCaveItemName = Game1.player.caveChoice == 1 ? "Fruits" : "Mushrooms";
             _objectsList.Clear();
-        }
-
-        private void DoCheck()
-        {
-            var farmCave = Game1.locations.Find(l => l is FarmCave);
-
-            foreach (var pair in farmCave.objects)
-                if (pair.Value.parentSheetIndex == 128 && pair.Value.heldObject != null && pair.Value.readyForHarvest)
-                    if (_objectsList.ContainsKey(pair.Value.heldObject.name))
-                        _objectsList[pair.Value.heldObject.name] += 1;
-                    else
-                        _objectsList[pair.Value.heldObject.name] = 1;
-                else if (Array.BinarySearch(Fruits, pair.Value.parentSheetIndex) >= 0)
-                    if (_objectsList.ContainsKey(pair.Value.name))
-                        _objectsList[pair.Value.name] += 1;
-                    else
-                        _objectsList[pair.Value.name] = 1;
         }
 
         private static string Pluralize(string name, int number)

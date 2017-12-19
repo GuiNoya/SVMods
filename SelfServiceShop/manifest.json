@@ -5,5 +5,5 @@
 	"Description": "Enables you to buy in the shop if no one is at the counter but the owner is at the location",
 	"UniqueID": "GuiNoya.SelfServiceShop",
 	"EntryDll": "SelfServiceShop.dll",
-	"UpdateKeys": [ "Nexus:1622", "GitHub:GuiNoya/SVMods" ]
+	"UpdateKeys": [ "Nexus:1622" ]
 }

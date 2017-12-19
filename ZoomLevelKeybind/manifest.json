@@ -1,9 +1,9 @@
 ﻿{
 	"Name": "ZoomLevelKeybind",
 	"Author": "GuiNoya",
-	"Version": "1.1-compat",
+	"Version": "1.1.1-compat",
 	"Description": "Add keybinds to decrease and increase zoom levels",
 	"UniqueID": "GuiNoya.ZoomLevelKeybind",
 	"EntryDll": "ZoomLevelKeybind.dll",
-	"UpdateKeys": [ "Nexus:1621", "GitHub:GuiNoya/SVMods" ]
+	"UpdateKeys": [ "Nexus:1621" ]
 }

@@ -2,7 +2,9 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using StardewValley;
+using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
 
 namespace DailyTasksReport.UI
@@ -12,16 +14,21 @@ namespace DailyTasksReport.UI
         private readonly ModConfig _config;
         private readonly OptionsEnum _option;
 
-        internal readonly int ItemLevel;
+        private Rectangle _bubbleButtonSource;
+        private Rectangle _checkButtonSource;
+
         private bool _isChecked;
+        private bool _isMouseOnBubbleButton;
+        private bool _isMouseOnCheckbox;
 
         public Checkbox(string label, OptionsEnum whichOption, ModConfig config, int itemLevel = 0) :
             base(label, -1, -1, Game1.pixelZoom * 9, Game1.pixelZoom * 9)
         {
             _option = whichOption;
             _config = config;
-            ItemLevel = itemLevel;
             bounds.X += itemLevel * Game1.pixelZoom * 7;
+            _checkButtonSource = bounds;
+
 
             if (whichOption == OptionsEnum.AllAnimalProducts || whichOption == OptionsEnum.AllMachines)
                 this.whichOption = -1;
@@ -32,15 +39,70 @@ namespace DailyTasksReport.UI
             RefreshStatus();
         }
 
+        public Checkbox(string label, OptionsEnum whichOption, ModConfig config, bool hasBubbleButton, int slotWidth) :
+            base(label, -1, -1, slotWidth, Game1.pixelZoom * 9, (int) whichOption)
+        {
+            _option = whichOption;
+            _config = config;
+            _checkButtonSource = new Rectangle(bounds.X, bounds.Y, Game1.pixelZoom * 9, Game1.pixelZoom * 9);
+
+            if (hasBubbleButton)
+                _bubbleButtonSource = new Rectangle(slotWidth - 20 * Game1.pixelZoom, bounds.Y,
+                    Game1.pixelZoom * 12, Game1.pixelZoom * 17);
+
+            RefreshStatus();
+        }
+
+        public override void receiveKeyPress(Keys key)
+        {
+            base.receiveKeyPress(key);
+            if (!Game1.options.snappyMenus || !Game1.options.gamepadControls || _bubbleButtonSource.IsEmpty)
+                return;
+            if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
+            {
+                _isMouseOnBubbleButton = true;
+                _isMouseOnCheckbox = false;
+            }
+            else if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
+            {
+                _isMouseOnBubbleButton = false;
+                _isMouseOnCheckbox = true;
+            }
+        }
+
+        public void CursorAboveOption()
+        {
+            if (!Game1.options.snappyMenus || !Game1.options.gamepadControls)
+                return;
+            if (_isMouseOnCheckbox || _isMouseOnBubbleButton)
+                return;
+            _isMouseOnCheckbox = true;
+            _isMouseOnBubbleButton = false;
+        }
+
         internal void RefreshStatus()
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_option)
             {
+                case OptionsEnum.ShowReportButton:
+                    _isChecked = _config.DisplayReportButton;
+                    break;
                 case OptionsEnum.ShowDetailedInfo:
                     _isChecked = _config.ShowDetailedInfo;
                     break;
+                case OptionsEnum.DisplayBubbles:
+                    _isChecked = _config.DisplayBubbles;
+                    break;
 
+                case OptionsEnum.NewRecipeOnTv:
+                    _isChecked = _config.NewRecipeOnTv;
+                    break;
+                case OptionsEnum.Birthdays:
+                    _isChecked = _config.Birthdays;
+                    break;
+                case OptionsEnum.TravelingMerchant:
+                    _isChecked = _config.TravelingMerchant;
+                    break;
                 case OptionsEnum.UnwateredCrops:
                     _isChecked = _config.UnwateredCrops;
                     break;
@@ -97,11 +159,11 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.DuckFeather:
                     _isChecked = _config.AnimalProducts["Duck feather"];
                     break;
-                case OptionsEnum.RabitsWool:
-                    _isChecked = _config.AnimalProducts["Rabit's wool"];
+                case OptionsEnum.RabbitsWool:
+                    _isChecked = _config.AnimalProducts["Rabbit's wool"];
                     break;
-                case OptionsEnum.RabitsFoot:
-                    _isChecked = _config.AnimalProducts["Rabit's foot"];
+                case OptionsEnum.RabbitsFoot:
+                    _isChecked = _config.AnimalProducts["Rabbit's foot"];
                     break;
                 case OptionsEnum.Truffle:
                     _isChecked = _config.AnimalProducts["Truffle"];
@@ -171,6 +233,41 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.WormBin:
                     _isChecked = _config.Machines["Worm Bin"];
                     break;
+
+                case OptionsEnum.DrawUnwateredCrops:
+                    _isChecked = _config.DrawBubbleUnwateredCrops;
+                    break;
+                case OptionsEnum.DrawUnharvestedCrops:
+                    _isChecked = _config.DrawBubbleUnharvestedCrops;
+                    break;
+                case OptionsEnum.DrawDeadCrops:
+                    _isChecked = _config.DrawBubbleDeadCrops;
+                    break;
+                case OptionsEnum.DrawUnpettedPet:
+                    _isChecked = _config.DrawBubbleUnpettedPet;
+                    break;
+                case OptionsEnum.DrawUnpettedAnimals:
+                    _isChecked = _config.DrawBubbleUnpettedAnimals;
+                    break;
+                case OptionsEnum.DrawAnimalsWithProduce:
+                    _isChecked = _config.DrawBubbleAnimalsWithProduce;
+                    break;
+                case OptionsEnum.DrawBuildingsWithProduce:
+                    _isChecked = _config.DrawBubbleBuildingsWithProduce;
+                    break;
+                case OptionsEnum.DrawBuildingsMissingHay:
+                    _isChecked = _config.DrawBubbleBuildingsMissingHay;
+                    break;
+                case OptionsEnum.DrawTruffles:
+                    _isChecked = _config.DrawBubbleTruffles;
+                    break;
+                case OptionsEnum.DrawCrabpotsNotBaited:
+                    _isChecked = _config.DrawBubbleCrabpotsNotBaited;
+                    break;
+                case OptionsEnum.DrawCask:
+                    _isChecked = _config.DrawBubbleCask;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a checkbox.");
             }
@@ -180,11 +277,13 @@ namespace DailyTasksReport.UI
         {
             if (whichOption == -1)
             {
-                b.Draw(Game1.mouseCursors, new Vector2(slotX + bounds.X, slotY + bounds.Y + Game1.pixelZoom),
+                b.Draw(Game1.mouseCursors,
+                    new Vector2(slotX + _checkButtonSource.X, slotY + _checkButtonSource.Y + Game1.pixelZoom),
                     _isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked,
                     Color.White * (greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None,
                     0.4f);
-                base.draw(b, slotX + bounds.X + Game1.pixelZoom * 4, slotY - Game1.pixelZoom * 3);
+                SpriteText.drawString(b, label, slotX + bounds.X * 2 + Game1.pixelZoom * 4, slotY + bounds.Y, 999, -1,
+                    999, 1f, 0.1f);
             }
             else
             {
@@ -192,7 +291,26 @@ namespace DailyTasksReport.UI
                     _isChecked ? OptionsCheckbox.sourceRectChecked : OptionsCheckbox.sourceRectUnchecked,
                     Color.White * (greyedOut ? 0.33f : 1f), 0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None,
                     0.4f);
-                base.draw(b, slotX, slotY);
+                Utility.drawTextWithShadow(b, label, Game1.dialogueFont,
+                    new Vector2(slotX + bounds.X + _checkButtonSource.Width + Game1.pixelZoom * 2, slotY + bounds.Y),
+                    greyedOut ? Game1.textColor * 0.33f : Game1.textColor, 1f, 0.1f);
+                if (!_bubbleButtonSource.IsEmpty)
+                    Utility.drawWithShadow(b, Game1.mouseCursors,
+                        new Vector2(slotX + _bubbleButtonSource.X, slotY + _bubbleButtonSource.Y),
+                        new Rectangle(66, 4, 14, 12), Color.White, 0f, Vector2.Zero, 3.5f, false, 0.4f);
+                if (Game1.options.snappyMenus && Game1.options.gamepadControls)
+                    if (_isMouseOnCheckbox)
+                    {
+                        Game1.setMousePosition(slotX + _checkButtonSource.Center.X,
+                            slotY + _checkButtonSource.Center.Y);
+                        _isMouseOnCheckbox = false;
+                    }
+                    else if (_isMouseOnBubbleButton)
+                    {
+                        Game1.setMousePosition(slotX + _bubbleButtonSource.Center.X,
+                            slotY + _bubbleButtonSource.Center.Y);
+                        _isMouseOnBubbleButton = false;
+                    }
             }
         }
 
@@ -201,17 +319,36 @@ namespace DailyTasksReport.UI
             if (greyedOut)
                 return;
 
+            if (_bubbleButtonSource.Contains(x, y))
+                BubblesMenu.OpenMenu(_config);
+
+            if (!_checkButtonSource.Contains(x, y)) return;
+
             Game1.playSound("drumkit6");
             _isChecked = !_isChecked;
 
             // Change options
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_option)
             {
+                case OptionsEnum.ShowReportButton:
+                    _config.DisplayReportButton = _isChecked;
+                    return;
                 case OptionsEnum.ShowDetailedInfo:
                     _config.ShowDetailedInfo = _isChecked;
                     break;
+                case OptionsEnum.DisplayBubbles:
+                    _config.DisplayBubbles = _isChecked;
+                    return;
 
+                case OptionsEnum.NewRecipeOnTv:
+                    _config.NewRecipeOnTv = _isChecked;
+                    break;
+                case OptionsEnum.Birthdays:
+                    _config.Birthdays = _isChecked;
+                    break;
+                case OptionsEnum.TravelingMerchant:
+                    _config.TravelingMerchant = _isChecked;
+                    break;
                 case OptionsEnum.UnwateredCrops:
                     _config.UnwateredCrops = _isChecked;
                     break;
@@ -269,11 +406,11 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.DuckFeather:
                     _config.AnimalProducts["Duck feather"] = _isChecked;
                     break;
-                case OptionsEnum.RabitsWool:
-                    _config.AnimalProducts["Rabit's wool"] = _isChecked;
+                case OptionsEnum.RabbitsWool:
+                    _config.AnimalProducts["Rabbit's wool"] = _isChecked;
                     break;
-                case OptionsEnum.RabitsFoot:
-                    _config.AnimalProducts["Rabit's foot"] = _isChecked;
+                case OptionsEnum.RabbitsFoot:
+                    _config.AnimalProducts["Rabbit's foot"] = _isChecked;
                     break;
                 case OptionsEnum.Truffle:
                     _config.AnimalProducts["Truffle"] = _isChecked;
@@ -348,10 +485,45 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.WormBin:
                     _config.Machines["Worm Bin"] = _isChecked;
                     break;
+
+                case OptionsEnum.DrawUnwateredCrops:
+                    _config.DrawBubbleUnwateredCrops = _isChecked;
+                    break;
+                case OptionsEnum.DrawUnharvestedCrops:
+                    _config.DrawBubbleUnharvestedCrops = _isChecked;
+                    break;
+                case OptionsEnum.DrawDeadCrops:
+                    _config.DrawBubbleDeadCrops = _isChecked;
+                    break;
+                case OptionsEnum.DrawUnpettedPet:
+                    _config.DrawBubbleUnpettedPet = _isChecked;
+                    break;
+                case OptionsEnum.DrawUnpettedAnimals:
+                    _config.DrawBubbleUnpettedAnimals = _isChecked;
+                    break;
+                case OptionsEnum.DrawAnimalsWithProduce:
+                    _config.DrawBubbleAnimalsWithProduce = _isChecked;
+                    break;
+                case OptionsEnum.DrawBuildingsWithProduce:
+                    _config.DrawBubbleBuildingsWithProduce = _isChecked;
+                    break;
+                case OptionsEnum.DrawBuildingsMissingHay:
+                    _config.DrawBubbleBuildingsMissingHay = _isChecked;
+                    break;
+                case OptionsEnum.DrawTruffles:
+                    _config.DrawBubbleTruffles = _isChecked;
+                    break;
+                case OptionsEnum.DrawCrabpotsNotBaited:
+                    _config.DrawBubbleCrabpotsNotBaited = _isChecked;
+                    break;
+                case OptionsEnum.DrawCask:
+                    _config.DrawBubbleCask = _isChecked;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a checkbox.");
             }
-            SettingsMenu.RaiseReportConfigChanged();
+            SettingsMenu.RaiseReportConfigChanged(new SettingsChangedEventArgs(_option));
         }
     }
 }
