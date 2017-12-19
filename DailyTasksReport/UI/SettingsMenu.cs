@@ -83,9 +83,10 @@ namespace DailyTasksReport.UI
                 parent.Config));
             _options.Add(new InputListener("Toggle Bubbles Key", OptionsEnum.ToggleBubbles, _slots[0].bounds.Width,
                 _parent.Config));
-            _options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.Config));
+            _options.Add(new Checkbox("Show report button", OptionsEnum.ShowReportButton, parent.Config));
             _options.Add(new Checkbox("Display bubbles", OptionsEnum.DisplayBubbles, parent.Config, true,
                 _slots[0].bounds.Width));
+            _options.Add(new Checkbox("Show detailed info", OptionsEnum.ShowDetailedInfo, parent.Config));
             _options.Add(new OptionsElement("Report:"));
             _options.Add(new Checkbox("New recipe on TV", OptionsEnum.NewRecipeOnTv, parent.Config));
             _options.Add(new Checkbox("Birthdays", OptionsEnum.Birthdays, parent.Config));

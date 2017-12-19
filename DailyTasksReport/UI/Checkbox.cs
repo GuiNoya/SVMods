@@ -84,6 +84,9 @@ namespace DailyTasksReport.UI
         {
             switch (_option)
             {
+                case OptionsEnum.ShowReportButton:
+                    _isChecked = _config.DisplayReportButton;
+                    break;
                 case OptionsEnum.ShowDetailedInfo:
                     _isChecked = _config.ShowDetailedInfo;
                     break;
@@ -327,6 +330,9 @@ namespace DailyTasksReport.UI
             // Change options
             switch (_option)
             {
+                case OptionsEnum.ShowReportButton:
+                    _config.DisplayReportButton = _isChecked;
+                    return;
                 case OptionsEnum.ShowDetailedInfo:
                     _config.ShowDetailedInfo = _isChecked;
                     break;

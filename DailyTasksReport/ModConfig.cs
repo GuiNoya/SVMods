@@ -15,11 +15,14 @@ namespace DailyTasksReport
         /// <summary> The input to toggle the display of bubble notifications. </summary>
         public SButton ToggleBubbles { get; set; } = SButton.None;
 
-        /// <summary> Show detailed info on the next pages. </summary>
-        public bool ShowDetailedInfo { get; set; } = true;
+        /// <summary> Show the open report button below quests button. </summary>
+        public bool DisplayReportButton { get; set; } = true;
 
         /// <summary> Display bubbles for items in the report that normally does not display bubbles. </summary>
         public bool DisplayBubbles { get; set; } = false;
+
+        /// <summary> Show detailed info on the next pages. </summary>
+        public bool ShowDetailedInfo { get; set; } = true;
 
         /// <summary> Report if there is a new recipe being aired on the queen of sauce. </summary>
         public bool NewRecipeOnTv { get; set; } = true;

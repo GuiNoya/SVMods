@@ -63,6 +63,7 @@
     <Compile Include="UI\InputListener.cs" />
     <Compile Include="UI\OptionsEnum.cs" />
     <Compile Include="UI\QualityOption.cs" />
+    <Compile Include="UI\ReportButton.cs" />
     <Compile Include="UI\ReportMenu.cs" />
     <Compile Include="UI\SettingsMenu.cs" />
   </ItemGroup>

@@ -6,6 +6,7 @@
         OpenReportKey = 1,
         OpenSettings = 2,
         ToggleBubbles = 3,
+        ShowReportButton = 4,
 
         // Basic options
         ShowDetailedInfo = 50,

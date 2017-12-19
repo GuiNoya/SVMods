@@ -36,6 +36,7 @@ namespace DailyTasksReport
             SetupTasks();
 
             SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
 
             // In-game Events 
@@ -50,6 +51,12 @@ namespace DailyTasksReport
         private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
         {
             _tasks.ForEach(t => t.Clear());
+        }
+
+        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        {
+            // If inserted last and player has no quest, DayTimeMoneyBox will receive left click
+            Game1.onScreenMenus.Insert(0, new ReportButton(this, OpenReport));
         }
 
         // Setup events
