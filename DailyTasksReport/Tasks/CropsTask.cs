@@ -42,9 +42,6 @@ namespace DailyTasksReport.Tasks
                 _locationName = "Greenhouse";
             }
 
-            if (ObjectsNames.Count == 0)
-                PopulateObjectsNames();
-
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
@@ -73,6 +70,9 @@ namespace DailyTasksReport.Tasks
         {
             if (_who == CropsTaskId.None)
                 _who = _id;
+
+            if (ObjectsNames.Count == 0)
+                PopulateObjectsNames();
         }
 
         public override string GeneralInfo(out int usedLines)

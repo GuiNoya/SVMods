@@ -32,10 +32,7 @@ namespace DailyTasksReport.Tasks
         {
             _config = config;
             _id = id;
-
-            if (ObjectsNames.Count == 0)
-                PopulateObjectsNames();
-
+            
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
 
             if (id == AnimalsTaskId.UnpettedAnimals)
@@ -104,6 +101,9 @@ namespace DailyTasksReport.Tasks
                 _who = _id;
             else if (_who != _id)
                 return;
+
+            if (ObjectsNames.Count == 0)
+                PopulateObjectsNames();
 
             _farm = Game1.locations.Find(l => l is Farm) as Farm;
 
