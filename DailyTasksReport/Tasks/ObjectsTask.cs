@@ -117,22 +117,26 @@ namespace DailyTasksReport.Tasks
         {
             Vector2 pos;
             var loc = Game1.currentLocation;
+            if (Game1.currentLocation is MineShaft) return;
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                     pos = (Vector2) e.NewItems[0];
                     var obj = loc.objects[pos];
                     if (obj == null) return;
-                    if (_config.Machines.ContainsKey(obj.name) || obj is Cask)
-                        Machines[loc].Add(pos);
-                    else if (obj is CrabPot)
-                        CrabPots[loc].Add(pos);
+                    if ((_config.Machines.ContainsKey(obj.name) || obj is Cask) &&
+                        Machines.TryGetValue(loc, out var list))
+                        list.Add(pos);
+                    else if (obj is CrabPot && CrabPots.TryGetValue(loc, out list))
+                        list.Add(pos);
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
                     pos = (Vector2) e.OldItems[0];
-                    Machines[loc].Remove(pos);
-                    if (CrabPots.TryGetValue(loc, out var list))
+                    if (Machines.TryGetValue(loc, out list))
+                        list.Remove(pos);
+                    if (CrabPots.TryGetValue(loc, out list))
                         list.Remove(pos);
                     break;
             }
