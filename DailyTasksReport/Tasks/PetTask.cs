@@ -25,9 +25,7 @@ namespace DailyTasksReport.Tasks
 
         private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
         {
-            var a = e.OptionChanged == OptionsEnum.UnpettedPet || e.OptionChanged == OptionsEnum.UnfilledPetBowl;
-            var b = _config.UnpettedPet || _config.UnfilledPetBowl;
-            Enabled = a && b;
+            Enabled = _config.UnpettedPet || _config.UnfilledPetBowl;
         }
 
         protected override void FirstScan()
@@ -36,27 +34,30 @@ namespace DailyTasksReport.Tasks
 
             _pet = _farm?.characters.Find(npc => npc is Pet) as Pet;
 
-            if (_pet == null)
-            {
-                var location = Game1.locations.Find(l => l is FarmHouse);
-                _pet = location.characters.Find(npc => npc is Pet) as Pet;
-            }
+            if (_pet != null) return;
 
-            Enabled = _pet != null;
+            var location = Game1.locations.Find(l => l is FarmHouse);
+            _pet = location.characters.Find(npc => npc is Pet) as Pet;
         }
 
         private void UpdateInfo()
         {
+            if (_pet == null)
+            {
+                FirstScan();
+                if (_pet == null)
+                    return;
+            }
+
             _petPetted = ModEntry.ReflectionHelper.GetPrivateValue<bool>(_pet, "wasPetToday");
             _petBowlFilled = _farm.getTileIndexAt(54, 7, "Buildings") == 1939;
 
-            if (_petBowlFilled && _petPetted)
-                Enabled = false;
+            Enabled = Enabled && !(_petBowlFilled && _petPetted);
         }
 
         public override void Draw(SpriteBatch b)
         {
-            if (!_config.DrawBubbleUnpettedPet || _pet == null ||
+            if (!_config.DrawBubbleUnpettedPet || _pet == null || _pet.currentLocation != Game1.currentLocation ||
                 !(Game1.currentLocation is Farm) && !(Game1.currentLocation is FarmHouse)) return;
 
             _petPetted = ModEntry.ReflectionHelper.GetPrivateValue<bool>(_pet, "wasPetToday");
@@ -70,12 +71,12 @@ namespace DailyTasksReport.Tasks
         public override string GeneralInfo(out int usedLines)
         {
             usedLines = 0;
-
-            if (!Enabled)
-                return "";
-
+            
             UpdateInfo();
-
+            
+            if (!Enabled || _pet == null)
+                return "";
+            
             var stringBuilder = new StringBuilder();
 
             if (_config.UnpettedPet && !_petPetted)
