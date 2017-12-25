@@ -304,17 +304,19 @@ namespace DailyTasksReport.UI
                 }
 
             // Check the close button
-            if (upperRightCloseButton == null || !readyToClose() || !upperRightCloseButton.containsPoint(x, y))
-                return;
+            if (upperRightCloseButton != null && readyToClose() && upperRightCloseButton.containsPoint(x, y) ||
+                !isWithinBounds(x, y))
+            {
 
-            if (playSound)
-                Game1.playSound("bigDeSelect");
-            ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
-            Game1.activeClickableMenu = _previousMenu;
-            _previousMenu = null;
-            exitFunction?.Invoke();
-            if (Game1.options.snappyMenus && Game1.options.gamepadControls)
-                Game1.activeClickableMenu?.snapCursorToCurrentSnappedComponent();
+                if (playSound)
+                    Game1.playSound("bigDeSelect");
+                ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
+                Game1.activeClickableMenu = _previousMenu;
+                _previousMenu = null;
+                exitFunction?.Invoke();
+                if (Game1.options.snappyMenus && Game1.options.gamepadControls)
+                    Game1.activeClickableMenu?.snapCursorToCurrentSnappedComponent();
+            }
         }
 
         public override void releaseLeftClick(int x, int y)
