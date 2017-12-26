@@ -268,15 +268,19 @@ namespace DailyTasksReport.UI
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            if (_downArrow.bounds.Contains(x, y) && _currentIndex < _options.Count - ItemsPerPage)
+            if (_downArrow.bounds.Contains(x, y))
             {
+                if (_currentIndex >= _options.Count - ItemsPerPage) return;
+
                 ++_currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shwip");
                 return;
             }
-            if (_upArrow.bounds.Contains(x, y) && _currentIndex > 0)
+            if (_upArrow.bounds.Contains(x, y))
             {
+                if (_currentIndex <= 0) return;
+
                 --_currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shwip");
