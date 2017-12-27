@@ -66,7 +66,7 @@ namespace SelfServiceShop
                                 robin = npc;
                             else
                                 break;
-                            var carpenters = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "carpenters");
+                            var carpenters = Helper.Reflection.GetMethod(Game1.currentLocation, "carpenters");
                             var tileLocation = robin.getTileLocation();
                             carpenters.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y));
                         }
@@ -88,7 +88,7 @@ namespace SelfServiceShop
                                 marnie = npc;
                             else
                                 break;
-                            var animalShop = Helper.Reflection.GetPrivateMethod(Game1.currentLocation, "animalShop");
+                            var animalShop = Helper.Reflection.GetMethod(Game1.currentLocation, "animalShop");
                             var tileLocation = marnie.getTileLocation();
                             animalShop.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y + 1));
                         }
