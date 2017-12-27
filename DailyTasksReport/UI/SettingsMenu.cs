@@ -147,7 +147,7 @@ namespace DailyTasksReport.UI
             snapCursorToCurrentSnappedComponent();
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             RefreshOptionStatus();
             _parent.Helper.WriteConfig(_parent.Config);
@@ -421,21 +421,11 @@ namespace DailyTasksReport.UI
             Game1.activeClickableMenu = new SettingsMenu(parent);
         }
 
-        public static event EventHandler<SettingsChangedEventArgs> ReportConfigChanged;
+        public static event EventHandler ReportConfigChanged;
 
-        internal static void RaiseReportConfigChanged(SettingsChangedEventArgs args)
+        internal static void RaiseReportConfigChanged()
         {
-            ReportConfigChanged?.Invoke(null, args);
-        }
-    }
-
-    internal class SettingsChangedEventArgs : EventArgs
-    {
-        internal readonly OptionsEnum OptionChanged;
-
-        public SettingsChangedEventArgs(OptionsEnum optionChanged)
-        {
-            OptionChanged = optionChanged;
+            ReportConfigChanged?.Invoke(null, null);
         }
     }
 }

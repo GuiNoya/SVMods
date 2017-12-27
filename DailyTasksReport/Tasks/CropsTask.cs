@@ -44,7 +44,7 @@ namespace DailyTasksReport.Tasks
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             switch (_id)
             {

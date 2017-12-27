@@ -24,7 +24,7 @@ namespace DailyTasksReport.Tasks
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             Enabled = _config.FarmCave && (Game1.player.caveChoice != 0 || Game1.player.totalMoneyEarned >= 25000);
         }

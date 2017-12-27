@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,7 +24,7 @@ namespace DailyTasksReport.Tasks
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             Enabled = _config.UnpettedPet || _config.UnfilledPetBowl;
         }
@@ -49,7 +50,7 @@ namespace DailyTasksReport.Tasks
                     return;
             }
 
-            _petPetted = ModEntry.ReflectionHelper.GetPrivateValue<bool>(_pet, "wasPetToday");
+            _petPetted = ModEntry.ReflectionHelper.GetField<bool>(_pet, "wasPetToday").GetValue();
             _petBowlFilled = _farm.getTileIndexAt(54, 7, "Buildings") == 1939;
 
             Enabled = Enabled && !(_petBowlFilled && _petPetted);
@@ -60,7 +61,7 @@ namespace DailyTasksReport.Tasks
             if (!_config.DrawBubbleUnpettedPet || _pet == null || _pet.currentLocation != Game1.currentLocation ||
                 !(Game1.currentLocation is Farm) && !(Game1.currentLocation is FarmHouse)) return;
 
-            _petPetted = ModEntry.ReflectionHelper.GetPrivateValue<bool>(_pet, "wasPetToday");
+            _petPetted = ModEntry.ReflectionHelper.GetField<bool>(_pet, "wasPetToday").GetValue();
             if (_petPetted) return;
 
             var v = new Vector2(_pet.getStandingX() - Game1.viewport.X - Game1.tileSize * 0.3f,
