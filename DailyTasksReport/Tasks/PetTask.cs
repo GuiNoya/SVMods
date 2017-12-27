@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,7 +24,7 @@ namespace DailyTasksReport.Tasks
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             Enabled = _config.UnpettedPet || _config.UnfilledPetBowl;
         }

@@ -120,7 +120,7 @@ namespace DailyTasksReport
             }
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             _refreshReport = true;
         }

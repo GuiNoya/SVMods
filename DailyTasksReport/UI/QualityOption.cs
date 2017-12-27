@@ -87,7 +87,7 @@ namespace DailyTasksReport.UI
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a QualityOption.");
             }
-            SettingsMenu.RaiseReportConfigChanged(new SettingsChangedEventArgs(_option));
+            SettingsMenu.RaiseReportConfigChanged();
         }
 
         public override void receiveKeyPress(Keys key)

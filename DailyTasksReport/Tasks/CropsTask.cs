@@ -22,7 +22,6 @@ namespace DailyTasksReport.Tasks
         private static readonly List<Tuple<Vector2, HoeDirt>>[] Crops =
             {new List<Tuple<Vector2, HoeDirt>>(), new List<Tuple<Vector2, HoeDirt>>()};
 
-        private static bool _doneScan;
         private static CropsTaskId _who = CropsTaskId.None;
 
         internal CropsTask(ModConfig config, CropsTaskId id)
@@ -45,7 +44,7 @@ namespace DailyTasksReport.Tasks
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             switch (_id)
             {
@@ -85,10 +84,8 @@ namespace DailyTasksReport.Tasks
             usedLines = 1;
             int count;
 
-            if (!_doneScan && Crops[_index].Count == 0)
+            if (Crops[_index].Count == 0)
             {
-                _doneScan = true;
-
                 var location = Game1.locations.Find(l => l.name == _locationName);
                 foreach (var keyValuePair in location.terrainFeatures)
                     if (keyValuePair.Value is HoeDirt dirt && dirt.crop != null)
@@ -200,7 +197,6 @@ namespace DailyTasksReport.Tasks
         public override void FinishedReport()
         {
             Crops[_index].Clear();
-            _doneScan = false;
         }
 
         public override void Draw(SpriteBatch b)

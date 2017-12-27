@@ -147,7 +147,7 @@ namespace DailyTasksReport.UI
             snapCursorToCurrentSnappedComponent();
         }
 
-        private void SettingsMenu_ReportConfigChanged(object sender, SettingsChangedEventArgs e)
+        private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
             RefreshOptionStatus();
             _parent.Helper.WriteConfig(_parent.Config);
@@ -268,15 +268,19 @@ namespace DailyTasksReport.UI
 
         public override void receiveLeftClick(int x, int y, bool playSound = true)
         {
-            if (_downArrow.bounds.Contains(x, y) && _currentIndex < _options.Count - ItemsPerPage)
+            if (_downArrow.bounds.Contains(x, y))
             {
+                if (_currentIndex >= _options.Count - ItemsPerPage) return;
+
                 ++_currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shwip");
                 return;
             }
-            if (_upArrow.bounds.Contains(x, y) && _currentIndex > 0)
+            if (_upArrow.bounds.Contains(x, y))
             {
+                if (_currentIndex <= 0) return;
+
                 --_currentIndex;
                 AdjustScrollBarPosition();
                 Game1.playSound("shwip");
@@ -304,17 +308,19 @@ namespace DailyTasksReport.UI
                 }
 
             // Check the close button
-            if (upperRightCloseButton == null || !readyToClose() || !upperRightCloseButton.containsPoint(x, y))
-                return;
+            if (upperRightCloseButton != null && readyToClose() && upperRightCloseButton.containsPoint(x, y) ||
+                !isWithinBounds(x, y))
+            {
 
-            if (playSound)
-                Game1.playSound("bigDeSelect");
-            ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
-            Game1.activeClickableMenu = _previousMenu;
-            _previousMenu = null;
-            exitFunction?.Invoke();
-            if (Game1.options.snappyMenus && Game1.options.gamepadControls)
-                Game1.activeClickableMenu?.snapCursorToCurrentSnappedComponent();
+                if (playSound)
+                    Game1.playSound("bigDeSelect");
+                ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
+                Game1.activeClickableMenu = _previousMenu;
+                _previousMenu = null;
+                exitFunction?.Invoke();
+                if (Game1.options.snappyMenus && Game1.options.gamepadControls)
+                    Game1.activeClickableMenu?.snapCursorToCurrentSnappedComponent();
+            }
         }
 
         public override void releaseLeftClick(int x, int y)
@@ -415,21 +421,11 @@ namespace DailyTasksReport.UI
             Game1.activeClickableMenu = new SettingsMenu(parent);
         }
 
-        public static event EventHandler<SettingsChangedEventArgs> ReportConfigChanged;
+        public static event EventHandler ReportConfigChanged;
 
-        internal static void RaiseReportConfigChanged(SettingsChangedEventArgs args)
+        internal static void RaiseReportConfigChanged()
         {
-            ReportConfigChanged?.Invoke(null, args);
-        }
-    }
-
-    internal class SettingsChangedEventArgs : EventArgs
-    {
-        internal readonly OptionsEnum OptionChanged;
-
-        public SettingsChangedEventArgs(OptionsEnum optionChanged)
-        {
-            OptionChanged = optionChanged;
+            ReportConfigChanged?.Invoke(null, null);
         }
     }
 }
