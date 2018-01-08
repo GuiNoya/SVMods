@@ -178,9 +178,10 @@ namespace DailyTasksReport.Tasks
                     }
                     break;
                 case ObjectsTaskId.UncollectedMachines:
+                    Object machine;
                     count = (from pair in Machines
                         from pos in pair.Value
-                        where MachineReady(pair.Key.objects[pos])
+                        where pair.Key.objects.TryGetValue(pos, out machine) && MachineReady(machine)
                         select 1).Count();
                     if (count > 0)
                     {
@@ -252,8 +253,9 @@ namespace DailyTasksReport.Tasks
             foreach (var location in Machines)
             foreach (var position in location.Value)
             {
-                var machine = location.Key.objects[position];
+                if (!location.Key.objects.TryGetValue(position, out var machine)) continue;
                 if (!MachineReady(machine)) continue;
+
                 var quality = "";
                 if (machine is Cask cask)
                     quality = cask.heldObject.quality == 1 ? "Silver "
