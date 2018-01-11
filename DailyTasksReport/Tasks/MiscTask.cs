@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
@@ -29,7 +30,7 @@ namespace DailyTasksReport.Tasks
 
         protected override void FirstScan()
         {
-            if (Game1.dayOfMonth % 7 % 5 == 0)
+            if (Game1.locations.OfType<Forest>().First().travelingMerchantDay)
             {
                 MenuEvents.MenuChanged -= MenuEvents_MenuChanged;
                 MenuEvents.MenuChanged += MenuEvents_MenuChanged;
@@ -73,7 +74,7 @@ namespace DailyTasksReport.Tasks
 
         private void Update()
         {
-            if (Game1.dayOfMonth % 7 % 5 == 0)
+            if (Game1.locations.OfType<Forest>().First().travelingMerchantDay)
                 _isTravelingMerchantOpen = Game1.timeOfDay < 2000;
 
             if (_birthdayNpc != null && Game1.player.friendships.TryGetValue(_birthdayNpc.name, out var array) &&
