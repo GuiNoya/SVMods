@@ -10,7 +10,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
-using Object = StardewValley.Object;
+using SObject = StardewValley.Object;
 
 namespace DailyTasksReport.Tasks
 {
@@ -117,8 +117,8 @@ namespace DailyTasksReport.Tasks
         {
             Vector2 pos;
             var loc = Game1.currentLocation;
-            if (Game1.currentLocation is MineShaft) return;
-
+            if (Game1.currentLocation is MineShaft || Game1.newDay) return;
+            
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -178,7 +178,7 @@ namespace DailyTasksReport.Tasks
                     }
                     break;
                 case ObjectsTaskId.UncollectedMachines:
-                    Object machine;
+                    SObject machine;
                     count = (from pair in Machines
                         from pos in pair.Value
                         where pair.Key.objects.TryGetValue(pos, out machine) && MachineReady(machine)
@@ -197,7 +197,7 @@ namespace DailyTasksReport.Tasks
             return "";
         }
 
-        private static bool MachineReady(Object o)
+        private static bool MachineReady(SObject o)
         {
             return o != null && _config.Machines.TryGetValue(o.name, out var enabled) && enabled && o.readyForHarvest ||
                    o is Cask cask && cask.heldObject?.quality >= _config.Cask;
