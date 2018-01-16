@@ -22,6 +22,9 @@ namespace DailyTasksReport.Tasks
         private static readonly List<Tuple<Vector2, HoeDirt>>[] Crops =
             {new List<Tuple<Vector2, HoeDirt>>(), new List<Tuple<Vector2, HoeDirt>>()};
 
+        private static readonly List<Tuple<Vector2, FruitTree>>[] FruitTrees =
+            {new List<Tuple<Vector2, FruitTree>>(), new List<Tuple<Vector2, FruitTree>>()};
+
         private static CropsTaskId _who = CropsTaskId.None;
 
         internal CropsTask(ModConfig config, CropsTaskId id)
@@ -30,7 +33,7 @@ namespace DailyTasksReport.Tasks
             _id = id;
 
             if (id == CropsTaskId.UnwateredCropFarm || id == CropsTaskId.UnharvestedCropFarm ||
-                id == CropsTaskId.DeadCropFarm)
+                id == CropsTaskId.DeadCropFarm || id == CropsTaskId.FruitTreesFarm)
             {
                 _index = 0;
                 _locationName = "Farm";
@@ -60,6 +63,10 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.DeadCropGreenhouse:
                     Enabled = _config.DeadCrops;
                     break;
+                case CropsTaskId.FruitTreesFarm:
+                case CropsTaskId.FruitTreesGreenhouse:
+                    Enabled = _config.FruitTrees > 0;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }
@@ -72,6 +79,18 @@ namespace DailyTasksReport.Tasks
 
             if (ObjectsNames.Count == 0)
                 PopulateObjectsNames();
+
+            if (_who != _id) return;
+
+            GameLocation location = Game1.locations.OfType<Farm>().First();
+            foreach (var pair in location.terrainFeatures)
+                if (pair.Value is FruitTree tree && tree.fruitsOnTree > 0)
+                    FruitTrees[0].Add(new Tuple<Vector2, FruitTree>(pair.Key, tree));
+
+            location = Game1.locations.First(l => l.name == "Greenhouse");
+            foreach (var pair in location.terrainFeatures)
+                if (pair.Value is FruitTree tree && tree.fruitsOnTree > 0)
+                    FruitTrees[1].Add(new Tuple<Vector2, FruitTree>(pair.Key, tree));
         }
 
         public override string GeneralInfo(out int usedLines)
@@ -125,6 +144,15 @@ namespace DailyTasksReport.Tasks
                     }
                     break;
 
+                case CropsTaskId.FruitTreesFarm:
+                case CropsTaskId.FruitTreesGreenhouse:
+                    count = FruitTrees[_index].Count(p => p.Item2.fruitsOnTree >= _config.FruitTrees);
+                    if (count > 0)
+                    {
+                        _anyCrop = true;
+                        return $"Fruit trees with fruits in the {_locationName}: {count}^";
+                    }
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }
@@ -159,6 +187,11 @@ namespace DailyTasksReport.Tasks
                     usedLines++;
                     skipNextPage = true;
                     break;
+                case CropsTaskId.FruitTreesFarm:
+                    stringBuilder.Append("Fruit trees with fruits:^");
+                    usedLines++;
+                    skipNextPage = true;
+                    break;
             }
 
             switch (_id)
@@ -175,6 +208,18 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.DeadCropFarm:
                 case CropsTaskId.DeadCropGreenhouse:
                     EchoForCrops(ref stringBuilder, ref usedLines, pair => pair.Item2.crop.dead);
+                    break;
+                case CropsTaskId.FruitTreesFarm:
+                case CropsTaskId.FruitTreesGreenhouse:
+                    if (_config.FruitTrees == 0) break;
+                    foreach (var tuple in FruitTrees[_index].Where(t => t.Item2.fruitsOnTree >= _config.FruitTrees))
+                    {
+                        var s = "";
+                        if (tuple.Item2.fruitsOnTree > 1) s = "s";
+                        stringBuilder.Append(
+                            $"{ObjectsNames[tuple.Item2.indexOfFruit]} tree at {_locationName} with {tuple.Item2.fruitsOnTree} fruit{s} ({tuple.Item1.X}, {tuple.Item1.Y})^");
+                        usedLines++;
+                    }
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
@@ -226,7 +271,13 @@ namespace DailyTasksReport.Tasks
 
         public override void Clear()
         {
-            Crops[_index].Clear();
+            if (_who == _id)
+            {
+                Crops[0].Clear();
+                Crops[1].Clear();
+                FruitTrees[0].Clear();
+                FruitTrees[1].Clear();
+            }
 
             switch (_id)
             {
@@ -242,6 +293,10 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.DeadCropGreenhouse:
                     Enabled = _config.DeadCrops;
                     break;
+                case CropsTaskId.FruitTreesFarm:
+                case CropsTaskId.FruitTreesGreenhouse:
+                    Enabled = _config.FruitTrees > 0;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }
@@ -256,6 +311,8 @@ namespace DailyTasksReport.Tasks
         UnharvestedCropFarm = 2,
         UnharvestedCropGreenhouse = 3,
         DeadCropFarm = 4,
-        DeadCropGreenhouse = 5
+        DeadCropGreenhouse = 5,
+        FruitTreesFarm = 6,
+        FruitTreesGreenhouse = 7
     }
 }

@@ -70,6 +70,8 @@ namespace DailyTasksReport
             _tasks.Add(new CropsTask(Config, CropsTaskId.UnharvestedCropGreenhouse));
             _tasks.Add(new CropsTask(Config, CropsTaskId.DeadCropFarm));
             _tasks.Add(new CropsTask(Config, CropsTaskId.DeadCropGreenhouse));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.FruitTreesFarm));
+            _tasks.Add(new CropsTask(Config, CropsTaskId.FruitTreesGreenhouse));
             _tasks.Add(new PetTask(Config));
             _tasks.Add(new AnimalsTask(Config, AnimalsTaskId.UnpettedAnimals));
             _tasks.Add(new AnimalsTask(Config, AnimalsTaskId.AnimalProducts));

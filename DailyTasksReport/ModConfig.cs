@@ -42,6 +42,8 @@ namespace DailyTasksReport
         /// <summary> Check or not if there are dead crops. </summary>
         public bool DeadCrops { get; set; } = true;
 
+        public int FruitTrees { get; set; } = 3;
+
         /// <summary> Check or not for if you petted your pet. </summary>
         public bool UnpettedPet { get; set; } = true;
 
@@ -145,9 +147,16 @@ namespace DailyTasksReport
         {
             var changed = false;
 
+            if (FruitTrees < 0 || FruitTrees > 3)
+            {
+                monitor.Log("Wrong configuration for Fruit Trees, setting to 3 fruits...", LogLevel.Warn);
+                FruitTrees = 3;
+                changed = true;
+            }
+
             if (Cask < 0 || Cask > 4)
             {
-                monitor.Log("Wrong configuration for Casks, setting to iridium quality...", LogLevel.Error);
+                monitor.Log("Wrong configuration for Casks, setting to iridium quality...", LogLevel.Warn);
                 Cask = 4;
                 changed = true;
             }
