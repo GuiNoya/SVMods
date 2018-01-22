@@ -16,14 +16,15 @@ namespace DailyTasksReport.UI
         private int _selectedQuality;
         private bool _isMouseOnMinusButton;
         private bool _isMouseOnPlusButton;
+        private Rectangle _minusButton;
+        private Rectangle _plusButton;
+        private readonly List<string> _displayOptions;
 
-        private static readonly List<string> DisplayOptions = new List<string> {"None", "Silver", "Gold", "Iridium"};
+
         private static readonly Rectangle MinusButtonSource = new Rectangle(177, 345, 7, 8);
         private static readonly Rectangle PlusButtonSource = new Rectangle(184, 345, 7, 8);
-        private static Rectangle _minusButton;
-        private static Rectangle _plusButton;
-
-        public QualityOption(string label, OptionsEnum whichOption, ModConfig config, int itemLevel = 0) :
+        
+        public QualityOption(string label, OptionsEnum whichOption, ModConfig config, int itemLevel = 0, int choices = -1) :
             base(label, -1, -1, 7 * Game1.pixelZoom, 7 * Game1.pixelZoom, (int) whichOption)
         {
             _config = config;
@@ -31,8 +32,24 @@ namespace DailyTasksReport.UI
             bounds.X += itemLevel * Game1.pixelZoom * 7;
             this.whichOption = (int) whichOption;
 
-            var biggestOption = (int) Game1.dialogueFont.MeasureString(DisplayOptions[0]).X + 4 * Game1.pixelZoom;
-            foreach (var displayOption in DisplayOptions)
+            if (choices == 0)
+            {
+                throw new ArgumentOutOfRangeException($"Argument 'choices' can't be 0");
+            }
+            if (choices < 0)
+            {
+                _displayOptions = new List<string> {"None", "Silver", "Gold", "Iridium"};
+            }
+            else
+            {
+                _displayOptions = new List<string> {"None"};
+                for (var i = 1; i <= choices; i++)
+                    _displayOptions.Add(i.ToString());
+            }
+
+
+            var biggestOption = (int) Game1.dialogueFont.MeasureString(_displayOptions[0]).X + 4 * Game1.pixelZoom;
+            foreach (var displayOption in _displayOptions)
                 biggestOption = Math.Max((int) Game1.dialogueFont.MeasureString(displayOption).X + 4 * Game1.pixelZoom,
                     biggestOption);
 
@@ -51,6 +68,10 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.Cask:
                     _selectedQuality = _config.Cask == 4 ? 3 : _config.Cask;
                     break;
+                case OptionsEnum.FruitTrees:
+                    _selectedQuality = _config.FruitTrees;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a QualityOption.");
             }
@@ -66,7 +87,7 @@ namespace DailyTasksReport.UI
                 _selectedQuality--;
                 Game1.playSound("drumkit6");
             }
-            else if (_plusButton.Contains(x, y) && _selectedQuality != DisplayOptions.Count - 1)
+            else if (_plusButton.Contains(x, y) && _selectedQuality != _displayOptions.Count - 1)
             {
                 _selectedQuality++;
                 Game1.playSound("drumkit6");
@@ -74,8 +95,8 @@ namespace DailyTasksReport.UI
 
             if (_selectedQuality < 0)
                 _selectedQuality = 0;
-            else if (_selectedQuality >= DisplayOptions.Count)
-                _selectedQuality = DisplayOptions.Count - 1;
+            else if (_selectedQuality >= _displayOptions.Count)
+                _selectedQuality = _displayOptions.Count - 1;
             if (previousSelected == _selectedQuality)
                 return;
 
@@ -84,6 +105,10 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.Cask:
                     _config.Cask = _selectedQuality == 3 ? 4 : _selectedQuality;
                     break;
+                case OptionsEnum.FruitTrees:
+                    _config.FruitTrees = _selectedQuality;
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a QualityOption.");
             }
@@ -125,12 +150,19 @@ namespace DailyTasksReport.UI
                 Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == 0 ? 0.5f : 1f), 0.0f, Vector2.Zero,
                 Game1.pixelZoom, SpriteEffects.None, 0.4f);
             b.Draw(Game1.mouseCursors, new Vector2(slotX + _plusButton.X, slotY + _plusButton.Y), PlusButtonSource,
-                Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == DisplayOptions.Count - 1 ? 0.5f : 1f),
+                Color.White * (greyedOut ? 0.33f : 1f) * (_selectedQuality == _displayOptions.Count - 1 ? 0.5f : 1f),
                 0.0f, Vector2.Zero, Game1.pixelZoom, SpriteEffects.None, 0.4f);
+
+            Vector2 labelPosition;
+            if (_displayOptions[_selectedQuality].Length > 1)
+                labelPosition = new Vector2(slotX + _minusButton.X + _minusButton.Width + Game1.pixelZoom,
+                    slotY + _minusButton.Y - Game1.pixelZoom);
+            else
+                labelPosition = new Vector2(slotX + (_plusButton.X - _minusButton.Right),
+                    slotY + _minusButton.Y - Game1.pixelZoom);
             b.DrawString(Game1.dialogueFont,
-                _selectedQuality >= DisplayOptions.Count || _selectedQuality == -1 ? "" : DisplayOptions[_selectedQuality],
-                new Vector2(slotX + _minusButton.X + _minusButton.Width + Game1.pixelZoom,
-                    slotY + _minusButton.Y - Game1.pixelZoom), Game1.textColor);
+                _selectedQuality >= _displayOptions.Count || _selectedQuality == -1 ? "" : _displayOptions[_selectedQuality],
+                labelPosition, Game1.textColor);
 
             if (Game1.options.snappyMenus && Game1.options.gamepadControls)
                 if (_isMouseOnMinusButton)

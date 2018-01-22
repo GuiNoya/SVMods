@@ -26,6 +26,7 @@
         NewRecipeOnTv = 110,
         Birthdays = 111,
         TravelingMerchant = 112,
+        FruitTrees = 113,
 
         //Animal products
         AllAnimalProducts = 200,
