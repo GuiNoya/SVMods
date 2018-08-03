@@ -2,6 +2,7 @@
 
 ### Daily Tasks report
 * Update mod to SV 1.3.
+* Add void egg as product in AnimalsTask (code 305, needs confirmation).
 * Take a look and fix [this](https://log.smapi.io/sWNwTFzq).
 * Create option to only show flowers as harvestable on the last day of the season.
 * Create option to set radius to omit flower near bee houses.
