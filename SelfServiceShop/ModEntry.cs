@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
+using System.Collections.Generic;
 using xTile.Dimensions;
 
 namespace SelfServiceShop
@@ -15,8 +13,6 @@ namespace SelfServiceShop
     // ReSharper disable once UnusedMember.Global
     public class ModEntry : Mod
     {
-        private static readonly NPC Ghost = new NPC();
-
         private static readonly Texture2D PortraitRobin = Game1.content.Load<Texture2D>("Portraits\\Robin");
         private static readonly Texture2D PortraitMarnie = Game1.content.Load<Texture2D>("Portraits\\Marnie");
         private ModConfig _config;
@@ -34,21 +30,20 @@ namespace SelfServiceShop
                 !e.IsActionButton && e.Button != SButton.ControllerA)
                 return;
 
-            var property = Game1.currentLocation.doesTileHaveProperty((int) e.Cursor.GrabTile.X,
-                (int) e.Cursor.GrabTile.Y, "Action", "Buildings");
+            var property = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X,
+                (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
 
-            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (property)
             {
                 case "Buy General":
                     if (_config.Pierre && (_config.ShopsAlwaysOpen || IsNpcInLocation("Pierre")))
                     {
                         e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
                         Game1.activeClickableMenu =
-                            new ShopMenu(((SeedShop) Game1.currentLocation).shopStock(), 0, "Pierre");
+                            new ShopMenu(((SeedShop)Game1.currentLocation).shopStock(), 0, "Pierre");
                     }
                     break;
+
                 case "Carpenter":
                     if (_config.Carpenter)
                     {
@@ -65,12 +60,12 @@ namespace SelfServiceShop
                                 break;
                             var carpenters = Helper.Reflection.GetMethod(Game1.currentLocation, "carpenters");
                             var tileLocation = robin.getTileLocation();
-                            carpenters.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y));
+                            carpenters.Invoke(new Location((int)tileLocation.X, (int)tileLocation.Y));
                         }
                         e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
                     }
                     break;
+
                 case "AnimalShop":
                     if (_config.Ranch)
                     {
@@ -87,21 +82,21 @@ namespace SelfServiceShop
                                 break;
                             var animalShop = Helper.Reflection.GetMethod(Game1.currentLocation, "animalShop");
                             var tileLocation = marnie.getTileLocation();
-                            animalShop.Invoke(new Location((int) tileLocation.X, (int) tileLocation.Y + 1));
+                            animalShop.Invoke(new Location((int)tileLocation.X, (int)tileLocation.Y + 1));
                         }
                         e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
                     }
                     break;
+
                 case "Buy Fish":
                     if (_config.FishShop &&
                         (_config.ShopsAlwaysOpen || IsNpcInLocation("Willy") || IsNpcInLocation("Willy", "Beach")))
                     {
                         e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
                         Game1.activeClickableMenu = new ShopMenu(Utility.getFishShopStock(Game1.player), 0, "Willy");
                     }
                     break;
+
                 case "Blacksmith":
                     if (_config.Blacksmith)
                     {
@@ -119,9 +114,9 @@ namespace SelfServiceShop
                             Blacksmith(clint);
                         }
                         e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
                     }
                     break;
+
                 case "IceCreamStand":
                     if (_config.IceCreamStand &&
                         (_config.ShopsAlwaysOpen || _config.IceCreamInAllSeasons || SDate.Now().Season == "summer"))
@@ -132,60 +127,18 @@ namespace SelfServiceShop
                         };
                         Game1.activeClickableMenu = new ShopMenu(d);
                         e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
                     }
                     break;
-                // FarmExpansion mod compatibility (versions >= 3.0 and < 3.1)
-                // Not the way I want, but it's the way I found
-                case "FECarpenter":
-                    if (_config.Carpenter &&
-                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Find("Robin") != null))
-                    {
-                        var robin = Game1.currentLocation.characters.Find("Robin");
-                        if (robin == null || Vector2.Distance(robin.getTileLocation(), e.Cursor.GrabTile) > 3f)
-                        {
-                            Ghost.name.Set("Robin");
-                            Ghost.setTilePosition((int) e.Cursor.GrabTile.X, (int) e.Cursor.GrabTile.Y - 1);
-                            Ghost.Portrait = PortraitRobin;
-                            Game1.currentLocation.characters.Insert(0, Ghost);
-                            MenuEvents.MenuChanged += MenuEvents_MenuChangedGhost;
-                        }
 
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
-                    }
-                    break;
-                case "FEAnimalShop":
-                    if (_config.Ranch &&
-                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Find("Marnie") != null))
-                    {
-                        var marnie = Game1.currentLocation.characters.Find("Marnie");
-                        if (marnie == null ||
-                            !marnie.getTileLocation().Equals(new Vector2(e.Cursor.GrabTile.X, e.Cursor.GrabTile.Y - 1)))
-                        {
-                            Ghost.name.Set("Marnie");
-                            Ghost.setTilePosition((int) e.Cursor.GrabTile.X, (int) e.Cursor.GrabTile.Y - 1);
-                            Ghost.Portrait = PortraitMarnie;
-                            Game1.currentLocation.characters.Insert(0, Ghost);
-                            MenuEvents.MenuChanged += MenuEvents_MenuChangedGhost;
-                        }
-                        e.SuppressButton();
-                        SuppressRightMouseButton(e.Button.ToString());
-                    }
+                default:
                     break;
             }
-        }
-
-        private static void MenuEvents_MenuChangedGhost(object sender, EventArgsClickableMenuChanged e)
-        {
-            Game1.currentLocation.characters.Remove(Ghost);
-            MenuEvents.MenuChanged -= MenuEvents_MenuChangedGhost;
         }
 
         private static bool IsNpcInLocation(string name, string locationName = "")
         {
             GameLocation location;
-            location = locationName == "" ? Game1.currentLocation : Game1.locations.Find(locationName);
+            location = locationName.Length == 0 ? Game1.currentLocation : Game1.locations.Find(locationName);
 
             return location.characters.Find(name) != null;
         }
@@ -196,8 +149,7 @@ namespace SelfServiceShop
                 Game1.player.currentUpgrade == null)
             {
                 Response[] answerChoices;
-                if (Game1.player.HouseUpgradeLevel < 3)
-                    answerChoices = new[]
+                answerChoices = Game1.player.HouseUpgradeLevel < 3 ? new[]
                     {
                         new Response("Shop",
                             Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop")),
@@ -207,9 +159,7 @@ namespace SelfServiceShop
                             Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Construct")),
                         new Response("Leave",
                             Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Leave"))
-                    };
-                else
-                    answerChoices = new[]
+                    } : new[]
                     {
                         new Response("Shop",
                             Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop")),
@@ -263,7 +213,7 @@ namespace SelfServiceShop
                 return;
             }
 
-            if (Game1.player.daysLeftForToolUpgrade <= 0)
+            if (Game1.player.daysLeftForToolUpgrade.Value <= 0)
             {
                 if (Game1.player.freeSpotsInInventory() > 0)
                 {
@@ -277,7 +227,7 @@ namespace SelfServiceShop
             }
             Game1.drawDialogue(clint,
                 Game1.content.LoadString("Data\\ExtraDialogue:Clint_StillWorking",
-                    (object) Game1.player.toolBeingUpgraded.Value.DisplayName));
+                    Game1.player.toolBeingUpgraded.Value.DisplayName));
             MenuEvents.MenuClosed += MenuEvents_MenuClosedBlacksmith;
         }
 
@@ -299,27 +249,6 @@ namespace SelfServiceShop
                 Game1.activeClickableMenu = new ShopMenu(Utility.getBlacksmithStock(), 0, "Clint");
             }
             MenuEvents.MenuClosed -= MenuEvents_MenuClosedBlacksmith;
-        }
-
-        /// <summary>
-        ///     EventArgsInput.SuppressButton has a bug that does not suppress mouse buttons as of SMAPI 2.1.
-        ///     So this method is a workaround to this bug.
-        ///     Issue: https://github.com/Pathoschild/SMAPI/issues/384
-        /// </summary>
-        private static void SuppressRightMouseButton(string button)
-        {
-            if (button != "MouseRight")
-                return;
-            Game1.oldMouseState = new MouseState(
-                Game1.oldMouseState.X,
-                Game1.oldMouseState.Y,
-                Game1.oldMouseState.ScrollWheelValue,
-                Game1.oldMouseState.LeftButton,
-                Game1.oldMouseState.MiddleButton,
-                ButtonState.Pressed,
-                Game1.oldMouseState.XButton1,
-                Game1.oldMouseState.XButton2
-            );
         }
     }
 }
