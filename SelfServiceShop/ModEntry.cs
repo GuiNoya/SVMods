@@ -15,10 +15,7 @@ namespace SelfServiceShop
     // ReSharper disable once UnusedMember.Global
     public class ModEntry : Mod
     {
-        private static readonly NPC Ghost = new NPC
-        {
-            sprite = new AnimatedSprite(new Texture2D(Game1.graphics.GraphicsDevice, 1, 1))
-        };
+        private static readonly NPC Ghost = new NPC();
 
         private static readonly Texture2D PortraitRobin = Game1.content.Load<Texture2D>("Portraits\\Robin");
         private static readonly Texture2D PortraitMarnie = Game1.content.Load<Texture2D>("Portraits\\Marnie");
@@ -62,7 +59,7 @@ namespace SelfServiceShop
                         else
                         {
                             NPC robin;
-                            if (Game1.currentLocation.characters.Find(c => c.name == "Robin") is NPC npc)
+                            if (Game1.currentLocation.characters.Find("Robin") is NPC npc)
                                 robin = npc;
                             else
                                 break;
@@ -84,7 +81,7 @@ namespace SelfServiceShop
                         else
                         {
                             NPC marnie;
-                            if (Game1.currentLocation.characters.Find(c => c.name == "Marnie") is NPC npc)
+                            if (Game1.currentLocation.characters.Find("Marnie") is NPC npc)
                                 marnie = npc;
                             else
                                 break;
@@ -115,7 +112,7 @@ namespace SelfServiceShop
                         else
                         {
                             NPC clint;
-                            if (Game1.currentLocation.characters.Find(c => c.name == "Clint") is NPC npc)
+                            if (Game1.currentLocation.characters.Find("Clint") is NPC npc)
                                 clint = npc;
                             else
                                 break;
@@ -142,12 +139,12 @@ namespace SelfServiceShop
                 // Not the way I want, but it's the way I found
                 case "FECarpenter":
                     if (_config.Carpenter &&
-                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Exists(n => n.name == "Robin")))
+                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Find("Robin") != null))
                     {
-                        var robin = Game1.currentLocation.characters.Find(n => n.name == "Robin");
+                        var robin = Game1.currentLocation.characters.Find("Robin");
                         if (robin == null || Vector2.Distance(robin.getTileLocation(), e.Cursor.GrabTile) > 3f)
                         {
-                            Ghost.name = "Robin";
+                            Ghost.name.Set("Robin");
                             Ghost.setTilePosition((int) e.Cursor.GrabTile.X, (int) e.Cursor.GrabTile.Y - 1);
                             Ghost.Portrait = PortraitRobin;
                             Game1.currentLocation.characters.Insert(0, Ghost);
@@ -160,13 +157,13 @@ namespace SelfServiceShop
                     break;
                 case "FEAnimalShop":
                     if (_config.Ranch &&
-                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Exists(n => n.name == "Marnie")))
+                        (_config.ShopsAlwaysOpen || Game1.currentLocation.characters.Find("Marnie") != null))
                     {
-                        var marnie = Game1.currentLocation.characters.Find(n => n.name == "Marnie");
+                        var marnie = Game1.currentLocation.characters.Find("Marnie");
                         if (marnie == null ||
                             !marnie.getTileLocation().Equals(new Vector2(e.Cursor.GrabTile.X, e.Cursor.GrabTile.Y - 1)))
                         {
-                            Ghost.name = "Marnie";
+                            Ghost.name.Set("Marnie");
                             Ghost.setTilePosition((int) e.Cursor.GrabTile.X, (int) e.Cursor.GrabTile.Y - 1);
                             Ghost.Portrait = PortraitMarnie;
                             Game1.currentLocation.characters.Insert(0, Ghost);
@@ -187,17 +184,19 @@ namespace SelfServiceShop
 
         private static bool IsNpcInLocation(string name, string locationName = "")
         {
-            return (locationName == "" ? Game1.currentLocation : Game1.locations.Find(l => l.name == locationName))
-                .characters.Exists(c => c.name == name);
+            GameLocation location;
+            location = locationName == "" ? Game1.currentLocation : Game1.locations.Find(locationName);
+
+            return location.characters.Find(name) != null;
         }
 
         private static void Carpenters()
         {
-            if (Game1.player.daysUntilHouseUpgrade < 0 && !Game1.getFarm().isThereABuildingUnderConstruction() &&
+            if (Game1.player.daysUntilHouseUpgrade.Value < 0 && !Game1.getFarm().isThereABuildingUnderConstruction() &&
                 Game1.player.currentUpgrade == null)
             {
                 Response[] answerChoices;
-                if (Game1.player.houseUpgradeLevel < 3)
+                if (Game1.player.HouseUpgradeLevel < 3)
                     answerChoices = new[]
                     {
                         new Response("Shop",
@@ -239,7 +238,7 @@ namespace SelfServiceShop
 
         private static void Blacksmith(NPC clint)
         {
-            if (Game1.player.toolBeingUpgraded == null)
+            if (Game1.player.toolBeingUpgraded.Value == null)
             {
                 Response[] answerChoices;
                 if (Game1.player.hasItemInInventory(535, 1) || Game1.player.hasItemInInventory(536, 1) ||
@@ -268,9 +267,9 @@ namespace SelfServiceShop
             {
                 if (Game1.player.freeSpotsInInventory() > 0)
                 {
-                    Game1.player.holdUpItemThenMessage(Game1.player.toolBeingUpgraded);
-                    Game1.player.addItemToInventoryBool(Game1.player.toolBeingUpgraded);
-                    Game1.player.toolBeingUpgraded = null;
+                    Game1.player.holdUpItemThenMessage(Game1.player.toolBeingUpgraded.Value);
+                    Game1.player.addItemToInventoryBool(Game1.player.toolBeingUpgraded.Value);
+                    Game1.player.toolBeingUpgraded.Value = null;
                     return;
                 }
                 Game1.drawDialogue(clint, Game1.content.LoadString("Data\\ExtraDialogue:Clint_NoInventorySpace"));
@@ -278,7 +277,7 @@ namespace SelfServiceShop
             }
             Game1.drawDialogue(clint,
                 Game1.content.LoadString("Data\\ExtraDialogue:Clint_StillWorking",
-                    (object) Game1.player.toolBeingUpgraded.DisplayName));
+                    (object) Game1.player.toolBeingUpgraded.Value.DisplayName));
             MenuEvents.MenuClosed += MenuEvents_MenuClosedBlacksmith;
         }
 
