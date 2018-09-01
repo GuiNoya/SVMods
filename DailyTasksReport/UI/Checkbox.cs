@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
+using System;
+using System.Linq;
 
 namespace DailyTasksReport.UI
 {
@@ -14,8 +14,8 @@ namespace DailyTasksReport.UI
         private readonly ModConfig _config;
         private readonly OptionsEnum _option;
 
-        private Rectangle _bubbleButtonSource;
-        private Rectangle _checkButtonSource;
+        private readonly Rectangle _bubbleButtonSource;
+        private readonly Rectangle _checkButtonSource;
 
         private bool _isChecked;
         private bool _isMouseOnBubbleButton;
@@ -29,18 +29,17 @@ namespace DailyTasksReport.UI
             bounds.X += itemLevel * Game1.pixelZoom * 7;
             _checkButtonSource = bounds;
 
-
             if (whichOption == OptionsEnum.AllAnimalProducts || whichOption == OptionsEnum.AllMachines)
                 this.whichOption = -1;
             else
-                this.whichOption = (int) whichOption;
+                this.whichOption = (int)whichOption;
 
             // Load options
             RefreshStatus();
         }
 
         public Checkbox(string label, OptionsEnum whichOption, ModConfig config, bool hasBubbleButton, int slotWidth) :
-            base(label, -1, -1, slotWidth, Game1.pixelZoom * 9, (int) whichOption)
+            base(label, -1, -1, slotWidth, Game1.pixelZoom * 9, (int)whichOption)
         {
             _option = whichOption;
             _config = config;
@@ -87,9 +86,11 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.ShowReportButton:
                     _isChecked = _config.DisplayReportButton;
                     break;
+
                 case OptionsEnum.ShowDetailedInfo:
                     _isChecked = _config.ShowDetailedInfo;
                     break;
+
                 case OptionsEnum.DisplayBubbles:
                     _isChecked = _config.DisplayBubbles;
                     break;
@@ -97,39 +98,51 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.NewRecipeOnTv:
                     _isChecked = _config.NewRecipeOnTv;
                     break;
+
                 case OptionsEnum.Birthdays:
                     _isChecked = _config.Birthdays;
                     break;
+
                 case OptionsEnum.TravelingMerchant:
                     _isChecked = _config.TravelingMerchant;
                     break;
+
                 case OptionsEnum.UnwateredCrops:
                     _isChecked = _config.UnwateredCrops;
                     break;
+
                 case OptionsEnum.UnharvestedCrops:
                     _isChecked = _config.UnharvestedCrops;
                     break;
+
                 case OptionsEnum.DeadCrops:
                     _isChecked = _config.DeadCrops;
                     break;
+
                 case OptionsEnum.UnpettedPet:
                     _isChecked = _config.UnpettedPet;
                     break;
+
                 case OptionsEnum.UnfilledPetBowl:
                     _isChecked = _config.UnfilledPetBowl;
                     break;
+
                 case OptionsEnum.UnpettedAnimals:
                     _isChecked = _config.UnpettedAnimals;
                     break;
+
                 case OptionsEnum.MissingHay:
                     _isChecked = _config.MissingHay;
                     break;
+
                 case OptionsEnum.FarmCave:
                     _isChecked = _config.FarmCave;
                     break;
+
                 case OptionsEnum.UncollectedCrabpots:
                     _isChecked = _config.UncollectedCrabpots;
                     break;
+
                 case OptionsEnum.NotBaitedCrabpots:
                     _isChecked = _config.NotBaitedCrabpots;
                     break;
@@ -138,36 +151,47 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.AllAnimalProducts:
                     _isChecked = !_config.AnimalProducts.ContainsValue(false);
                     break;
+
                 case OptionsEnum.CowMilk:
                     _isChecked = _config.AnimalProducts["Cow milk"];
                     break;
+
                 case OptionsEnum.GoatMilk:
                     _isChecked = _config.AnimalProducts["Goat milk"];
                     break;
+
                 case OptionsEnum.SheepWool:
                     _isChecked = _config.AnimalProducts["Sheep wool"];
                     break;
+
                 case OptionsEnum.ChickenEgg:
                     _isChecked = _config.AnimalProducts["Chicken egg"];
                     break;
+
                 case OptionsEnum.DinosaurEgg:
                     _isChecked = _config.AnimalProducts["Dinosaur egg"];
                     break;
+
                 case OptionsEnum.DuckEgg:
                     _isChecked = _config.AnimalProducts["Duck egg"];
                     break;
+
                 case OptionsEnum.DuckFeather:
                     _isChecked = _config.AnimalProducts["Duck feather"];
                     break;
+
                 case OptionsEnum.RabbitsWool:
                     _isChecked = _config.AnimalProducts["Rabbit's wool"];
                     break;
+
                 case OptionsEnum.RabbitsFoot:
                     _isChecked = _config.AnimalProducts["Rabbit's foot"];
                     break;
+
                 case OptionsEnum.Truffle:
                     _isChecked = _config.AnimalProducts["Truffle"];
                     break;
+
                 case OptionsEnum.SlimeBall:
                     _isChecked = _config.AnimalProducts["Slime ball"];
                     break;
@@ -176,60 +200,79 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.AllMachines:
                     _isChecked = !_config.Machines.ContainsValue(false) && _config.Cask > 0;
                     break;
+
                 case OptionsEnum.BeeHouse:
                     _isChecked = _config.Machines["Bee House"];
                     break;
+
                 case OptionsEnum.CharcoalKiln:
                     _isChecked = _config.Machines["Charcoal Kiln"];
                     break;
+
                 case OptionsEnum.CheesePress:
                     _isChecked = _config.Machines["Cheese Press"];
                     break;
+
                 case OptionsEnum.Crystalarium:
                     _isChecked = _config.Machines["Crystalarium"];
                     break;
+
                 case OptionsEnum.Furnace:
                     _isChecked = _config.Machines["Furnace"];
                     break;
+
                 case OptionsEnum.Keg:
                     _isChecked = _config.Machines["Keg"];
                     break;
+
                 case OptionsEnum.LightningRod:
                     _isChecked = _config.Machines["Lightning Rod"];
                     break;
+
                 case OptionsEnum.Loom:
                     _isChecked = _config.Machines["Loom"];
                     break;
+
                 case OptionsEnum.MayonnaiseMachine:
                     _isChecked = _config.Machines["Mayonnaise Machine"];
                     break;
+
                 case OptionsEnum.OilMaker:
                     _isChecked = _config.Machines["Oil Maker"];
                     break;
+
                 case OptionsEnum.PreservesJar:
                     _isChecked = _config.Machines["Preserves Jar"];
                     break;
+
                 case OptionsEnum.RecyclingMachine:
                     _isChecked = _config.Machines["Recycling Machine"];
                     break;
+
                 case OptionsEnum.SeedMaker:
                     _isChecked = _config.Machines["Seed Maker"];
                     break;
+
                 case OptionsEnum.SlimeEggPress:
                     _isChecked = _config.Machines["Slime Egg-Press"];
                     break;
+
                 case OptionsEnum.SodaMachine:
                     _isChecked = _config.Machines["Soda Machine"];
                     break;
+
                 case OptionsEnum.StatueOfEndlessFortune:
                     _isChecked = _config.Machines["Statue Of Endless Fortune"];
                     break;
+
                 case OptionsEnum.StatueOfPerfection:
                     _isChecked = _config.Machines["Statue Of Perfection"];
                     break;
+
                 case OptionsEnum.Tapper:
                     _isChecked = _config.Machines["Tapper"];
                     break;
+
                 case OptionsEnum.WormBin:
                     _isChecked = _config.Machines["Worm Bin"];
                     break;
@@ -237,33 +280,43 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.DrawUnwateredCrops:
                     _isChecked = _config.DrawBubbleUnwateredCrops;
                     break;
+
                 case OptionsEnum.DrawUnharvestedCrops:
                     _isChecked = _config.DrawBubbleUnharvestedCrops;
                     break;
+
                 case OptionsEnum.DrawDeadCrops:
                     _isChecked = _config.DrawBubbleDeadCrops;
                     break;
+
                 case OptionsEnum.DrawUnpettedPet:
                     _isChecked = _config.DrawBubbleUnpettedPet;
                     break;
+
                 case OptionsEnum.DrawUnpettedAnimals:
                     _isChecked = _config.DrawBubbleUnpettedAnimals;
                     break;
+
                 case OptionsEnum.DrawAnimalsWithProduce:
                     _isChecked = _config.DrawBubbleAnimalsWithProduce;
                     break;
+
                 case OptionsEnum.DrawBuildingsWithProduce:
                     _isChecked = _config.DrawBubbleBuildingsWithProduce;
                     break;
+
                 case OptionsEnum.DrawBuildingsMissingHay:
                     _isChecked = _config.DrawBubbleBuildingsMissingHay;
                     break;
+
                 case OptionsEnum.DrawTruffles:
                     _isChecked = _config.DrawBubbleTruffles;
                     break;
+
                 case OptionsEnum.DrawCrabpotsNotBaited:
                     _isChecked = _config.DrawBubbleCrabpotsNotBaited;
                     break;
+
                 case OptionsEnum.DrawCask:
                     _isChecked = _config.DrawBubbleCask;
                     break;
@@ -333,9 +386,11 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.ShowReportButton:
                     _config.DisplayReportButton = _isChecked;
                     return;
+
                 case OptionsEnum.ShowDetailedInfo:
                     _config.ShowDetailedInfo = _isChecked;
                     break;
+
                 case OptionsEnum.DisplayBubbles:
                     _config.DisplayBubbles = _isChecked;
                     return;
@@ -343,39 +398,51 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.NewRecipeOnTv:
                     _config.NewRecipeOnTv = _isChecked;
                     break;
+
                 case OptionsEnum.Birthdays:
                     _config.Birthdays = _isChecked;
                     break;
+
                 case OptionsEnum.TravelingMerchant:
                     _config.TravelingMerchant = _isChecked;
                     break;
+
                 case OptionsEnum.UnwateredCrops:
                     _config.UnwateredCrops = _isChecked;
                     break;
+
                 case OptionsEnum.UnharvestedCrops:
                     _config.UnharvestedCrops = _isChecked;
                     break;
+
                 case OptionsEnum.DeadCrops:
                     _config.DeadCrops = _isChecked;
                     break;
+
                 case OptionsEnum.UnpettedPet:
                     _config.UnpettedPet = _isChecked;
                     break;
+
                 case OptionsEnum.UnfilledPetBowl:
                     _config.UnfilledPetBowl = _isChecked;
                     break;
+
                 case OptionsEnum.UnpettedAnimals:
                     _config.UnpettedAnimals = _isChecked;
                     break;
+
                 case OptionsEnum.MissingHay:
                     _config.MissingHay = _isChecked;
                     break;
+
                 case OptionsEnum.FarmCave:
                     _config.FarmCave = _isChecked;
                     break;
+
                 case OptionsEnum.UncollectedCrabpots:
                     _config.UncollectedCrabpots = _isChecked;
                     break;
+
                 case OptionsEnum.NotBaitedCrabpots:
                     _config.NotBaitedCrabpots = _isChecked;
                     break;
@@ -385,36 +452,47 @@ namespace DailyTasksReport.UI
                     foreach (var key in _config.AnimalProducts.Keys.ToList())
                         _config.AnimalProducts[key] = _isChecked;
                     break;
+
                 case OptionsEnum.CowMilk:
                     _config.AnimalProducts["Cow milk"] = _isChecked;
                     break;
+
                 case OptionsEnum.GoatMilk:
                     _config.AnimalProducts["Goat milk"] = _isChecked;
                     break;
+
                 case OptionsEnum.SheepWool:
                     _config.AnimalProducts["Sheep wool"] = _isChecked;
                     break;
+
                 case OptionsEnum.ChickenEgg:
                     _config.AnimalProducts["Chicken egg"] = _isChecked;
                     break;
+
                 case OptionsEnum.DinosaurEgg:
                     _config.AnimalProducts["Dinosaur egg"] = _isChecked;
                     break;
+
                 case OptionsEnum.DuckEgg:
                     _config.AnimalProducts["Duck egg"] = _isChecked;
                     break;
+
                 case OptionsEnum.DuckFeather:
                     _config.AnimalProducts["Duck feather"] = _isChecked;
                     break;
+
                 case OptionsEnum.RabbitsWool:
                     _config.AnimalProducts["Rabbit's wool"] = _isChecked;
                     break;
+
                 case OptionsEnum.RabbitsFoot:
                     _config.AnimalProducts["Rabbit's foot"] = _isChecked;
                     break;
+
                 case OptionsEnum.Truffle:
                     _config.AnimalProducts["Truffle"] = _isChecked;
                     break;
+
                 case OptionsEnum.SlimeBall:
                     _config.AnimalProducts["Slime ball"] = _isChecked;
                     break;
@@ -428,60 +506,79 @@ namespace DailyTasksReport.UI
                     else if (_config.Cask == 0)
                         _config.Cask = 4;
                     break;
+
                 case OptionsEnum.BeeHouse:
                     _config.Machines["Bee House"] = _isChecked;
                     break;
+
                 case OptionsEnum.CharcoalKiln:
                     _config.Machines["Charcoal Kiln"] = _isChecked;
                     break;
+
                 case OptionsEnum.CheesePress:
                     _config.Machines["Cheese Press"] = _isChecked;
                     break;
+
                 case OptionsEnum.Crystalarium:
                     _config.Machines["Crystalarium"] = _isChecked;
                     break;
+
                 case OptionsEnum.Furnace:
                     _config.Machines["Furnace"] = _isChecked;
                     break;
+
                 case OptionsEnum.Keg:
                     _config.Machines["Keg"] = _isChecked;
                     break;
+
                 case OptionsEnum.LightningRod:
                     _config.Machines["Lightning Rod"] = _isChecked;
                     break;
+
                 case OptionsEnum.Loom:
                     _config.Machines["Loom"] = _isChecked;
                     break;
+
                 case OptionsEnum.MayonnaiseMachine:
                     _config.Machines["Mayonnaise Machine"] = _isChecked;
                     break;
+
                 case OptionsEnum.OilMaker:
                     _config.Machines["Oil Maker"] = _isChecked;
                     break;
+
                 case OptionsEnum.PreservesJar:
                     _config.Machines["Preserves Jar"] = _isChecked;
                     break;
+
                 case OptionsEnum.RecyclingMachine:
                     _config.Machines["Recycling Machine"] = _isChecked;
                     break;
+
                 case OptionsEnum.SeedMaker:
                     _config.Machines["Seed Maker"] = _isChecked;
                     break;
+
                 case OptionsEnum.SlimeEggPress:
                     _config.Machines["Slime Egg-Press"] = _isChecked;
                     break;
+
                 case OptionsEnum.SodaMachine:
                     _config.Machines["Soda Machine"] = _isChecked;
                     break;
+
                 case OptionsEnum.StatueOfEndlessFortune:
                     _config.Machines["Statue Of Endless Fortune"] = _isChecked;
                     break;
+
                 case OptionsEnum.StatueOfPerfection:
                     _config.Machines["Statue Of Perfection"] = _isChecked;
                     break;
+
                 case OptionsEnum.Tapper:
                     _config.Machines["Tapper"] = _isChecked;
                     break;
+
                 case OptionsEnum.WormBin:
                     _config.Machines["Worm Bin"] = _isChecked;
                     break;
@@ -489,33 +586,43 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.DrawUnwateredCrops:
                     _config.DrawBubbleUnwateredCrops = _isChecked;
                     break;
+
                 case OptionsEnum.DrawUnharvestedCrops:
                     _config.DrawBubbleUnharvestedCrops = _isChecked;
                     break;
+
                 case OptionsEnum.DrawDeadCrops:
                     _config.DrawBubbleDeadCrops = _isChecked;
                     break;
+
                 case OptionsEnum.DrawUnpettedPet:
                     _config.DrawBubbleUnpettedPet = _isChecked;
                     break;
+
                 case OptionsEnum.DrawUnpettedAnimals:
                     _config.DrawBubbleUnpettedAnimals = _isChecked;
                     break;
+
                 case OptionsEnum.DrawAnimalsWithProduce:
                     _config.DrawBubbleAnimalsWithProduce = _isChecked;
                     break;
+
                 case OptionsEnum.DrawBuildingsWithProduce:
                     _config.DrawBubbleBuildingsWithProduce = _isChecked;
                     break;
+
                 case OptionsEnum.DrawBuildingsMissingHay:
                     _config.DrawBubbleBuildingsMissingHay = _isChecked;
                     break;
+
                 case OptionsEnum.DrawTruffles:
                     _config.DrawBubbleTruffles = _isChecked;
                     break;
+
                 case OptionsEnum.DrawCrabpotsNotBaited:
                     _config.DrawBubbleCrabpotsNotBaited = _isChecked;
                     break;
+
                 case OptionsEnum.DrawCask:
                     _config.DrawBubbleCask = _isChecked;
                     break;

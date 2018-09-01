@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using DailyTasksReport.UI;
+﻿using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.TerrainFeatures;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace DailyTasksReport.Tasks
 {
@@ -55,18 +55,22 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.UnwateredCropGreenhouse:
                     Enabled = _config.UnwateredCrops;
                     break;
+
                 case CropsTaskId.UnharvestedCropFarm:
                 case CropsTaskId.UnharvestedCropGreenhouse:
                     Enabled = _config.UnharvestedCrops;
                     break;
+
                 case CropsTaskId.DeadCropFarm:
                 case CropsTaskId.DeadCropGreenhouse:
                     Enabled = _config.DeadCrops;
                     break;
+
                 case CropsTaskId.FruitTreesFarm:
                 case CropsTaskId.FruitTreesGreenhouse:
                     Enabled = _config.FruitTrees > 0;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }
@@ -82,14 +86,14 @@ namespace DailyTasksReport.Tasks
 
             if (_who != _id) return;
 
-            GameLocation location = Game1.locations.OfType<Farm>().First();
-            foreach (var pair in location.terrainFeatures)
-                if (pair.Value is FruitTree tree && tree.fruitsOnTree > 0)
+            GameLocation location = Game1.locations.OfType<Farm>().FirstOrDefault();
+            foreach (var pair in location.terrainFeatures.Pairs)
+                if (pair.Value is FruitTree tree && tree.fruitsOnTree.Value > 0)
                     FruitTrees[0].Add(new Tuple<Vector2, FruitTree>(pair.Key, tree));
 
-            location = Game1.locations.First(l => l.name == "Greenhouse");
-            foreach (var pair in location.terrainFeatures)
-                if (pair.Value is FruitTree tree && tree.fruitsOnTree > 0)
+            location = Game1.locations.FirstOrDefault(l => l.IsGreenhouse);
+            foreach (var pair in location.terrainFeatures.Pairs)
+                if (pair.Value is FruitTree tree && tree.fruitsOnTree.Value > 0)
                     FruitTrees[1].Add(new Tuple<Vector2, FruitTree>(pair.Key, tree));
         }
 
@@ -105,8 +109,8 @@ namespace DailyTasksReport.Tasks
 
             if (Crops[_index].Count == 0)
             {
-                var location = Game1.locations.Find(l => l.name == _locationName);
-                foreach (var keyValuePair in location.terrainFeatures)
+                var location = Game1.locations.FirstOrDefault(l => l.Name == _locationName);
+                foreach (var keyValuePair in location.terrainFeatures.Pairs)
                     if (keyValuePair.Value is HoeDirt dirt && dirt.crop != null)
                         Crops[_index].Add(new Tuple<Vector2, HoeDirt>(keyValuePair.Key, dirt));
             }
@@ -116,7 +120,7 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.UnwateredCropFarm:
                 case CropsTaskId.UnwateredCropGreenhouse:
                     count = Crops[_index].Count(pair =>
-                        pair.Item2.state == HoeDirt.dry && pair.Item2.needsWatering() && !pair.Item2.crop.dead);
+                        pair.Item2.state.Value == HoeDirt.dry && pair.Item2.needsWatering() && !pair.Item2.crop.dead.Value);
                     if (count > 0)
                     {
                         _anyCrop = true;
@@ -136,7 +140,7 @@ namespace DailyTasksReport.Tasks
 
                 case CropsTaskId.DeadCropFarm:
                 case CropsTaskId.DeadCropGreenhouse:
-                    count = Crops[_index].Count(pair => pair.Item2.crop.dead);
+                    count = Crops[_index].Count(pair => pair.Item2.crop.dead.Value);
                     if (count > 0)
                     {
                         _anyCrop = true;
@@ -146,13 +150,14 @@ namespace DailyTasksReport.Tasks
 
                 case CropsTaskId.FruitTreesFarm:
                 case CropsTaskId.FruitTreesGreenhouse:
-                    count = FruitTrees[_index].Count(p => p.Item2.fruitsOnTree >= _config.FruitTrees);
+                    count = FruitTrees[_index].Count(p => p.Item2.fruitsOnTree.Value >= _config.FruitTrees);
                     if (count > 0)
                     {
                         _anyCrop = true;
                         return $"Fruit trees with fruits in the {_locationName}: {count}^";
                     }
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }
@@ -177,20 +182,26 @@ namespace DailyTasksReport.Tasks
                     usedLines++;
                     skipNextPage = true;
                     break;
+
                 case CropsTaskId.UnharvestedCropFarm:
                     stringBuilder.Append("Ready to harvest crops:^");
                     usedLines++;
                     skipNextPage = true;
                     break;
+
                 case CropsTaskId.DeadCropFarm:
                     stringBuilder.Append("Dead crops:^");
                     usedLines++;
                     skipNextPage = true;
                     break;
+
                 case CropsTaskId.FruitTreesFarm:
                     stringBuilder.Append("Fruit trees with fruits:^");
                     usedLines++;
                     skipNextPage = true;
+                    break;
+
+                default:
                     break;
             }
 
@@ -199,28 +210,32 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.UnwateredCropFarm:
                 case CropsTaskId.UnwateredCropGreenhouse:
                     EchoForCrops(ref stringBuilder, ref usedLines, pair =>
-                        pair.Item2.state == HoeDirt.dry && pair.Item2.needsWatering() && !pair.Item2.crop.dead);
+                        pair.Item2.state.Value == HoeDirt.dry && pair.Item2.needsWatering() && !pair.Item2.crop.dead.Value);
                     break;
+
                 case CropsTaskId.UnharvestedCropFarm:
                 case CropsTaskId.UnharvestedCropGreenhouse:
                     EchoForCrops(ref stringBuilder, ref usedLines, pair => pair.Item2.readyForHarvest());
                     break;
+
                 case CropsTaskId.DeadCropFarm:
                 case CropsTaskId.DeadCropGreenhouse:
-                    EchoForCrops(ref stringBuilder, ref usedLines, pair => pair.Item2.crop.dead);
+                    EchoForCrops(ref stringBuilder, ref usedLines, pair => pair.Item2.crop.dead.Value);
                     break;
+
                 case CropsTaskId.FruitTreesFarm:
                 case CropsTaskId.FruitTreesGreenhouse:
                     if (_config.FruitTrees == 0) break;
-                    foreach (var tuple in FruitTrees[_index].Where(t => t.Item2.fruitsOnTree >= _config.FruitTrees))
+                    foreach (var tuple in FruitTrees[_index].Where(t => t.Item2.fruitsOnTree.Value >= _config.FruitTrees))
                     {
                         var s = "";
-                        if (tuple.Item2.fruitsOnTree > 1) s = "s";
+                        if (tuple.Item2.fruitsOnTree.Value > 1) s = "s";
                         stringBuilder.Append(
-                            $"{ObjectsNames[tuple.Item2.indexOfFruit]} tree at {_locationName} with {tuple.Item2.fruitsOnTree} fruit{s} ({tuple.Item1.X}, {tuple.Item1.Y})^");
+                            $"{ObjectsNames[tuple.Item2.indexOfFruit.Value]} tree at {_locationName} with {tuple.Item2.fruitsOnTree} fruit{s} ({tuple.Item1.X}, {tuple.Item1.Y})^");
                         usedLines++;
                     }
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }
@@ -234,7 +249,7 @@ namespace DailyTasksReport.Tasks
             foreach (var item in Crops[_index].Where(predicate))
             {
                 stringBuilder.Append(
-                    $"{ObjectsNames[item.Item2.crop.indexOfHarvest]} at {_locationName} ({item.Item1.X}, {item.Item1.Y})^");
+                    $"{ObjectsNames[item.Item2.crop.indexOfHarvest.Value]} at {_locationName} ({item.Item1.X}, {item.Item1.Y})^");
                 count++;
             }
         }
@@ -246,27 +261,29 @@ namespace DailyTasksReport.Tasks
 
         public override void Draw(SpriteBatch b)
         {
-            if (!(Game1.currentLocation is Farm) && Game1.currentLocation.name != "Greenhouse" || _who != _id) return;
+            if (!(Game1.currentLocation is Farm) && Game1.currentLocation.IsGreenhouse || _who != _id) return;
 
             var x = Game1.viewport.X / Game1.tileSize;
             var xLimit = (Game1.viewport.X + Game1.viewport.Width) / Game1.tileSize;
             var yStart = Game1.viewport.Y / Game1.tileSize;
             var yLimit = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
             for (; x <= xLimit; ++x)
-            for (var y = yStart; y <= yLimit; ++y)
-                if (Game1.currentLocation.terrainFeatures.TryGetValue(new Vector2(x, y), out var t) &&
-                    t is HoeDirt dirt && dirt.crop != null)
-                {
-                    var v = new Vector2(x * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8,
-                        y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 2 / 4);
+                for (var y = yStart; y <= yLimit; ++y)
+                    if (Game1.currentLocation.terrainFeatures.TryGetValue(new Vector2(x, y), out var t) &&
+                        t is HoeDirt dirt && dirt.crop != null)
+                    {
+                        var v = new Vector2(x * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8,
+                            y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 2 / 4);
 
-                    if (dirt.crop.dead && _config.DrawBubbleDeadCrops)
-                        DrawBubble(b, Game1.mouseCursors, new Rectangle(269, 471, 14, 15), v);
-                    else if (dirt.readyForHarvest() && _config.DrawBubbleUnharvestedCrops)
-                        DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
-                    else if (dirt.state == HoeDirt.dry && _config.DrawBubbleUnwateredCrops)
-                        DrawBubble(b, Game1.toolSpriteSheet, new Rectangle(49, 226, 15, 13), v);
-                }
+                        var cropDead = dirt.crop.dead.Value;
+                        var dirtState = dirt.state.Value;
+                        if (cropDead && _config.DrawBubbleDeadCrops)
+                            DrawBubble(b, Game1.mouseCursors, new Rectangle(269, 471, 14, 15), v);
+                        else if (dirt.readyForHarvest() && _config.DrawBubbleUnharvestedCrops)
+                            DrawBubble(b, Game1.mouseCursors, new Rectangle(32, 0, 10, 10), v);
+                        else if (dirtState == HoeDirt.dry && _config.DrawBubbleUnwateredCrops)
+                            DrawBubble(b, Game1.toolSpriteSheet, new Rectangle(49, 226, 15, 13), v);
+                    }
         }
 
         public override void Clear()
@@ -285,18 +302,22 @@ namespace DailyTasksReport.Tasks
                 case CropsTaskId.UnwateredCropGreenhouse:
                     Enabled = _config.UnwateredCrops;
                     break;
+
                 case CropsTaskId.UnharvestedCropFarm:
                 case CropsTaskId.UnharvestedCropGreenhouse:
                     Enabled = _config.UnharvestedCrops;
                     break;
+
                 case CropsTaskId.DeadCropFarm:
                 case CropsTaskId.DeadCropGreenhouse:
                     Enabled = _config.DeadCrops;
                     break;
+
                 case CropsTaskId.FruitTreesFarm:
                 case CropsTaskId.FruitTreesGreenhouse:
                     Enabled = _config.FruitTrees > 0;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Crop task or location not implemented");
             }

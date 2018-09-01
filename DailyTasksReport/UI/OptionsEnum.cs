@@ -2,17 +2,17 @@
 {
     internal enum OptionsEnum
     {
-        // Special options
+        /* Special options*/
         OpenReportKey = 1,
         OpenSettings = 2,
         ToggleBubbles = 3,
         ShowReportButton = 4,
 
-        // Basic options
+        /* Basic options */
         ShowDetailedInfo = 50,
         DisplayBubbles = 51,
 
-        // What to report
+        /* What to report */
         UnwateredCrops = 100,
         UnharvestedCrops = 101,
         DeadCrops = 102,
@@ -28,7 +28,7 @@
         TravelingMerchant = 112,
         FruitTrees = 113,
 
-        //Animal products
+        /* Animal products */
         AllAnimalProducts = 200,
         ChickenEgg = 201,
         DinosaurEgg = 202,
@@ -42,7 +42,7 @@
         RabbitsFoot = 210,
         SlimeBall = 211,
 
-        //Machines
+        /* Machines */
         AllMachines = 300,
         BeeHouse = 301,
         Cask = 302,
@@ -65,7 +65,7 @@
         Tapper = 319,
         WormBin = 320,
 
-        //Draw Bubbles
+        /* Draw Bubbles */
         DrawUnwateredCrops = 500,
         DrawUnharvestedCrops = 501,
         DrawDeadCrops = 502,

@@ -1,22 +1,22 @@
-﻿using System;
+﻿using DailyTasksReport.UI;
+using StardewValley;
+using StardewValley.Locations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DailyTasksReport.UI;
-using StardewValley;
-using StardewValley.Locations;
 
 namespace DailyTasksReport.Tasks
 {
     public class FarmCaveTask : Task
     {
-        private static readonly int[] Fruits = {296, 396, 406, 410, 613, 634, 635, 636, 637, 638};
+        private static readonly int[] Fruits = { 296, 396, 406, 410, 613, 634, 635, 636, 637, 638 };
 
         private readonly ModConfig _config;
         private string _farmCaveItemName;
 
         private readonly Dictionary<string, int> _objectsList = new Dictionary<string, int>();
-        
+
         internal FarmCaveTask(ModConfig config)
         {
             _config = config;
@@ -26,7 +26,7 @@ namespace DailyTasksReport.Tasks
 
         private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
         {
-            Enabled = _config.FarmCave && (Game1.player.caveChoice != 0 || Game1.player.totalMoneyEarned >= 25000);
+            Enabled = _config.FarmCave && (Game1.player.caveChoice.Value != 0 || Game1.player.totalMoneyEarned >= 25000);
         }
 
         protected override void FirstScan()
@@ -35,19 +35,25 @@ namespace DailyTasksReport.Tasks
 
         private void Update()
         {
-            var farmCave = Game1.locations.Find(l => l is FarmCave);
+            var farmCave = Game1.locations.OfType<FarmCave>().FirstOrDefault();
 
             foreach (var obj in farmCave.objects.Values)
-                if (obj.parentSheetIndex == 128 && obj.heldObject != null && obj.readyForHarvest)
-                    if (_objectsList.ContainsKey(obj.heldObject.name))
-                        _objectsList[obj.heldObject.name] += 1;
-                    else
-                        _objectsList[obj.heldObject.name] = 1;
-                else if (Array.BinarySearch(Fruits, obj.parentSheetIndex) >= 0)
+            {
+                if (obj.ParentSheetIndex == 128 && obj.readyForHarvest.Value)
+                {
+                    var heldObject = obj.heldObject.Value;
+                    if (heldObject != null)
+                        if (_objectsList.ContainsKey(heldObject.Name))
+                            _objectsList[heldObject.Name] += 1;
+                        else
+                            _objectsList[heldObject.Name] = 1;
+                }
+                else if (Array.BinarySearch(Fruits, obj.ParentSheetIndex) >= 0)
                     if (_objectsList.ContainsKey(obj.name))
                         _objectsList[obj.name] += 1;
                     else
                         _objectsList[obj.name] = 1;
+            }
         }
 
         public override string GeneralInfo(out int usedLines)
@@ -87,8 +93,8 @@ namespace DailyTasksReport.Tasks
 
         public override void Clear()
         {
-            Enabled = _config.FarmCave && (Game1.player.caveChoice != 0 || Game1.player.totalMoneyEarned >= 25000);
-            _farmCaveItemName = Game1.player.caveChoice == 1 ? "Fruits" : "Mushrooms";
+            Enabled = _config.FarmCave && (Game1.player.caveChoice.Value != 0 || Game1.player.totalMoneyEarned >= 25000);
+            _farmCaveItemName = Game1.player.caveChoice.Value == 1 ? "Fruits" : "Mushrooms";
             _objectsList.Clear();
         }
 

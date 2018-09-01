@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace DailyTasksReport.Tasks
 {
@@ -16,6 +16,7 @@ namespace DailyTasksReport.Tasks
 
         private readonly Dictionary<string, string> _tvRecipes =
             Game1.content.Load<Dictionary<string, string>>("Data\\TV\\CookingChannel");
+
         private string _recipeOfTheDay;
 
         private NPC _birthdayNpc;
@@ -38,12 +39,12 @@ namespace DailyTasksReport.Tasks
 
             if ((Game1.dayOfMonth % 7 == 0 || Game1.dayOfMonth % 7 == 3) && Game1.stats.DaysPlayed > 5)
             {
-                var recipeId = (int) (Game1.stats.DaysPlayed % 224 / 7);
+                var recipeId = (int)(Game1.stats.DaysPlayed % 224 / 7);
 
                 if (Game1.dayOfMonth % 7 == 3)
                     recipeId = Math.Max(1,
-                        1 + new Random((int) Game1.stats.DaysPlayed + (int) Game1.uniqueIDForThisGame / 2).
-                        Next((int) Game1.stats.DaysPlayed % 224) / 7);
+                        1 + new Random((int)Game1.stats.DaysPlayed + (int)Game1.uniqueIDForThisGame / 2).
+                        Next((int)Game1.stats.DaysPlayed % 224) / 7);
 
                 if (_tvRecipes.TryGetValue(recipeId.ToString(), out var value))
                 {
@@ -54,12 +55,12 @@ namespace DailyTasksReport.Tasks
             }
 
             foreach (var location in Game1.locations)
-            foreach (var npc in location.characters)
-                if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
-                {
-                    _birthdayNpc = npc;
-                    return;
-                }
+                foreach (var npc in location.characters)
+                    if (npc.isBirthday(Game1.currentSeason, Game1.dayOfMonth))
+                    {
+                        _birthdayNpc = npc;
+                        return;
+                    }
         }
 
         private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
@@ -77,8 +78,8 @@ namespace DailyTasksReport.Tasks
             if (Game1.locations.OfType<Forest>().First().travelingMerchantDay)
                 _isTravelingMerchantOpen = Game1.timeOfDay < 2000;
 
-            if (_birthdayNpc != null && Game1.player.friendships.TryGetValue(_birthdayNpc.name, out var array) &&
-                array[3] == 1)
+            if (_birthdayNpc != null && Game1.player.friendshipData.TryGetValue(_birthdayNpc.Name, out var friendship) &&
+                friendship.GiftsToday > 0)
                 _birthdayNpc = null;
 
             if (_recipeOfTheDay.Length > 0 && Game1.player.knowsRecipe(_recipeOfTheDay))

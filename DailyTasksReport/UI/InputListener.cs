@@ -1,11 +1,11 @@
-﻿using System;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Menus;
+using System;
 
 namespace DailyTasksReport.UI
 {
@@ -15,12 +15,12 @@ namespace DailyTasksReport.UI
 
         private readonly ModConfig _config;
         private readonly OptionsEnum _option;
-        private Rectangle _buttonBounds;
+        private readonly Rectangle _buttonBounds;
         private string _buttonName;
         private bool _listening;
 
         public InputListener(string label, OptionsEnum whichOption, int slotWidth, ModConfig config)
-            : base(label, -1, -1, slotWidth, Game1.pixelZoom * 11, (int) whichOption)
+            : base(label, -1, -1, slotWidth, Game1.pixelZoom * 11, (int)whichOption)
         {
             _buttonBounds = new Rectangle(slotWidth - 28 * Game1.pixelZoom, Game1.pixelZoom * 3 - 1,
                 21 * Game1.pixelZoom, 11 * Game1.pixelZoom);
@@ -33,12 +33,15 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.OpenReportKey:
                     _buttonName = config.OpenReportKey.ToString();
                     break;
+
                 case OptionsEnum.OpenSettings:
                     _buttonName = config.OpenSettings.ToString();
                     break;
+
                 case OptionsEnum.ToggleBubbles:
                     _buttonName = config.ToggleBubbles.ToString();
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
             }
@@ -55,7 +58,7 @@ namespace DailyTasksReport.UI
 
         private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
         {
-            if (e.Button == (SButton) Keys.Escape)
+            if (e.Button == (SButton)Keys.Escape)
             {
                 Game1.playSound("bigDeSelect");
             }
@@ -66,12 +69,15 @@ namespace DailyTasksReport.UI
                     case OptionsEnum.OpenReportKey:
                         _config.OpenReportKey = e.Button;
                         break;
+
                     case OptionsEnum.OpenSettings:
                         _config.OpenSettings = e.Button;
                         break;
+
                     case OptionsEnum.ToggleBubbles:
                         _config.ToggleBubbles = e.Button;
                         break;
+
                     default:
                         throw new ArgumentOutOfRangeException($"Option {_option} is not possible on a InputListener.");
                 }

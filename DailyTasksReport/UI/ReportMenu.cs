@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
 
 namespace DailyTasksReport.UI
 {
-    public class ReportMenu : IClickableMenu
+    public sealed class ReportMenu : IClickableMenu
     {
-        private readonly Texture2D _letterTexture = Game1.temporaryContent.Load<Texture2D>("LooseSprites\\letterBG");
+        private readonly Texture2D _letterTexture = Game1.temporaryContent.Load<Texture2D>(@"LooseSprites\letterBG");
         private ClickableTextureComponent _backButton;
         private ClickableTextureComponent _forwardButton;
         private ClickableTextureComponent _settingsButton;
@@ -24,8 +24,8 @@ namespace DailyTasksReport.UI
         private float _scale;
 
         public ReportMenu(ModEntry parent, string text, bool skipAnimation = false) : base(
-            (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).X,
-            (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).Y,
+            (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).X,
+            (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom, 180 * Game1.pixelZoom).Y,
             320 * Game1.pixelZoom, 180 * Game1.pixelZoom, true)
         {
             _parent = parent;
@@ -58,7 +58,7 @@ namespace DailyTasksReport.UI
             _settingsButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
                     12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
-                (float) (Game1.pixelZoom * 0.85))
+                (float)(Game1.pixelZoom * 0.85))
             {
                 myID = 103,
                 upNeighborID = 100,
@@ -74,7 +74,7 @@ namespace DailyTasksReport.UI
 
             if (!Game1.options.SnappyMenus || !Game1.options.gamepadControls) return;
             allClickableComponents =
-                new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
+                new List<ClickableComponent> { upperRightCloseButton, _backButton, _forwardButton, _settingsButton };
             snapToDefaultClickableComponent();
         }
 
@@ -86,9 +86,9 @@ namespace DailyTasksReport.UI
 
         public override void gameWindowSizeChanged(Rectangle oldBounds, Rectangle newBounds)
         {
-            xPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom,
+            xPositionOnScreen = (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom,
                                                                                      180 * Game1.pixelZoom).X;
-            yPositionOnScreen = (int) Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom,
+            yPositionOnScreen = (int)Utility.getTopLeftPositionForCenteringOnScreen(320 * Game1.pixelZoom,
                                                                                      180 * Game1.pixelZoom).Y;
 
             _backButton = new ClickableTextureComponent(
@@ -114,7 +114,7 @@ namespace DailyTasksReport.UI
             _settingsButton = new ClickableTextureComponent(
                 new Rectangle(xPositionOnScreen + width - 9 * Game1.pixelZoom, yPositionOnScreen + Game1.pixelZoom * 14,
                     12 * Game1.pixelZoom, 12 * Game1.pixelZoom), Game1.mouseCursors, new Rectangle(366, 372, 17, 17),
-                (float) (Game1.pixelZoom * 0.85))
+                (float)(Game1.pixelZoom * 0.85))
             {
                 myID = 103,
                 upNeighborID = 100,
@@ -129,22 +129,26 @@ namespace DailyTasksReport.UI
             if (!Game1.options.SnappyMenus) return;
 
             allClickableComponents =
-                new List<ClickableComponent> {upperRightCloseButton, _backButton, _forwardButton, _settingsButton};
+                new List<ClickableComponent> { upperRightCloseButton, _backButton, _forwardButton, _settingsButton };
 
             switch (currentlySnappedComponent.myID)
             {
                 case 100:
                     currentlySnappedComponent = upperRightCloseButton;
                     break;
+
                 case 101:
                     currentlySnappedComponent = _backButton;
                     break;
+
                 case 102:
                     currentlySnappedComponent = _forwardButton;
                     break;
+
                 case 103:
                     currentlySnappedComponent = _settingsButton;
                     break;
+
                 default:
                     snapToDefaultClickableComponent();
                     break;
@@ -161,9 +165,13 @@ namespace DailyTasksReport.UI
                     --_page;
                     Game1.playSound("shwip");
                     break;
+
                 case Buttons.RightTrigger when _page < _mailMessage.Count - 1:
                     ++_page;
                     Game1.playSound("shwip");
+                    break;
+
+                default:
                     break;
             }
         }
@@ -223,21 +231,21 @@ namespace DailyTasksReport.UI
             base.update(time);
             if (_scale < 1.0f)
             {
-                _scale = (float) (_scale + time.ElapsedGameTime.Milliseconds * (3.0 / 1000.0));
+                _scale = (float)(_scale + time.ElapsedGameTime.Milliseconds * (3.0 / 1000.0));
                 if (_scale >= 1.0f)
                     _scale = 1.0f;
             }
             if (_page >= _mailMessage.Count - 1 ||
                 _forwardButton.containsPoint(Game1.getOldMouseX(), Game1.getOldMouseY()))
                 return;
-            _forwardButton.scale = (float) (4.0 + Math.Sin(time.TotalGameTime.Milliseconds / (64.0 * Math.PI)) / 1.5);
+            _forwardButton.scale = (float)(4.0 + Math.Sin(time.TotalGameTime.Milliseconds / (64.0 * Math.PI)) / 1.5);
         }
 
         public override void receiveKeyPress(Keys key)
         {
             base.receiveKeyPress(key);
 
-            if ((SButton) key == _parent.Config.OpenReportKey && readyToClose())
+            if ((SButton)key == _parent.Config.OpenReportKey && readyToClose())
             {
                 if (_firstKeyEvent)
                 {
@@ -256,7 +264,7 @@ namespace DailyTasksReport.UI
                 --_page;
                 Game1.playSound("shwip");
             }
-            else if ((SButton) key == _parent.Config.OpenSettings)
+            else if ((SButton)key == _parent.Config.OpenSettings)
             {
                 SettingsMenu.OpenMenu(_parent);
             }

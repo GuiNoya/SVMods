@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
 
 namespace DailyTasksReport.UI
 {
@@ -12,25 +12,24 @@ namespace DailyTasksReport.UI
     {
         private readonly ModConfig _config;
         private readonly OptionsEnum _option;
-        
+
         private int _selectedQuality;
         private bool _isMouseOnMinusButton;
         private bool _isMouseOnPlusButton;
-        private Rectangle _minusButton;
-        private Rectangle _plusButton;
+        private readonly Rectangle _minusButton;
+        private readonly Rectangle _plusButton;
         private readonly List<string> _displayOptions;
-
 
         private static readonly Rectangle MinusButtonSource = new Rectangle(177, 345, 7, 8);
         private static readonly Rectangle PlusButtonSource = new Rectangle(184, 345, 7, 8);
-        
+
         public QualityOption(string label, OptionsEnum whichOption, ModConfig config, int itemLevel = 0, int choices = -1) :
-            base(label, -1, -1, 7 * Game1.pixelZoom, 7 * Game1.pixelZoom, (int) whichOption)
+            base(label, -1, -1, 7 * Game1.pixelZoom, 7 * Game1.pixelZoom, (int)whichOption)
         {
             _config = config;
             _option = whichOption;
             bounds.X += itemLevel * Game1.pixelZoom * 7;
-            this.whichOption = (int) whichOption;
+            this.whichOption = (int)whichOption;
 
             if (choices == 0)
             {
@@ -38,19 +37,18 @@ namespace DailyTasksReport.UI
             }
             if (choices < 0)
             {
-                _displayOptions = new List<string> {"None", "Silver", "Gold", "Iridium"};
+                _displayOptions = new List<string> { "None", "Silver", "Gold", "Iridium" };
             }
             else
             {
-                _displayOptions = new List<string> {"None"};
+                _displayOptions = new List<string> { "None" };
                 for (var i = 1; i <= choices; i++)
                     _displayOptions.Add(i.ToString());
             }
 
-
-            var biggestOption = (int) Game1.dialogueFont.MeasureString(_displayOptions[0]).X + 4 * Game1.pixelZoom;
+            var biggestOption = (int)Game1.dialogueFont.MeasureString(_displayOptions[0]).X + 4 * Game1.pixelZoom;
             foreach (var displayOption in _displayOptions)
-                biggestOption = Math.Max((int) Game1.dialogueFont.MeasureString(displayOption).X + 4 * Game1.pixelZoom,
+                biggestOption = Math.Max((int)Game1.dialogueFont.MeasureString(displayOption).X + 4 * Game1.pixelZoom,
                     biggestOption);
 
             bounds = new Rectangle(bounds.X, bounds.Y, 7 * Game1.pixelZoom * 2 + biggestOption, 8 * Game1.pixelZoom);
@@ -68,6 +66,7 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.Cask:
                     _selectedQuality = _config.Cask == 4 ? 3 : _config.Cask;
                     break;
+
                 case OptionsEnum.FruitTrees:
                     _selectedQuality = _config.FruitTrees;
                     break;
@@ -105,6 +104,7 @@ namespace DailyTasksReport.UI
                 case OptionsEnum.Cask:
                     _config.Cask = _selectedQuality == 3 ? 4 : _selectedQuality;
                     break;
+
                 case OptionsEnum.FruitTrees:
                     _config.FruitTrees = _selectedQuality;
                     break;

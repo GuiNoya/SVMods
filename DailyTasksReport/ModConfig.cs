@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using StardewModdingAPI;
+using System.Collections.Generic;
 
 namespace DailyTasksReport
 {

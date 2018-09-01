@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using System.Collections.Generic;
 
 namespace DailyTasksReport.Tasks
 {
@@ -11,8 +11,11 @@ namespace DailyTasksReport.Tasks
         protected bool Enabled = true;
 
         protected abstract void FirstScan();
+
         public abstract void Clear();
+
         public abstract string GeneralInfo(out int usedLines);
+
         public abstract string DetailedInfo(out int usedLines, out bool skipNextPage);
 
         public virtual void FinishedReport()
@@ -32,7 +35,7 @@ namespace DailyTasksReport.Tasks
         protected static void DrawBubble(SpriteBatch b, Texture2D texture, Rectangle sourceRectangle,
             Vector2 destinationPosition)
         {
-            var r = new Rectangle((int) destinationPosition.X, (int) destinationPosition.Y, Game1.tileSize * 3 / 4,
+            var r = new Rectangle((int)destinationPosition.X, (int)destinationPosition.Y, Game1.tileSize * 3 / 4,
                 Game1.tileSize * 3 / 4);
             b.Draw(Game1.mouseCursors, r, new Rectangle(141, 465, 20, 24), Color.White * 0.75f);
             r.Offset(r.Width / 4, r.Height / 6);
@@ -44,8 +47,8 @@ namespace DailyTasksReport.Tasks
         protected static void DrawBubble2Icons(SpriteBatch b, Texture2D texture1, Rectangle sourceRectangle1,
             Texture2D texture2, Rectangle sourceRectangle2, Vector2 destinationPosition)
         {
-            var r = new Rectangle((int) destinationPosition.X - Game1.tileSize / 4,
-                (int) destinationPosition.Y,
+            var r = new Rectangle((int)destinationPosition.X - Game1.tileSize / 4,
+                (int)destinationPosition.Y,
                 Game1.tileSize,
                 Game1.tileSize * 3 / 4);
             b.Draw(Game1.mouseCursors, r, new Rectangle(141, 465, 20, 24), Color.White * 0.75f);

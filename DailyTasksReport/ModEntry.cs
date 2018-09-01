@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using DailyTasksReport.Tasks;
+﻿using DailyTasksReport.Tasks;
 using DailyTasksReport.UI;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using System;
+using System.Collections.Generic;
 
 namespace DailyTasksReport
 {
@@ -24,6 +24,7 @@ namespace DailyTasksReport
         /*********
         ** Public methods
         *********/
+
         /// <inheritdoc />
         public override void Entry(IModHelper helper)
         {
@@ -39,7 +40,7 @@ namespace DailyTasksReport
             SaveEvents.AfterLoad += SaveEvents_AfterLoad;
             TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
 
-            // In-game Events 
+            // In-game Events
             InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;

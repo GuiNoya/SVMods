@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using DailyTasksReport.Tasks;
+using System.Collections.Generic;
 using System.Text;
-using DailyTasksReport.Tasks;
 
 namespace DailyTasksReport
 {

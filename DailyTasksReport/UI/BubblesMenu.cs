@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
+using System.Collections.Generic;
 
 namespace DailyTasksReport.UI
 {
@@ -63,7 +63,7 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Casks with lower quality items", OptionsEnum.DrawCask, config));
 
             if (!Game1.options.snappyMenus || !Game1.options.gamepadControls) return;
-            allClickableComponents = new List<ClickableComponent>(_slots) {upperRightCloseButton};
+            allClickableComponents = new List<ClickableComponent>(_slots) { upperRightCloseButton };
             currentlySnappedComponent = allClickableComponents[0];
             snapCursorToCurrentSnappedComponent();
         }
@@ -124,7 +124,7 @@ namespace DailyTasksReport.UI
 
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             drawTextureBox(Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
-            var yTitleOffset = (int) (SpriteText.getHeightOfString("Bubble Settings") * 1.6);
+            var yTitleOffset = (int)(SpriteText.getHeightOfString("Bubble Settings") * 1.6);
             SpriteText.drawStringWithScrollCenteredAt(b, "Bubble Settings", xPositionOnScreen + width / 2,
                 yPositionOnScreen - yTitleOffset);
 

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using DailyTasksReport.UI;
+﻿using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Objects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using SObject = StardewValley.Object;
 
 namespace DailyTasksReport.Tasks
@@ -25,6 +24,7 @@ namespace DailyTasksReport.Tasks
 
         private static readonly Dictionary<GameLocation, List<Vector2>> Machines =
             new Dictionary<GameLocation, List<Vector2>>();
+
         private static readonly Dictionary<GameLocation, List<Vector2>> CrabPots =
             new Dictionary<GameLocation, List<Vector2>>();
 
@@ -34,7 +34,7 @@ namespace DailyTasksReport.Tasks
             _id = id;
 
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
-            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            LocationEvents.ObjectsChanged += LocationEvents_ObjectsChanged;
         }
 
         private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
@@ -44,13 +44,16 @@ namespace DailyTasksReport.Tasks
                 case ObjectsTaskId.UncollectedCrabpots:
                     Enabled = _config.UncollectedCrabpots;
                     break;
+
                 case ObjectsTaskId.NotBaitedCrabpots:
                     _hasLuremaster = Game1.player.professions.Contains(11);
                     Enabled = _config.NotBaitedCrabpots && !_hasLuremaster;
                     break;
+
                 case ObjectsTaskId.UncollectedMachines:
                     Enabled = _config.Machines.ContainsValue(true) || _config.Cask > 0;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Object type not implemented");
             }
@@ -70,7 +73,7 @@ namespace DailyTasksReport.Tasks
                 if (location.waterTiles != null && !CrabPots.ContainsKey(location))
                     CrabPots[location] = new List<Vector2>();
 
-                foreach (var @object in location.objects)
+                foreach (var @object in location.Objects.Pairs)
                     if (_config.Machines.ContainsKey(@object.Value.name) || @object.Value is Cask)
                         Machines[location].Add(@object.Key);
                     else if (@object.Value is CrabPot)
@@ -80,65 +83,46 @@ namespace DailyTasksReport.Tasks
 
                 foreach (var building in farm.buildings)
                 {
-                    if (building.indoors == null) continue;
+                    var indoors = building.indoors.Value;
+                    if (indoors == null) continue;
 
-                    var indoors = building.indoors;
                     if (!Machines.ContainsKey(indoors))
                         Machines[indoors] = new List<Vector2>();
 
-                    foreach (var @object in indoors.objects)
+                    foreach (var @object in indoors.Objects.Pairs)
                         if (_config.Machines.ContainsKey(@object.Value.name))
                             Machines[indoors].Add(@object.Key);
                 }
             }
         }
 
-        private static void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
-        {
-            Game1.currentLocation.objects.CollectionChanged -= ObjectChangedEvent;
-        }
-
-        public override void OnDayStarted()
-        {
-            LocationEvents.CurrentLocationChanged -= LocationEvents_CurrentLocationChanged;
-            base.OnDayStarted();
-            LocationEvents.CurrentLocationChanged += LocationEvents_CurrentLocationChanged;
-        }
-
-        private static void LocationEvents_CurrentLocationChanged(object sender, EventArgsCurrentLocationChanged e)
-        {
-            if (e.PriorLocation != null)
-                e.PriorLocation.objects.CollectionChanged -= ObjectChangedEvent;
-            if (e.NewLocation != null)
-                e.NewLocation.objects.CollectionChanged += ObjectChangedEvent;
-        }
-
-        private static void ObjectChangedEvent(object sender, NotifyCollectionChangedEventArgs e)
+        private static void LocationEvents_ObjectsChanged(object sender, EventArgsLocationObjectsChanged e)
         {
             Vector2 pos;
+            SObject obj;
             var loc = Game1.currentLocation;
-            if (Game1.currentLocation is MineShaft || Game1.newDay) return;
-            
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    pos = (Vector2) e.NewItems[0];
-                    var obj = loc.objects[pos];
-                    if (obj == null) return;
-                    if ((_config.Machines.ContainsKey(obj.name) || obj is Cask) &&
-                        Machines.TryGetValue(loc, out var list))
-                        list.Add(pos);
-                    else if (obj is CrabPot && CrabPots.TryGetValue(loc, out list))
-                        list.Add(pos);
-                    break;
+            if (e.Location is MineShaft || Game1.newDay) return;
 
-                case NotifyCollectionChangedAction.Remove:
-                    pos = (Vector2) e.OldItems[0];
-                    if (Machines.TryGetValue(loc, out list))
-                        list.Remove(pos);
-                    if (CrabPots.TryGetValue(loc, out list))
-                        list.Remove(pos);
-                    break;
+            foreach (var item in e.Added)
+            {
+                pos = item.Key;
+                obj = item.Value;
+                if ((_config.Machines.ContainsKey(obj.name) || obj is Cask) &&
+                        Machines.TryGetValue(loc, out var list))
+                    list.Add(pos);
+                else if (obj is CrabPot && CrabPots.TryGetValue(loc, out list))
+                    list.Add(pos);
+            }
+
+            foreach (var item in e.Removed)
+            {
+                pos = item.Key;
+                obj = item.Value;
+                if (Machines.TryGetValue(loc, out var list))
+                    list.Remove(pos);
+                if (CrabPots.TryGetValue(loc, out list))
+                    list.Remove(pos);
+                break;
             }
         }
 
@@ -156,39 +140,42 @@ namespace DailyTasksReport.Tasks
             {
                 case ObjectsTaskId.UncollectedCrabpots:
                     count = (from pair in CrabPots
-                        from pos in pair.Value
-                        where (pair.Key.objects[pos] as CrabPot)?.heldObject != null
-                        select 1).Count();
+                             from pos in pair.Value
+                             where (pair.Key.objects[pos] as CrabPot)?.heldObject.Value != null
+                             select 1).Count();
                     if (count > 0)
                     {
                         _anyObject = true;
                         return $"Crabpots ready to collect: {count}^";
                     }
                     break;
+
                 case ObjectsTaskId.NotBaitedCrabpots:
                     if (_hasLuremaster) break;
                     count = (from pair in CrabPots
-                        from pos in pair.Value
-                        where (pair.Key.objects[pos] as CrabPot)?.bait == null
-                        select 1).Count();
+                             from pos in pair.Value
+                             where (pair.Key.objects[pos] as CrabPot)?.bait.Value == null
+                             select 1).Count();
                     if (count > 0)
                     {
                         _anyObject = true;
                         return $"Crabpots not baited: {count}^";
                     }
                     break;
+
                 case ObjectsTaskId.UncollectedMachines:
                     SObject machine;
                     count = (from pair in Machines
-                        from pos in pair.Value
-                        where pair.Key.objects.TryGetValue(pos, out machine) && MachineReady(machine)
-                        select 1).Count();
+                             from pos in pair.Value
+                             where pair.Key.objects.TryGetValue(pos, out machine) && MachineReady(machine)
+                             select 1).Count();
                     if (count > 0)
                     {
                         _anyObject = true;
                         return $"Uncollected machines: {count}^";
                     }
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Object type not implemented");
             }
@@ -199,8 +186,13 @@ namespace DailyTasksReport.Tasks
 
         private static bool MachineReady(SObject o)
         {
-            return o != null && _config.Machines.TryGetValue(o.name, out var enabled) && enabled && o.readyForHarvest ||
-                   o is Cask cask && cask.heldObject?.quality >= _config.Cask;
+            if (o != null)
+            {
+                return
+                    (_config.Machines.TryGetValue(o.Name, out var enabled) && enabled && o.readyForHarvest.Value) ||
+                    (o is Cask cask && cask.heldObject.Value?.Quality >= _config.Cask);
+            }
+            return false;
         }
 
         public override string DetailedInfo(out int usedLines, out bool skipNextPage)
@@ -217,18 +209,21 @@ namespace DailyTasksReport.Tasks
                 case ObjectsTaskId.UncollectedCrabpots:
                     stringBuilder.Append("Uncollected crabpots:^");
                     usedLines++;
-                    EchoForCrabpots(ref stringBuilder, ref usedLines, c => c.heldObject != null);
+                    EchoForCrabpots(ref stringBuilder, ref usedLines, c => c.heldObject.Value != null);
                     break;
+
                 case ObjectsTaskId.NotBaitedCrabpots:
                     stringBuilder.Append("Crabpots still not baited:^");
                     usedLines++;
-                    EchoForCrabpots(ref stringBuilder, ref usedLines, c => c.bait == null);
+                    EchoForCrabpots(ref stringBuilder, ref usedLines, c => c.bait.Value == null);
                     break;
+
                 case ObjectsTaskId.UncollectedMachines:
                     stringBuilder.Append("Machines ready to collect:^");
                     usedLines++;
                     EchoForMachines(ref stringBuilder, ref usedLines);
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Object type not implemented");
             }
@@ -240,32 +235,36 @@ namespace DailyTasksReport.Tasks
             Predicate<CrabPot> predicate)
         {
             foreach (var location in CrabPots)
-            foreach (var position in location.Value)
-            {
-                if (!(location.Key.objects[position] is CrabPot cp) || !predicate.Invoke(cp)) continue;
-                stringBuilder.Append($"{location.Key.name} ({position.X}, {position.Y})^");
-                usedLines++;
-            }
+                foreach (var position in location.Value)
+                {
+                    if (!(location.Key.objects[position] is CrabPot cp) || !predicate.Invoke(cp)) continue;
+                    stringBuilder.Append($"{location.Key.Name} ({position.X}, {position.Y})^");
+                    usedLines++;
+                }
         }
 
         private static void EchoForMachines(ref StringBuilder stringBuilder, ref int usedLines)
         {
             foreach (var location in Machines)
-            foreach (var position in location.Value)
-            {
-                if (!location.Key.objects.TryGetValue(position, out var machine)) continue;
-                if (!MachineReady(machine)) continue;
+                foreach (var position in location.Value)
+                {
+                    if (!location.Key.objects.TryGetValue(position, out var machine)) continue;
+                    if (!MachineReady(machine)) continue;
 
-                var quality = "";
-                if (machine is Cask cask)
-                    quality = cask.heldObject.quality == 1 ? "Silver "
-                        : cask.heldObject.quality == 2 ? "Gold "
-                        : cask.heldObject.quality == 4 ? "Iridium "
-                        : "";
-                stringBuilder.Append(
-                    $"{machine.name} with {quality}{machine.heldObject.name} at {location.Key.name} ({position.X}, {position.Y})^");
-                usedLines++;
-            }
+                    var heldObject = machine.heldObject.Value;
+
+                    var quality = "";
+                    if (machine is Cask cask)
+                    {
+                        quality = heldObject.Quality == 1 ? "Silver "
+                            : heldObject.Quality == 2 ? "Gold "
+                            : heldObject.Quality == 4 ? "Iridium "
+                            : "";
+                    }
+                    stringBuilder.Append(
+                        $"{machine.name} with {quality}{heldObject.Name} at {location.Key.Name} ({position.X}, {position.Y})^");
+                    usedLines++;
+                }
         }
 
         public override void Draw(SpriteBatch b)
@@ -277,28 +276,32 @@ namespace DailyTasksReport.Tasks
             var yStart = Game1.viewport.Y / Game1.tileSize;
             var yLimit = (Game1.viewport.Y + Game1.viewport.Height) / Game1.tileSize + 1;
             for (; x <= xLimit; ++x)
-            for (var y = yStart; y <= yLimit; ++y)
-            {
-                if (!Game1.currentLocation.objects.TryGetValue(new Vector2(x, y), out var o)) continue;
-
-                var v = new Vector2(o.tileLocation.X * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8f,
-                    o.tileLocation.Y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 5 / 4f);
-
-                switch (o)
+                for (var y = yStart; y <= yLimit; ++y)
                 {
-                    case Cask cask when _config.DrawBubbleCask && cask.heldObject?.quality > 0 &&
-                                        cask.heldObject.quality >= _config.Cask &&
-                                        cask.heldObject.quality < 4:
-                        DrawBubble(b, Game1.objectSpriteSheet,
-                            Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet,
-                                cask.heldObject.parentSheetIndex, 16, 16), v);
-                        break;
+                    if (!Game1.currentLocation.objects.TryGetValue(new Vector2(x, y), out var o)) continue;
 
-                    case CrabPot cp when _config.DrawBubbleCrabpotsNotBaited && cp.bait == null && !_hasLuremaster:
-                        DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(209, 450, 13, 13), v);
-                        break;
+                    var v = new Vector2(o.TileLocation.X * Game1.tileSize - Game1.viewport.X + Game1.tileSize / 8f,
+                        o.TileLocation.Y * Game1.tileSize - Game1.viewport.Y - Game1.tileSize * 5 / 4f);
+
+                    var heldObject = o.heldObject.Value;
+                    switch (o)
+                    {
+                        case Cask cask when _config.DrawBubbleCask && heldObject?.Quality > 0 &&
+                                            heldObject.Quality >= _config.Cask &&
+                                            heldObject.Quality < 4:
+                            DrawBubble(b, Game1.objectSpriteSheet,
+                                Game1.getSourceRectForStandardTileSheet(Game1.objectSpriteSheet,
+                                    heldObject.ParentSheetIndex, 16, 16), v);
+                            break;
+
+                        case CrabPot cp when _config.DrawBubbleCrabpotsNotBaited && cp.bait.Value == null && !_hasLuremaster:
+                            DrawBubble(b, Game1.objectSpriteSheet, new Rectangle(209, 450, 13, 13), v);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-            }
         }
 
         public override void Clear()
@@ -308,13 +311,16 @@ namespace DailyTasksReport.Tasks
                 case ObjectsTaskId.UncollectedCrabpots:
                     Enabled = _config.UncollectedCrabpots;
                     break;
+
                 case ObjectsTaskId.NotBaitedCrabpots:
                     _hasLuremaster = Game1.player.professions.Contains(11);
                     Enabled = _config.NotBaitedCrabpots && !_hasLuremaster;
                     break;
+
                 case ObjectsTaskId.UncollectedMachines:
                     Enabled = _config.Machines.ContainsValue(true) || _config.Cask > 0;
                     break;
+
                 default:
                     throw new ArgumentOutOfRangeException($"Object type not implemented");
             }

@@ -1,11 +1,12 @@
-﻿using System;
-using System.Text;
-using DailyTasksReport.UI;
+﻿using DailyTasksReport.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
+using System;
+using System.Linq;
+using System.Text;
 
 namespace DailyTasksReport.Tasks
 {
@@ -31,14 +32,14 @@ namespace DailyTasksReport.Tasks
 
         protected override void FirstScan()
         {
-            _farm = Game1.locations.Find(l => l is Farm) as Farm;
+            _farm = Game1.locations.OfType<Farm>().FirstOrDefault();
 
-            _pet = _farm?.characters.Find(npc => npc is Pet) as Pet;
+            _pet = _farm?.characters.OfType<Pet>().FirstOrDefault();
 
             if (_pet != null) return;
 
-            var location = Game1.locations.Find(l => l is FarmHouse);
-            _pet = location.characters.Find(npc => npc is Pet) as Pet;
+            var location = Game1.locations.OfType<FarmHouse>().FirstOrDefault();
+            _pet = location.characters.OfType<Pet>().FirstOrDefault();
         }
 
         private void UpdateInfo()
@@ -72,12 +73,12 @@ namespace DailyTasksReport.Tasks
         public override string GeneralInfo(out int usedLines)
         {
             usedLines = 0;
-            
+
             UpdateInfo();
-            
+
             if (!Enabled || _pet == null)
                 return "";
-            
+
             var stringBuilder = new StringBuilder();
 
             if (_config.UnpettedPet && !_petPetted)

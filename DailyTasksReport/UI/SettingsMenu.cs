@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
 
 namespace DailyTasksReport.UI
 {
@@ -75,7 +75,6 @@ namespace DailyTasksReport.UI
                 _slots.Add(clickableComponent);
             }
 
-
             // Add options
             _options.Add(new InputListener("Open Report Key", OptionsEnum.OpenReportKey, _slots[0].bounds.Width,
                 parent.Config));
@@ -143,7 +142,7 @@ namespace DailyTasksReport.UI
             ReportConfigChanged += SettingsMenu_ReportConfigChanged;
 
             if (!Game1.options.snappyMenus || !Game1.options.gamepadControls) return;
-            allClickableComponents = new List<ClickableComponent>(_slots) {upperRightCloseButton};
+            allClickableComponents = new List<ClickableComponent>(_slots) { upperRightCloseButton };
             currentlySnappedComponent = allClickableComponents[0];
             snapCursorToCurrentSnappedComponent();
         }
@@ -170,12 +169,15 @@ namespace DailyTasksReport.UI
                         Game1.setMousePosition(currentlySnappedComponent.bounds.Right - Game1.tileSize * 3 / 4,
                             currentlySnappedComponent.bounds.Center.Y);
                         break;
+
                     case Checkbox cb:
                         cb.CursorAboveOption();
                         break;
+
                     case QualityOption qo:
                         qo.CursorAboveOption();
                         break;
+
                     default:
                         Game1.setMousePosition(currentlySnappedComponent.bounds.Left + Game1.tileSize * 3 / 4,
                             currentlySnappedComponent.bounds.Center.Y);
@@ -240,7 +242,7 @@ namespace DailyTasksReport.UI
 
             b.Draw(Game1.fadeToBlackRect, Game1.graphics.GraphicsDevice.Viewport.Bounds, Color.Black * 0.75f);
             drawTextureBox(Game1.spriteBatch, xPositionOnScreen, yPositionOnScreen, width, height, Color.White);
-            var yTitleOffset = (int) (SpriteText.getHeightOfString("Daily Tasks Report Settings") * 1.6);
+            var yTitleOffset = (int)(SpriteText.getHeightOfString("Daily Tasks Report Settings") * 1.6);
             SpriteText.drawStringWithScrollCenteredAt(b, "Daily Tasks Settings", xPositionOnScreen + width / 2,
                 yPositionOnScreen - yTitleOffset);
 
@@ -312,7 +314,6 @@ namespace DailyTasksReport.UI
             if (upperRightCloseButton != null && readyToClose() && upperRightCloseButton.containsPoint(x, y) ||
                 !isWithinBounds(x, y))
             {
-
                 if (playSound)
                     Game1.playSound("bigDeSelect");
                 ReportConfigChanged -= SettingsMenu_ReportConfigChanged;
@@ -353,8 +354,8 @@ namespace DailyTasksReport.UI
 
         private void AdjustScrollBarPosition()
         {
-            _scrollBar.bounds.Y = (int) (_scrollBarRunner.Y +
-                                         (double) (_scrollBarRunner.Height - _scrollBar.bounds.Height) /
+            _scrollBar.bounds.Y = (int)(_scrollBarRunner.Y +
+                                         (double)(_scrollBarRunner.Height - _scrollBar.bounds.Height) /
                                          (_options.Count - ItemsPerPage) * _currentIndex);
         }
 
@@ -372,8 +373,12 @@ namespace DailyTasksReport.UI
                     case Checkbox cb:
                         cb.RefreshStatus();
                         break;
+
                     case QualityOption qo:
                         qo.RefreshStatus();
+                        break;
+
+                    default:
                         break;
                 }
         }
