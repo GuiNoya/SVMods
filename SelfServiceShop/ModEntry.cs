@@ -148,28 +148,30 @@ namespace SelfServiceShop
             if (Game1.player.daysUntilHouseUpgrade.Value < 0 && !Game1.getFarm().isThereABuildingUnderConstruction() &&
                 Game1.player.currentUpgrade == null)
             {
-                Response[] answerChoices;
-                answerChoices = Game1.player.HouseUpgradeLevel < 3 ? new[]
+                var responseList = new List<Response>(4)
+                {
+                    new Response("Shop", Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop"))
+                };
+                if (Game1.IsMasterGame)
+                {
+                    if (Game1.player.HouseUpgradeLevel < 3)
                     {
-                        new Response("Shop",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop")),
-                        new Response("Upgrade",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_UpgradeHouse")),
-                        new Response("Construct",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Construct")),
-                        new Response("Leave",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Leave"))
-                    } : new[]
+                        responseList.Add(new Response("Upgrade", Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_UpgradeHouse")));
+                    }
+                    else if ((Game1.MasterPlayer.mailReceived.Contains("ccIsComplete") || Game1.MasterPlayer.mailReceived.Contains("JojaMember") || Game1.MasterPlayer.hasCompletedCommunityCenter())
+                        && ((Game1.getLocationFromName("Town") as Town).daysUntilCommunityUpgrade.Value <= 0 && !Game1.MasterPlayer.mailReceived.Contains("pamHouseUpgrade")))
                     {
-                        new Response("Shop",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Shop")),
-                        new Response("Construct",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Construct")),
-                        new Response("Leave",
-                            Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Leave"))
-                    };
+                        responseList.Add(new Response("CommunityUpgrade", Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_CommunityUpgrade")));
+                    }
+                }
+                else if (Game1.player.HouseUpgradeLevel < 3)
+                {
+                    responseList.Add(new Response("Upgrade", Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_UpgradeCabin")));
+                }
+                responseList.Add(new Response("Construct", Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Construct")));
+                responseList.Add(new Response("Leave", Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu_Leave")));
                 Game1.currentLocation.createQuestionDialogue(
-                    Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu"), answerChoices,
+                    Game1.content.LoadString("Strings\\Locations:ScienceHouse_CarpenterMenu"), responseList.ToArray(),
                     "carpenter");
                 return;
             }
