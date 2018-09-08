@@ -93,7 +93,7 @@ namespace DailyTasksReport.UI
             _options.Add(new Checkbox("Unwatered crops", OptionsEnum.UnwateredCrops, parent.Config));
             _options.Add(new Checkbox("Unharvested crops", OptionsEnum.UnharvestedCrops, parent.Config));
             _options.Add(new Checkbox("Dead crops", OptionsEnum.DeadCrops, parent.Config));
-            _options.Add(new QualityOption("Fruit trees", OptionsEnum.FruitTrees, parent.Config, 0, 3));
+            _options.Add(new QualityOption("Fruits in trees", OptionsEnum.FruitTrees, parent.Config, 0, 3));
             _options.Add(new Checkbox("Unpetted pet", OptionsEnum.UnpettedPet, parent.Config));
             _options.Add(new Checkbox("Unfilled pet bowl", OptionsEnum.UnfilledPetBowl, parent.Config));
             _options.Add(new Checkbox("Unpetted animals", OptionsEnum.UnpettedAnimals, parent.Config));
