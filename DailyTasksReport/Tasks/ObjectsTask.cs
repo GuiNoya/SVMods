@@ -32,9 +32,10 @@ namespace DailyTasksReport.Tasks
         {
             _config = config;
             _id = id;
-
+            ModEntry.instance.Helper.Events.World.ObjectListChanged += LocationEvents_ObjectsChanged;
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
-            LocationEvents.ObjectsChanged += LocationEvents_ObjectsChanged;
+            
+            //LocationEvents.ObjectsChanged += LocationEvents_ObjectsChanged;
         }
 
         private void SettingsMenu_ReportConfigChanged(object sender, EventArgs e)
@@ -96,7 +97,7 @@ namespace DailyTasksReport.Tasks
             }
         }
 
-        private static void LocationEvents_ObjectsChanged(object sender, EventArgsLocationObjectsChanged e)
+        private static void LocationEvents_ObjectsChanged(object sender, ObjectListChangedEventArgs e)
         {
             Vector2 pos;
             SObject obj;

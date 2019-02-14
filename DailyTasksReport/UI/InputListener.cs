@@ -52,11 +52,12 @@ namespace DailyTasksReport.UI
             if (greyedOut || _listening || !_buttonBounds.Contains(x, y))
                 return;
             _listening = true;
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            ModEntry.instance.Helper.Events.Input.ButtonPressed += InputEvents_ButtonPressed;
+            //InputEvents.ButtonPressed += InputEvents_ButtonPressed;
             Game1.playSound("breathin");
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void InputEvents_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (e.Button == (SButton)Keys.Escape)
             {
@@ -85,8 +86,10 @@ namespace DailyTasksReport.UI
                 Game1.playSound("coin");
             }
             _listening = false;
-            InputEvents.ButtonPressed -= InputEvents_ButtonPressed;
-            e.SuppressButton();
+            ModEntry.instance.Helper.Events.Input.ButtonPressed -= InputEvents_ButtonPressed;
+            //InputEvents.ButtonPressed -= InputEvents_ButtonPressed;
+            ModEntry.instance.Helper.Input.Suppress(e.Button);
+            //e.Button.SuppressButton();
         }
 
         public override void draw(SpriteBatch b, int slotX, int slotY)

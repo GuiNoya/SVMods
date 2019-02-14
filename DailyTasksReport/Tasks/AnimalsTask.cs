@@ -37,8 +37,9 @@ namespace DailyTasksReport.Tasks
 
             if (id == AnimalsTaskId.UnpettedAnimals)
             {
-                MenuEvents.MenuChanged += MenuEvents_MenuChanged;
-                MenuEvents.MenuClosed += MenuEvents_MenuClosed;
+                ModEntry.instance.Helper.Events.Display.MenuChanged += MenuEvents_MenuChanged;
+                //MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+                //MenuEvents.MenuClosed += MenuEvents_MenuClosed;
             }
         }
 
@@ -71,11 +72,11 @@ namespace DailyTasksReport.Tasks
                 ReScanUnpettedAnimals();
         }
 
-        private static void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private static void MenuEvents_MenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (e.PriorMenu is PurchaseAnimalsMenu ||
-                e.PriorMenu is NamingMenu ||
-                e.PriorMenu?.GetType().FullName == "FarmExpansion.Menus.FEPurchaseAnimalsMenu")
+            if (e.OldMenu is PurchaseAnimalsMenu ||
+                e.OldMenu is NamingMenu ||
+                e.OldMenu?.GetType().FullName == "FarmExpansion.Menus.FEPurchaseAnimalsMenu")
                 ReScanUnpettedAnimals();
         }
 

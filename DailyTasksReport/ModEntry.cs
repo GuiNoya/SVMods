@@ -5,6 +5,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace DailyTasksReport
 {
@@ -21,6 +22,7 @@ namespace DailyTasksReport
 
         internal ModConfig Config;
 
+        public static ModEntry instance;
         /*********
         ** Public methods
         *********/
@@ -29,32 +31,39 @@ namespace DailyTasksReport
         public override void Entry(IModHelper helper)
         {
             ReflectionHelper = helper.Reflection;
-
+            instance = this;
             Config = helper.ReadConfig<ModConfig>();
             if (Config.Check(Monitor))
                 helper.WriteConfig(Config);
 
             SetupTasks();
 
-            SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
-            SaveEvents.AfterLoad += SaveEvents_AfterLoad;
-            TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
+
+            helper.Events.GameLoop.ReturnedToTitle += SaveEvents_AfterReturnToTitle;
+            //SaveEvents.AfterReturnToTitle += SaveEvents_AfterReturnToTitle;
+            helper.Events.GameLoop.SaveLoaded += SaveEvents_AfterLoad;
+            //SaveEvents.AfterLoad += SaveEvents_AfterLoad;
+            helper.Events.GameLoop.DayStarted += TimeEvents_AfterDayStarted;
+            //TimeEvents.AfterDayStarted += TimeEvents_AfterDayStarted;
 
             // In-game Events
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
-            MenuEvents.MenuChanged += MenuEvents_MenuChanged;
+            helper.Events.Input.ButtonPressed += InputEvents_ButtonPressed;
+            //InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            helper.Events.Display.MenuChanged += MenuEvents_MenuChanged;
+            //MenuEvents.MenuChanged += MenuEvents_MenuChanged;
             SettingsMenu.ReportConfigChanged += SettingsMenu_ReportConfigChanged;
 
             // Draw Events
-            GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
+            helper.Events.Display.RenderingHud += GraphicsEvents_OnPreRenderHudEvent;
+            //GraphicsEvents.OnPreRenderHudEvent += GraphicsEvents_OnPreRenderHudEvent;
         }
 
-        private void SaveEvents_AfterReturnToTitle(object sender, EventArgs e)
+        private void SaveEvents_AfterReturnToTitle(object sender, ReturnedToTitleEventArgs e)
         {
             _tasks.ForEach(t => t.Clear());
         }
 
-        private void SaveEvents_AfterLoad(object sender, EventArgs e)
+        private void SaveEvents_AfterLoad(object sender, SaveLoadedEventArgs e)
         {
             // If inserted last and player has no quest, DayTimeMoneyBox will receive left click
             Game1.onScreenMenus.Insert(0, new ReportButton(this, OpenReport));
@@ -83,7 +92,7 @@ namespace DailyTasksReport
             _tasks.Add(new ObjectsTask(Config, ObjectsTaskId.UncollectedMachines));
         }
 
-        private void TimeEvents_AfterDayStarted(object sender, EventArgs e)
+        private void TimeEvents_AfterDayStarted(object sender, DayStartedEventArgs e)
         {
             _tasks.ForEach(t => t.OnDayStarted());
 
@@ -95,14 +104,14 @@ namespace DailyTasksReport
 
         // In-game events
 
-        private void MenuEvents_MenuChanged(object sender, EventArgsClickableMenuChanged e)
+        private void MenuEvents_MenuChanged(object sender, MenuChangedEventArgs e)
         {
-            if (_refreshReport && e.PriorMenu is SettingsMenu && e.NewMenu is ReportMenu)
+            if (_refreshReport && e.OldMenu is SettingsMenu && e.NewMenu is ReportMenu)
                 OpenReport(true);
             _refreshReport = false;
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void InputEvents_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
             if (!Context.IsWorldReady || !Context.IsPlayerFree || e.Button == SButton.None)
                 return;
