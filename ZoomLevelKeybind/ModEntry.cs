@@ -14,14 +14,13 @@ namespace ZoomLevelKeybind
         public override void Entry(IModHelper helper)
         {
             _config = helper.ReadConfig<ModConfig>();
-
-            InputEvents.ButtonPressed += InputEvents_ButtonPressed;
+            helper.Events.Input.ButtonPressed += InputEvents_ButtonPressed;
         }
 
-        private void InputEvents_ButtonPressed(object sender, EventArgsInput e)
+        private void InputEvents_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
-            //if (!Context.IsWorldReady)
-            //    return;
+            if (!Context.IsWorldReady)
+               return;
 
             if (e.Button.TryGetKeyboard(out Keys _))
             {
@@ -46,7 +45,7 @@ namespace ZoomLevelKeybind
                 }
 
                 if (_config.SuppressControllerButton && wasZoom)
-                    e.SuppressButton();
+                    Helper.Input.Suppress(e.Button);
             }
         }
 
