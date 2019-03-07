@@ -85,7 +85,7 @@ namespace DailyTasksReport.UI
                 Game1.playSound("coin");
             }
             _listening = false;
-            ModEntry.EventsHelper.Input.ButtonPressed += Input_ButtonPressed;
+            ModEntry.EventsHelper.Input.ButtonPressed -= Input_ButtonPressed;
             ModEntry.InputHelper.Suppress(e.Button);
         }
 
