@@ -89,7 +89,7 @@ namespace DailyTasksReport.UI
             ModEntry.InputHelper.Suppress(e.Button);
         }
 
-        public override void draw(SpriteBatch b, int slotX, int slotY)
+        public override void draw(SpriteBatch b, int slotX, int slotY, IClickableMenu context = null)
         {
             if (_buttonName.Length > 0 || whichOption == -1)
                 if (whichOption == -1)
