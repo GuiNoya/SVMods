@@ -42,6 +42,18 @@ namespace DailyTasksReport.Tasks
             _pet = location.characters.OfType<Pet>().FirstOrDefault();
         }
 
+        private bool IsPetPetted()
+        {
+            if (_pet == null) return false;
+            return _pet.grantedFriendshipForPet.Value;
+        }
+
+        private bool IsPetBowlFilled()
+        {
+            if (_farm == null) return false;
+            return _farm.petBowlWatered.Value;
+        }
+
         private void UpdateInfo()
         {
             if (_pet == null)
@@ -51,8 +63,8 @@ namespace DailyTasksReport.Tasks
                     return;
             }
 
-            _petPetted = ModEntry.ReflectionHelper.GetField<bool>(_pet, "wasPetToday").GetValue();
-            _petBowlFilled = _farm.getTileIndexAt(54, 7, "Buildings") == 1939;
+            _petPetted = IsPetPetted();
+            _petBowlFilled = IsPetBowlFilled();
 
             Enabled = Enabled && !(_petBowlFilled && _petPetted);
         }
@@ -62,7 +74,7 @@ namespace DailyTasksReport.Tasks
             if (!_config.DrawBubbleUnpettedPet || _pet == null || _pet.currentLocation != Game1.currentLocation ||
                 !(Game1.currentLocation is Farm) && !(Game1.currentLocation is FarmHouse)) return;
 
-            _petPetted = ModEntry.ReflectionHelper.GetField<bool>(_pet, "wasPetToday").GetValue();
+            _petPetted = IsPetPetted();
             if (_petPetted) return;
 
             var v = new Vector2(_pet.getStandingX() - Game1.viewport.X - Game1.tileSize * 0.3f,

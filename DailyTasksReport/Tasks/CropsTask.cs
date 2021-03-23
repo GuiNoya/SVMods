@@ -117,9 +117,6 @@ namespace DailyTasksReport.Tasks
             foreach (var pair in location.terrainFeatures.Pairs)
                 if (pair.Value is FruitTree tree && tree.fruitsOnTree.Value > 0)
                     FruitTrees[2].Add(new Tuple<Vector2, FruitTree>(pair.Key, tree));
-
-
-
         }
 
         public override string GeneralInfo(out int usedLines)
