@@ -20,16 +20,27 @@ namespace ZoomLevelKeybind
 
         private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
         {
+            var wasZoom = false;
+
             if (e.Button.TryGetKeyboard(out Keys _))
             {
                 if (e.Button == _config.IncreaseZoomKey)
+                {
                     IncreaseZoom();
+                    wasZoom = true;
+                }
                 else if (e.Button == _config.DecreaseZoomKey)
+                {
                     DecreaseZoom();
+                    wasZoom = true;
+                }
+
+                if ( wasZoom)
+                    Helper.Input.Suppress(e.Button);
+                
             }
             else if (e.Button.TryGetController(out Buttons _))
             {
-                var wasZoom = false;
 
                 if (e.Button == _config.IncreaseZoomButton)
                 {

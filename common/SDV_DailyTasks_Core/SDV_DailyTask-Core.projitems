@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>9284ed39-2e56-47e0-92bf-ea91a927444c</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SDV_DailyTask_Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)I18n\I18n.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModEntry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Report.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\AnimalsTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\CropsTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\FarmCaveTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\MiscTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\ObjectsTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\PetTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\TerrainTask.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\BubblesMenu.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Checkbox.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\InputListener.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\OptionsEnum.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\QualityOption.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\ReportButton.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\ReportMenu.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\SettingsMenu.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)I18n\default.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+</Project>
