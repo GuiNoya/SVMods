@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDV_DailyTasks_TaskEngine", "SDV_DailyTasks_TaskEngine.shproj", "{0FAB322C-A71D-4748-B158-82FBA02D0248}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		SDV_DailyTasks_TaskEngine.projitems*{0fab322c-a71d-4748-b158-82fba02d0248}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15EC094E-C9DF-4AD9-98AD-287A9DFF193C}
+	EndGlobalSection
+EndGlobal

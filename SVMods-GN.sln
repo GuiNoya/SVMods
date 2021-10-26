@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2008
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DailyTasksReport", "DailyTasksReport\DailyTasksReport.csproj", "{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}"
 EndProject
@@ -9,27 +9,69 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SelfServiceShop", "SelfServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoomLevelKeybind", "ZoomLevelKeybind\ZoomLevelKeybind.csproj", "{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{93876A0A-9C28-4B49-BA74-F9B15EB19917}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDV_DailyTask-Core", "common\SDV_DailyTasks_Core\SDV_DailyTask-Core.shproj", "{9284ED39-2E56-47E0-92BF-EA91A927444C}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDV_DailyTasks_TaskEngine", "common\SDV_DailyTasks_TaskEngine\SDV_DailyTasks_TaskEngine.shproj", "{0FAB322C-A71D-4748-B158-82FBA02D0248}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DailyTaskReport64", "DailyTaskReport64\DailyTaskReport64.csproj", "{CF4D87A7-9348-4591-AE75-6E56313F8950}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		common\SDV_DailyTasks_TaskEngine\SDV_DailyTasks_TaskEngine.projitems*{0fab322c-a71d-4748-b158-82fba02d0248}*SharedItemsImports = 13
+		common\SDV_DailyTasks_Core\SDV_DailyTask-Core.projitems*{9284ed39-2e56-47e0-92bf-ea91a927444c}*SharedItemsImports = 13
+		common\SDV_DailyTasks_Core\SDV_DailyTask-Core.projitems*{9ee9e8fe-0321-45cd-82ea-85dc5b4a4172}*SharedItemsImports = 4
+		common\SDV_DailyTasks_TaskEngine\SDV_DailyTasks_TaskEngine.projitems*{9ee9e8fe-0321-45cd-82ea-85dc5b4a4172}*SharedItemsImports = 4
+		common\SDV_DailyTasks_Core\SDV_DailyTask-Core.projitems*{cf4d87a7-9348-4591-ae75-6e56313f8950}*SharedItemsImports = 5
+		common\SDV_DailyTasks_TaskEngine\SDV_DailyTasks_TaskEngine.projitems*{cf4d87a7-9348-4591-ae75-6e56313f8950}*SharedItemsImports = 5
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Debug|x86.ActiveCfg = Debug|x86
-		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Debug|x86.Build.0 = Debug|x86
+		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Debug|x86.Build.0 = Debug|Any CPU
+		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Release|x86.ActiveCfg = Release|x86
 		{9EE9E8FE-0321-45CD-82EA-85DC5B4A4172}.Release|x86.Build.0 = Release|x86
-		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Debug|x86.ActiveCfg = Debug|x86
-		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Debug|x86.Build.0 = Debug|x86
+		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Debug|x86.Build.0 = Debug|Any CPU
+		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Release|x86.ActiveCfg = Release|x86
 		{889A6A0F-D8B4-4E66-A4F3-A91B22F1B88E}.Release|x86.Build.0 = Release|x86
-		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Debug|x86.ActiveCfg = Debug|x86
-		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Debug|x86.Build.0 = Debug|x86
+		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Debug|x86.Build.0 = Debug|Any CPU
+		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Release|x86.ActiveCfg = Release|x86
 		{F6A9485E-7E1F-453A-9CE4-4E3F1AE3331D}.Release|x86.Build.0 = Release|x86
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Debug|x86.Build.0 = Debug|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Release|x86.ActiveCfg = Release|Any CPU
+		{CF4D87A7-9348-4591-AE75-6E56313F8950}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9284ED39-2E56-47E0-92BF-EA91A927444C} = {93876A0A-9C28-4B49-BA74-F9B15EB19917}
+		{0FAB322C-A71D-4748-B158-82FBA02D0248} = {93876A0A-9C28-4B49-BA74-F9B15EB19917}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6BCE7E2B-32C7-4460-BB46-0A315C7E52DD}

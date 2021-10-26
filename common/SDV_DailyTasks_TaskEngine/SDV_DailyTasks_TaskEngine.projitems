@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>0fab322c-a71d-4748-b158-82fba02d0248</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SDV_DailyTasks_TaskEngine</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Config\TaskReportConfig.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)DailyTaskHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ReportReturnItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\AnimalTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\CropTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\FarmCaveTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\MiscTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\ObjectTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\PetTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\TaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TaskEngines\TerrainTaskEngine.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\Task.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\TaskIds.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tasks\TaskItem.cs" />
+  </ItemGroup>
+</Project>

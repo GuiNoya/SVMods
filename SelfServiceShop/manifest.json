@@ -1,10 +1,10 @@
 ﻿{
 	"Name": "SelfServiceShop",
 	"Author": "GuiNoya",
-	"Version": "1.2.2",
+	"Version": "1.2.3-unofficial.1-prism99",
 	"Description": "Enables you to buy in the shop if no one is at the counter but the owner is at the location",
 	"UniqueID": "GuiNoya.SelfServiceShop",
 	"EntryDll": "SelfServiceShop.dll",
-	"MinimumApiVersion": "3.1.0",
+	"MinimumApiVersion": "3.8.0",
 	"UpdateKeys": [ "Nexus:1622" ]
 }
